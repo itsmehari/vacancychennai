@@ -1,0 +1,11 @@
+# Local / IDE
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (never commit real keys)
+.env
+.env.*
+!.env.example
