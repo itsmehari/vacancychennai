@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/*
+  Vacancy Chennai design tokens — trust + warmth, single elevation system.
+  Radius: 8 / 12 / 16 only. Cards: border + --shadow-card (no mixed heavy shadows).
+*/
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  --color-surface: #f8fafc;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-elevated: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-link: #1d4ed8;
+  --color-cta-amber: #fbbf24;
+  --color-cta-amber-hover: #f59e0b;
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #b45309;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.08);
+  --shadow-card-hover: 0 4px 12px -2px rgb(15 23 42 / 0.12);
+
+  --duration-fast: 150ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --home-section-gap: 3rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-vc-surface: var(--color-surface);
+  --color-vc-surface-muted: var(--color-surface-muted);
+  --color-vc-surface-elevated: var(--color-surface-elevated);
+  --color-vc-border: var(--color-border);
+  --color-vc-text: var(--color-text);
+  --color-vc-text-muted: var(--color-text-muted);
+  --color-vc-accent: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
