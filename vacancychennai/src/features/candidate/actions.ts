@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { unlockCandidateResume } from "@/features/core/mock-db";
 import {
   addAudit,
+  getCandidateResumeFileKey,
   listLocations,
   unlockCandidateResumeInDb,
   upsertCandidateProfileAfterEdit,
@@ -19,6 +20,11 @@ import {
 import { hasDatabase } from "@/lib/db";
 import { incrementMetric } from "@/lib/metrics";
 import { allowProfileSubmit } from "@/lib/profile-submit-rate";
+import {
+  deleteResumeBlobIfOwned,
+  getBlobReadWriteToken,
+  uploadCandidateResumeBlob,
+} from "@/lib/resume-blob";
 import { deleteResumeBuffer, setResumeBuffer } from "@/lib/resume-memory-store";
 
 export async function updateCandidateProfileAction(formData: FormData) {
@@ -48,6 +54,8 @@ export async function updateCandidateProfileAction(formData: FormData) {
   }
 
   let newResumeUploaded = false;
+  let resumeFileStorageKey: string | null | undefined = undefined;
+
   if (resumeFile instanceof File && resumeFile.size > 0) {
     if (resumeFile.size > MAX_RESUME_BYTES) {
       redirect("/candidate/dashboard?error=resume-too-large");
@@ -56,13 +64,41 @@ export async function updateCandidateProfileAction(formData: FormData) {
       redirect("/candidate/dashboard?error=resume-bad-type");
     }
     const buf = Buffer.from(await resumeFile.arrayBuffer());
-    deleteResumeBuffer(candidate.actorId);
-    setResumeBuffer(candidate.actorId, {
-      buffer: buf,
-      mime: resumeFile.type,
-      filename: resumeFile.name || "resume",
-    });
     newResumeUploaded = true;
+
+    if (hasDatabase()) {
+      const blobToken = getBlobReadWriteToken();
+      if (blobToken) {
+        const prevKey = await getCandidateResumeFileKey(candidate.actorId);
+        if (prevKey) {
+          await deleteResumeBlobIfOwned(prevKey, candidate.actorId);
+        }
+        deleteResumeBuffer(candidate.actorId);
+        const { url } = await uploadCandidateResumeBlob({
+          userId: candidate.actorId,
+          buffer: buf,
+          mime: resumeFile.type,
+          filename: resumeFile.name || "resume",
+          token: blobToken,
+        });
+        resumeFileStorageKey = url;
+      } else {
+        deleteResumeBuffer(candidate.actorId);
+        setResumeBuffer(candidate.actorId, {
+          buffer: buf,
+          mime: resumeFile.type,
+          filename: resumeFile.name || "resume",
+        });
+        resumeFileStorageKey = `memory:${candidate.actorId}`;
+      }
+    } else {
+      deleteResumeBuffer(candidate.actorId);
+      setResumeBuffer(candidate.actorId, {
+        buffer: buf,
+        mime: resumeFile.type,
+        filename: resumeFile.name || "resume",
+      });
+    }
   }
 
   await upsertCandidateProfileAfterEdit({
@@ -74,6 +110,7 @@ export async function updateCandidateProfileAction(formData: FormData) {
     experienceLevel,
     resumeUrl,
     newResumeUploaded,
+    resumeFileStorageKey: hasDatabase() ? resumeFileStorageKey : undefined,
   });
 
   await addAudit({

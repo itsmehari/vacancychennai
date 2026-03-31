@@ -1,5 +1,6 @@
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
+import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import {
   getEmployerCompanyNameMap,
   listLocations,
@@ -175,6 +176,9 @@ export default async function JobsInChennaiPage({ searchParams }: Props) {
             })}
           </div>
         )}
+      </div>
+      <div className="pb-8 pt-2">
+        <JobSeekerProfileCta variant="inline" dataCta="jobs-hub-profile" />
       </div>
     </>
   );

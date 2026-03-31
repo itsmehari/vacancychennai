@@ -25,7 +25,7 @@ Hyperlocal, location-first hiring platform for Chennai and suburbs.
 - SEO pages and JobPosting JSON-LD
 
 ## Additional Phase 2 / 3 Features
-- **Backlog priority (job seeker PRD):** (1) Admin CSV export of candidate profiles vs (2) employer “talent pool” search, (3) GA4 events on profile save, (4) honeypot/CAPTCHA on profile POST, (5) durable résumé storage (e.g. Vercel Blob) replacing in-memory MVP uploads.
+- **Backlog priority (job seeker PRD):** (1) Admin CSV export of candidate profiles vs (2) employer “talent pool” search, (3) GA4 events on profile save, (4) honeypot/CAPTCHA on profile POST. **Résumé files:** with `DATABASE_URL`, set **`BLOB_READ_WRITE_TOKEN`** (Vercel Blob) for durable private storage; without it, uploads use in-memory buffers (local dev only).
 - Candidate profile completion flow (headline, experience, résumé link/file — see `/job-seeker-profile`, `/candidate/dashboard`)
 - Advanced filters on `jobs-in-chennai`
 - Employer shortlist/reject pipeline actions

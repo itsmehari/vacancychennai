@@ -18,12 +18,15 @@ export default async function ResumeDatabasePage({ searchParams }: Props) {
     <section className="space-y-4 rounded-lg bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-bold">Resume database</h1>
       <p className="text-sm text-slate-600">
-        Candidates who have saved a profile may appear here. Contact details stay locked until you use an
-        unlock action (demo pricing). This is <strong>not</strong> a guarantee of recruiter distribution — see{" "}
+        Candidates who have saved a profile may appear here. <strong>Phone and email stay locked</strong> until
+        you use an unlock action (demo / pricing flow). Uploaded résumé <strong>files</strong> are not
+        downloadable from this screen today — candidates retrieve their own file when signed in; employers
+        see an external résumé link if the candidate provided one on their profile. This is{" "}
+        <strong>not</strong> a full talent-pool export — see{" "}
         <Link href="/pricing" className={linkInline}>
           pricing
         </Link>{" "}
-        and product copy for what employers receive.
+        and <Link href="/privacy" className={linkInline}>privacy</Link> for how data is used.
       </p>
       {query.success && (
         <p className="rounded bg-green-100 px-3 py-2 text-sm text-green-800">
@@ -63,7 +66,10 @@ export default async function ResumeDatabasePage({ searchParams }: Props) {
                   ) : null}
                   {candidate.resumeUrl && candidate.hasUploadedResumeFile ? " · " : null}
                   {candidate.hasUploadedResumeFile ? (
-                    <span className="text-slate-500">File on server (candidate download only in MVP)</span>
+                    <span className="text-slate-500">
+                      File uploaded (private storage; candidate session download only — not shown to employers
+                      here)
+                    </span>
                   ) : null}
                 </p>
               )}

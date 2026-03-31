@@ -21,12 +21,17 @@ export default function PrivacyPage() {
         <p>
           If you sign in as a candidate and save a profile, we may store your name, phone, email, preferred
           area, skills, a short headline, experience band, an optional résumé link, and (if you upload) a
-          résumé file. Résumé uploads on the current demo use server memory and do not persist across
-          restarts — prefer a stable résumé URL for production use until object storage is configured.
+          résumé file. Uploaded files are stored as{" "}
+          <strong>private objects</strong> in Vercel Blob when the site operator configures object storage;
+          otherwise, in <strong>server memory</strong> (typical for local development only — files do not
+          survive restarts). A résumé URL you paste yourself is not uploaded to our storage unless you also
+          attach a file.
         </p>
         <p>
-          Browsing and applying to jobs does not require a profile. Employer access to contact details or
-          résumés is described on the{" "}
+          Browsing and quick apply do not require a profile. <strong>Employers who post a job</strong> receive
+          the name, phone, and optional email and résumé link you submit on that application. They do{" "}
+          <strong>not</strong> automatically receive uploaded résumé files or full profile fields unless we
+          say so in product copy (see the{" "}
           <Link href="/employer/resume-database" className={linkInline}>
             resume database
           </Link>{" "}
@@ -34,7 +39,7 @@ export default function PrivacyPage() {
           <Link href="/pricing" className={linkInline}>
             pricing
           </Link>{" "}
-          pages and should match what we promise in product copy.
+          pages). Retention periods should be defined by the operator and added here when finalized.
         </p>
       </div>
 

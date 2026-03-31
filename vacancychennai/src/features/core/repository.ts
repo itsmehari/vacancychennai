@@ -1,4 +1,5 @@
 import { dbExecute, dbQuery, hasDatabase } from "@/lib/db";
+import { resumeFileKeyIndicatesUpload } from "@/lib/resume-blob";
 import {
   addApplication,
   addAuditLog,
@@ -344,7 +345,7 @@ function mapDbRowToCandidateProfile(row: {
     headline: row.bio ?? "",
     experienceLevel: row.experience_level ?? "",
     resumeUrl: row.resume_url ?? "",
-    hasUploadedResumeFile: Boolean(row.resume_file_key?.startsWith("memory:")),
+    hasUploadedResumeFile: resumeFileKeyIndicatesUpload(row.resume_file_key),
   };
 }
 
@@ -416,6 +417,15 @@ export async function getCandidateDashboardProfile(
   });
 }
 
+export async function getCandidateResumeFileKey(userId: string): Promise<string | null> {
+  if (!hasDatabase()) return null;
+  const rows = await dbQuery<{ resume_file_key: string | null }>(
+    `select resume_file_key from candidate_profiles where user_id = $1 limit 1`,
+    [userId],
+  );
+  return rows[0]?.resume_file_key ?? null;
+}
+
 export async function upsertCandidateProfileAfterEdit(input: {
   userId: string;
   name: string;
@@ -425,6 +435,8 @@ export async function upsertCandidateProfileAfterEdit(input: {
   experienceLevel: string;
   resumeUrl: string;
   newResumeUploaded: boolean;
+  /** When `newResumeUploaded`, set to blob URL or `memory:${userId}` (DB mode). Ignored for mock. */
+  resumeFileStorageKey?: string | null;
 }): Promise<void> {
   if (!hasDatabase()) {
     const existing = getCandidateById(input.userId);
@@ -447,7 +459,10 @@ export async function upsertCandidateProfileAfterEdit(input: {
   );
   let resumeFileKey = prevRows[0]?.resume_file_key ?? null;
   if (input.newResumeUploaded) {
-    resumeFileKey = `memory:${input.userId}`;
+    resumeFileKey =
+      input.resumeFileStorageKey !== undefined && input.resumeFileStorageKey !== null
+        ? input.resumeFileStorageKey
+        : `memory:${input.userId}`;
   }
 
   await dbExecute(`update users set full_name = $2, updated_at = now() where id = $1`, [
@@ -491,17 +506,22 @@ export async function getApplyPrefillForActor(actorId: string): Promise<{
   applicantPhone: string;
   applicantEmail: string;
   resumeLink: string;
+  profileHeadline: string;
+  skillsPreview: string;
 } | null> {
   const profile = await getCandidateDashboardProfile(actorId);
   if (!profile) return null;
   const resumeLink =
     profile.resumeUrl.trim() ||
     (profile.hasUploadedResumeFile ? "/api/candidate/resume" : "");
+  const skillsPreview = profile.skills.length ? profile.skills.join(", ") : "";
   return {
     applicantName: profile.name,
     applicantPhone: profile.phone,
     applicantEmail: profile.email,
     resumeLink,
+    profileHeadline: profile.headline.trim(),
+    skillsPreview,
   };
 }
 

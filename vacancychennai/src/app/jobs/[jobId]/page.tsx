@@ -131,6 +131,23 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               No heavy resume required. Name + phone is enough. Signed-in candidates can pre-fill from their
               profile.
             </p>
+            {prefill && (prefill.profileHeadline || prefill.skillsPreview) ? (
+              <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700 ring-1 ring-slate-100">
+                <p className="font-semibold text-slate-800">From your profile</p>
+                {prefill.profileHeadline ? (
+                  <p className="mt-1">
+                    <span className="text-slate-500">Headline: </span>
+                    {prefill.profileHeadline}
+                  </p>
+                ) : null}
+                {prefill.skillsPreview ? (
+                  <p className="mt-1">
+                    <span className="text-slate-500">Skills: </span>
+                    {prefill.skillsPreview}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
             {query.success === "applied" && (
               <div className="mt-4 space-y-3">
                 <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">

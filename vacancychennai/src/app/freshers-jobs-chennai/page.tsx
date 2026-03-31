@@ -1,5 +1,6 @@
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
+import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import {
   getEmployerCompanyNameMap,
   listLocations,
@@ -70,6 +71,9 @@ export default async function FreshersJobsPage() {
             })}
           </div>
         )}
+      </div>
+      <div className="pb-8 pt-4">
+        <JobSeekerProfileCta variant="inline" dataCta="freshers-hub-profile" />
       </div>
     </>
   );

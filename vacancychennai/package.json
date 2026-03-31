@@ -12,6 +12,7 @@
     "db:check": "node --env-file=.env.local scripts/check-db.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "^2.3.2",
     "bcryptjs": "^3.0.3",
     "next": "16.2.0",
     "pg": "^8.20.0",

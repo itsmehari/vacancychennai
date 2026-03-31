@@ -4,6 +4,30 @@ Chronological log of notable product and codebase changes. **Latest first.** Pai
 
 ---
 
+## 2026-04 — Job seeker profile PRD (Blob, apply pre-fill, CTAs, privacy)
+
+### Identity
+
+- **`docs/candidate-identity-decision.md`:** Documents **login-first** default; guest email-keyed profile deferred. **`job-seeker-profile-plan.md`** section 7 updated.
+
+### Résumé storage
+
+- **`@vercel/blob`:** Private upload when **`BLOB_READ_WRITE_TOKEN`** + **`DATABASE_URL`**; **`resume_file_key`** holds blob URL; replace deletes prior blob if path contains `/resumes/{userId}/`.
+- **Fallback:** In-memory **`resume-memory-store`** + `memory:{userId}` when Blob token unset (local dev).
+- **`src/lib/resume-blob.ts`**, **`GET /api/candidate/resume`:** Stream private blob or memory; **`getCandidateResumeFileKey`**, **`upsertCandidateProfileAfterEdit(..., resumeFileStorageKey)`**.
+
+### Apply + marketing
+
+- **`getApplyPrefillForActor`:** Adds **`profileHeadline`** + **`skillsPreview`**; job detail shows “From your profile”.
+- **`JobSeekerProfileCta` / link:** **`/jobs-in-chennai`**, **`/freshers-jobs-chennai`**, **`/part-time-jobs-chennai`**; home hero line to **`/job-seeker-profile`**.
+
+### Copy / docs
+
+- **`/privacy`**, **`/employer/resume-database`:** Align with who sees résumé links vs uploaded files.
+- **`README.md`** Phase 2 backlog, **`.env.example`** `BLOB_READ_WRITE_TOKEN`, **`docs/LEARNING.md`**.
+
+---
+
 ## 2026-03 — Admin password reset, scheduled digests/SMS, Next.js proxy
 
 ### Admin auth

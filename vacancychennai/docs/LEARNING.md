@@ -9,6 +9,8 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | [`AGENTS.md`](../AGENTS.md) | Cursor/agent rules for this app (Next.js warning + project conventions). |
 | [Cursor skill — Vacancy Chennai](../../.cursor/skills/vacancychennai-proj-skill/SKILL.md) | When the agent should load Vacancy Chennai context (triggers + file map). |
 | [Cursor skill — Next 16 proxy](../../.cursor/skills/nextjs-16-proxy-migration/SKILL.md) | `middleware.ts` → `proxy.ts` migration and conventions. |
+| [`job-seeker-profile-plan.md`](./job-seeker-profile-plan.md) | Job seeker profile PRD (Postgres, Server Actions, Vercel Blob when `BLOB_READ_WRITE_TOKEN` set). |
+| [`candidate-identity-decision.md`](./candidate-identity-decision.md) | Login-first candidate identity (guest profile deferred). |
 
 ## Next.js App Router
 
@@ -38,6 +40,13 @@ Engineering and design notes from implementation work (including the 2026 home/m
 ## Navigation
 
 - **Active states:** `usePathname()` lives in `SiteHeaderShell` (client). Pure helpers are in `src/lib/nav-active.ts` (`isNavHrefActive`, `isJobsExplorePath`, `isProfileHubPath`). Update those when adding new top-level flows so “Find jobs” / “Your Profile” stay correct.
+
+## Candidate résumé files (Vercel Blob)
+
+- **`BLOB_READ_WRITE_TOKEN`:** When set with `DATABASE_URL`, `updateCandidateProfileAction` uploads to **private** Vercel Blob under `vacancy-chennai/resumes/{userId}/…`; `candidate_profiles.resume_file_key` stores the **blob URL**. Replacing a file calls `del` on the previous URL only if it contains `/resumes/{userId}/` (tenant guard).
+- **No token:** DB mode falls back to **`resume-memory-store`** and `memory:{userId}` in `resume_file_key` (OK for local dev; not durable on serverless).
+- **Download:** `GET /api/candidate/resume` — candidate session; streams via `@vercel/blob` `get` for private URLs or memory buffer.
+- **Helpers:** `src/lib/resume-blob.ts` (`uploadCandidateResumeBlob`, `deleteResumeBlobIfOwned`, `resumeFileKeyIndicatesUpload`).
 
 ## Repository vs mock DB (Postgres parity)
 
@@ -135,3 +144,4 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | Dynamic area page | `src/app/[locationPage]/page.tsx` |
 | Agent rules | `AGENTS.md` (repo: `vacancychennai/AGENTS.md`) |
 | Cursor skills | `vacancychennai-proj-skill`, `nextjs-16-proxy-migration` under repo `.cursor/skills/` |
+| Job seeker profile PRD (Vacancy Chennai stack) | [`docs/job-seeker-profile-plan.md`](./job-seeker-profile-plan.md) |

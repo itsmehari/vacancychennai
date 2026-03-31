@@ -93,7 +93,7 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200/90 md:text-sm">
               Chennai · Hyperlocal hiring
             </p>
-            <h1 className="mt-4 max-w-xl text-3xl font-bold leading-[1.12] tracking-tight text-white md:text-4xl md:leading-[1.08] lg:text-[2.75rem] lg:leading-[1.06]">
+            <h1 className="mt-4 max-w-xl text-balance text-3xl font-bold leading-[1.12] tracking-tight text-white md:text-4xl md:leading-[1.08] lg:text-[2.75rem] lg:leading-[1.06]">
               The best jobsite for your{" "}
               <span className="relative inline-block align-baseline">
                 <span
@@ -142,6 +142,16 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
               <Link href="/candidate/login" className={`${linkInline} text-amber-200/90 hover:text-white`}>
                 Sign in
               </Link>
+            </p>
+            <p className="mt-2 max-w-lg text-xs text-slate-500">
+              <Link
+                href="/job-seeker-profile"
+                className={`${linkInline} font-medium text-amber-200/85 hover:text-white`}
+                data-cta="hero-job-seeker-profile"
+              >
+                Job seeker profile
+              </Link>{" "}
+              — save headline, skills, and a résumé for faster applies.
             </p>
 
             <p className="mt-8 text-xs font-medium text-slate-500 md:text-sm">
