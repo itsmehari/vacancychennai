@@ -63,7 +63,10 @@ export type EmployerProfile = {
 };
 
 export type CandidateProfile = {
+  /** Employer “unlock” target: mock candidate id or DB `candidate_profiles.id`. */
   id: string;
+  /** Present when using Postgres: `users.id` (session `actorId`). */
+  userId?: string;
   name: string;
   phone: string;
   email: string;
@@ -71,6 +74,13 @@ export type CandidateProfile = {
   locationId: string;
   resumeUnlocked: boolean;
   profileCompleted: boolean;
+  /** Short professional headline (manual entry; no CV parsing). */
+  headline: string;
+  experienceLevel: string;
+  /** External résumé URL (Drive, portfolio, etc.). */
+  resumeUrl: string;
+  /** True when a résumé file is available (MVP: in-memory store; see `/api/candidate/resume`). */
+  hasUploadedResumeFile: boolean;
 };
 
 export type AuditLog = {

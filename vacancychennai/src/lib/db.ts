@@ -11,12 +11,13 @@ function getPool() {
     return null;
   }
   if (!pool) {
+    const conn = process.env.DATABASE_URL;
+    const needsSsl =
+      process.env.NODE_ENV === "production" ||
+      Boolean(conn?.includes("neon.tech"));
     pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl:
-        process.env.NODE_ENV === "production"
-          ? { rejectUnauthorized: false }
-          : undefined,
+      connectionString: conn,
+      ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
       max: 10,
     });
   }

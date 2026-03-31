@@ -6,6 +6,7 @@ const counters: MetricCounters = {
   applySuccess: 0,
   applyFailure: 0,
   moderationUpdates: 0,
+  candidateProfileUpdate: 0,
 };
 
 export function incrementMetric(

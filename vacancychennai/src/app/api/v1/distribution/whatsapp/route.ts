@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getLocationById, getPublishedJobs } from "@/features/core/mock-db";
+import { listLocations, listPublishedJobs } from "@/features/core/repository";
 
 export async function GET(request: NextRequest) {
   const zone = request.nextUrl.searchParams.get("zone")?.toLowerCase();
-  const jobs = getPublishedJobs()
+
+  const [published, locations] = await Promise.all([listPublishedJobs(), listLocations()]);
+  const locById = new Map(locations.map((l) => [l.id, l]));
+
+  const jobs = published
     .filter((job) => {
       if (!zone) return true;
-      const location = getLocationById(job.locationId);
+      const location = locById.get(job.locationId);
       return location?.zone.toLowerCase().includes(zone);
     })
     .slice(0, 20)
     .map((job) => {
-      const location = getLocationById(job.locationId);
+      const location = locById.get(job.locationId);
       return {
         jobId: job.id,
-        whatsappText: `${job.title} | ${location?.area} | INR ${job.salaryMin}-${job.salaryMax} | Apply: ${
+        whatsappText: `${job.title} | ${location?.area ?? "Chennai"} | INR ${job.salaryMin}-${job.salaryMax} | Apply: ${
           process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in"
         }/jobs/${job.id}`,
       };
@@ -26,4 +30,3 @@ export async function GET(request: NextRequest) {
     jobs,
   });
 }
-

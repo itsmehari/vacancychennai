@@ -9,9 +9,9 @@ import {
   listLocations,
   addAudit,
   createJob,
+  promoteOwnedJob,
   setJobStatus,
 } from "@/features/core/repository";
-import { setJobFeatured } from "@/features/core/mock-db";
 import { JobStatus } from "@/types/domain";
 
 export async function createJobAction(formData: FormData) {
@@ -38,23 +38,28 @@ export async function createJobAction(formData: FormData) {
     redirect("/employer/dashboard?error=invalid-job");
   }
 
-  const created = await createJob({
-    employerId: employer.actorId,
-    title,
-    category,
-    industry,
-    jobType: jobType as
-      | "full-time"
-      | "part-time"
-      | "internship"
-      | "contract"
-      | "temporary",
-    salaryMin,
-    salaryMax,
-    locationId,
-    landmarkText,
-    description,
-  });
+  let created: { id: string };
+  try {
+    created = await createJob({
+      employerId: employer.actorId,
+      title,
+      category,
+      industry,
+      jobType: jobType as
+        | "full-time"
+        | "part-time"
+        | "internship"
+        | "contract"
+        | "temporary",
+      salaryMin,
+      salaryMax,
+      locationId,
+      landmarkText,
+      description,
+    });
+  } catch {
+    redirect("/employer/dashboard?error=invalid-job");
+  }
 
   await addAudit({
     actorRole: "employer",
@@ -106,8 +111,8 @@ export async function promoteJobAction(formData: FormData) {
   const tier = String(formData.get("tier") ?? "featured");
   const mappedTier = tier === "urgent" ? "urgent" : "featured";
 
-  const updated = setJobFeatured(jobId, mappedTier);
-  if (!updated || updated.employerId !== employer.actorId) {
+  const ok = await promoteOwnedJob(jobId, employer.actorId, mappedTier);
+  if (!ok) {
     redirect("/employer/dashboard?error=promotion-failed");
   }
 

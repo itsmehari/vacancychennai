@@ -37,3 +37,31 @@ export function clearFailedAttempts(key: string) {
   attempts.delete(key);
 }
 
+const verificationEmailSends = new Map<string, number[]>();
+
+export function canSendVerificationEmail(
+  key: string,
+  maxSends = 5,
+  windowMs = 60 * 60 * 1000,
+): boolean {
+  const now = Date.now();
+  const windowStart = now - windowMs;
+  const stamps = (verificationEmailSends.get(key) ?? []).filter(
+    (t) => t > windowStart,
+  );
+  return stamps.length < maxSends;
+}
+
+export function recordVerificationEmailSent(
+  key: string,
+  windowMs = 60 * 60 * 1000,
+) {
+  const now = Date.now();
+  const windowStart = now - windowMs;
+  const stamps = (verificationEmailSends.get(key) ?? []).filter(
+    (t) => t > windowStart,
+  );
+  stamps.push(now);
+  verificationEmailSends.set(key, stamps);
+}
+

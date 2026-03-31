@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { HOME_SEO_DESCRIPTION, HOME_SEO_TITLE } from "@/lib/home-seo-copy";
 
 export function baseMetadata(
   title: string,
@@ -7,6 +8,7 @@ export function baseMetadata(
 ): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
   const absolute = `${siteUrl}${path}`;
+  const ogImage = process.env.NEXT_PUBLIC_OG_IMAGE;
   return {
     title,
     description,
@@ -16,11 +18,36 @@ export function baseMetadata(
       description,
       url: absolute,
       type: "website",
+      siteName: "Vacancy Chennai",
+      locale: "en_IN",
+      ...(ogImage ? { images: [{ url: ogImage, alt: title }] } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+  };
+}
+
+const JOBS_IN_CHENNAI_DESCRIPTION =
+  "Filter moderated Vacancy Chennai listings by area, category, job type, and salary. OMR, Velachery, Tambaram, Porur, Ambattur — free to browse and quick-apply.";
+
+/** `/jobs-in-chennai` — bilingual hints for search (English default + Tamil UI). */
+export function jobsInChennaiListingMetadata(): Metadata {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
+  const path = "/jobs-in-chennai";
+  const base = baseMetadata("Jobs in Chennai", JOBS_IN_CHENNAI_DESCRIPTION, path);
+  return {
+    ...base,
+    alternates: {
+      canonical: `${siteUrl}${path}`,
+      languages: {
+        "en-IN": `${siteUrl}${path}`,
+        "ta-IN": `${siteUrl}${path}?lang=ta`,
+        "x-default": `${siteUrl}${path}`,
+      },
     },
   };
 }
@@ -28,13 +55,24 @@ export function baseMetadata(
 /** Home page (`/`) — SEO-optimized title/description, OG, Twitter, optional share image. */
 export function homePageMetadata(): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
-  const title = "Vacancy Chennai — Hyperlocal jobs near you in Chennai";
-  const description =
-    "Find Chennai jobs by area, category, and fresher or part-time tracks. Quick apply with name and phone. Employers: post local roles with moderation.";
+  const title = HOME_SEO_TITLE;
+  const description = HOME_SEO_DESCRIPTION;
   const ogImage = process.env.NEXT_PUBLIC_OG_IMAGE;
   return {
     title,
     description,
+    keywords: [
+      "Chennai jobs",
+      "jobs in Chennai",
+      "OMR jobs",
+      "Tambaram jobs",
+      "Velachery jobs",
+      "Porur jobs",
+      "hyperlocal jobs Chennai",
+      "freshers jobs Chennai",
+      "part time jobs Chennai",
+      "Vacancy Chennai",
+    ],
     alternates: { canonical: `${siteUrl}/` },
     openGraph: {
       title,
@@ -42,7 +80,8 @@ export function homePageMetadata(): Metadata {
       url: `${siteUrl}/`,
       type: "website",
       locale: "en_IN",
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      siteName: "Vacancy Chennai",
+      ...(ogImage ? { images: [{ url: ogImage, alt: "Vacancy Chennai — hyperlocal jobs" }] } : {}),
     },
     twitter: {
       card: "summary_large_image",

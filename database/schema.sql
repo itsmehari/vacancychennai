@@ -64,6 +64,8 @@ create table if not exists candidate_profiles (
   resume_file_key text,
   preferred_job_types job_type[] not null default '{}',
   bio text,
+  experience_level varchar(40),
+  resume_contacts_unlocked boolean not null default false,
   deleted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

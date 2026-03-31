@@ -72,6 +72,10 @@ export const candidates: CandidateProfile[] = [
     locationId: "loc-velachery",
     resumeUnlocked: false,
     profileCompleted: false,
+    headline: "",
+    experienceLevel: "",
+    resumeUrl: "",
+    hasUploadedResumeFile: false,
   },
   {
     id: "cand-002",
@@ -82,6 +86,10 @@ export const candidates: CandidateProfile[] = [
     locationId: "loc-tambaram",
     resumeUnlocked: false,
     profileCompleted: true,
+    headline: "Sales & retail — Tambaram",
+    experienceLevel: "y1_3",
+    resumeUrl: "",
+    hasUploadedResumeFile: false,
   },
 ];
 
@@ -161,6 +169,10 @@ export function getLocationById(id: string) {
 export function getLocationByAreaSlug(slug: string) {
   const normalized = slug.replaceAll("-", " ").toLowerCase();
   return locations.find((location) => location.area.toLowerCase() === normalized);
+}
+
+export function getEmployerById(id: string) {
+  return employers.find((e) => e.id === id);
 }
 
 export function getPublishedJobs() {
@@ -308,15 +320,31 @@ export function setJobFeatured(jobId: string, tier: "featured" | "urgent") {
   return job;
 }
 
+export type CandidateProfileUpdatePayload = {
+  name: string;
+  skills: string[];
+  locationId: string;
+  headline: string;
+  experienceLevel: string;
+  resumeUrl: string;
+  hasUploadedResumeFile?: boolean;
+};
+
 export function updateCandidateProfile(
   candidateId: string,
-  payload: { name: string; skills: string[]; locationId: string },
+  payload: CandidateProfileUpdatePayload,
 ) {
   const candidate = candidates.find((item) => item.id === candidateId);
   if (!candidate) return undefined;
   candidate.name = payload.name;
   candidate.skills = payload.skills;
   candidate.locationId = payload.locationId;
+  candidate.headline = payload.headline;
+  candidate.experienceLevel = payload.experienceLevel;
+  candidate.resumeUrl = payload.resumeUrl;
+  if (typeof payload.hasUploadedResumeFile === "boolean") {
+    candidate.hasUploadedResumeFile = payload.hasUploadedResumeFile;
+  }
   candidate.profileCompleted = true;
   return candidate;
 }

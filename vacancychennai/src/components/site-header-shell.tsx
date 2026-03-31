@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
-import type { MegaAreaLink, MegaSegmentLink } from "@/lib/nav-config";
+import {
+  profileNavLinks,
+  type MegaAreaLink,
+  type MegaSegmentLink,
+} from "@/lib/nav-config";
+import { isJobsExplorePath, isNavHrefActive, isProfileHubPath } from "@/lib/nav-active";
 import { focusRing, transitionFast } from "@/lib/ui";
 import type { UserRole } from "@/types/domain";
 
@@ -22,9 +28,19 @@ type Props = {
   session: SessionLite;
 };
 
-const navBtnClass = `rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-white ${focusRing} focus-visible:ring-offset-slate-950 ${transitionFast}`;
+const navBtnBase = `rounded-lg px-3 py-2 text-sm font-medium ${focusRing} focus-visible:ring-offset-slate-950 ${transitionFast}`;
+
+const navBtnInactive = `${navBtnBase} text-slate-200 transition-colors hover:bg-white/10 hover:text-white`;
+
+const navBtnActive = `${navBtnBase} bg-white/15 text-amber-200 ring-1 ring-amber-400/40 shadow-sm shadow-amber-950/25`;
 
 const megaLinkClass = `group flex flex-col gap-0.5 rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-900 ${focusRing} focus-visible:ring-offset-white ${transitionFast}`;
+
+const megaLinkActive = `bg-amber-50/90 text-amber-950 ring-1 ring-amber-200/90 hover:bg-amber-50`;
+
+const profileLinkClass = `group block rounded-lg px-3 py-2.5 text-left ${focusRing} focus-visible:ring-offset-white ${transitionFast}`;
+
+const profileLinkActive = `bg-amber-50/90 ring-1 ring-amber-200/80`;
 
 export default function SiteHeaderShell({
   sessionNavItems,
@@ -32,30 +48,42 @@ export default function SiteHeaderShell({
   megaSegments,
   session,
 }: Props) {
+  const pathname = usePathname();
   const [megaOpen, setMegaOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMegaOpen, setMobileMegaOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
   const megaRef = useRef<HTMLDivElement>(null);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavId = useId();
   const megaId = useId();
+  const profileMenuId = useId();
 
   const closeMega = useCallback(() => setMegaOpen(false), []);
+  const closeProfile = useCallback(() => setProfileOpen(false), []);
   const closeMobile = useCallback(() => {
     setMobileOpen(false);
     setMobileMegaOpen(false);
+    setMobileProfileOpen(false);
   }, []);
+
+  const findJobsNavActive = megaOpen || isJobsExplorePath(pathname);
+  const profileNavActive = profileOpen || isProfileHubPath(pathname);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         closeMega();
+        closeProfile();
         closeMobile();
       }
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [closeMega, closeMobile]);
+  }, [closeMega, closeProfile, closeMobile]);
 
   useEffect(() => {
     if (!megaOpen) return;
@@ -69,6 +97,19 @@ export default function SiteHeaderShell({
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [megaOpen, closeMega]);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    function onPointerDown(e: MouseEvent) {
+      const el = profileRef.current;
+      const btn = profileButtonRef.current;
+      if (!el || !btn) return;
+      const t = e.target as Node;
+      if (!el.contains(t) && !btn.contains(t)) closeProfile();
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [profileOpen, closeProfile]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -126,18 +167,21 @@ export default function SiteHeaderShell({
             className="hidden items-center gap-0.5 lg:flex"
             aria-label="Primary"
           >
-            <Link href="/" className={navBtnClass}>
+            <Link href="/" className={pathname === "/" ? navBtnActive : navBtnInactive}>
               Home
             </Link>
             <div className="relative">
               <button
                 ref={megaButtonRef}
                 type="button"
-                className={`inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium ${megaOpen ? "bg-white/15 text-white" : "text-slate-200 hover:bg-white/10 hover:text-white"} ${focusRing} focus-visible:ring-offset-slate-950 ${transitionFast}`}
+                className={`inline-flex items-center gap-1 ${findJobsNavActive ? navBtnActive : navBtnInactive}`}
                 aria-expanded={megaOpen}
                 aria-haspopup="true"
                 aria-controls={megaId}
-                onClick={() => setMegaOpen((v) => !v)}
+                onClick={() => {
+                  setProfileOpen(false);
+                  setMegaOpen((v) => !v);
+                }}
               >
                 Find jobs
                 <svg
@@ -152,14 +196,71 @@ export default function SiteHeaderShell({
                 </svg>
               </button>
             </div>
-            <Link href="/pricing" className={navBtnClass}>
+            <Link href="/pricing" className={pathname === "/pricing" ? navBtnActive : navBtnInactive}>
               Pricing
             </Link>
-            <Link href="/blog" className={navBtnClass}>
+            <Link
+              href="/blog"
+              className={isNavHrefActive(pathname, "/blog") ? navBtnActive : navBtnInactive}
+            >
               Blog
             </Link>
+            <div className="relative">
+              <button
+                ref={profileButtonRef}
+                type="button"
+                className={`inline-flex items-center gap-1 ${profileNavActive ? navBtnActive : navBtnInactive}`}
+                aria-expanded={profileOpen}
+                aria-haspopup="true"
+                aria-controls={profileMenuId}
+                onClick={() => {
+                  setMegaOpen(false);
+                  setProfileOpen((v) => !v);
+                }}
+              >
+                Your Profile
+                <svg
+                  className={`h-4 w-4 motion-reduce:transition-none ${profileOpen ? "rotate-180" : ""} ${transitionFast}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+              <div
+                ref={profileRef}
+                id={profileMenuId}
+                className={`absolute right-0 top-full z-[60] mt-1 w-[min(100vw-2rem,18rem)] origin-top rounded-xl border border-slate-200/90 bg-white py-2 shadow-xl ring-1 ring-slate-900/5 motion-reduce:transition-none lg:left-0 lg:right-auto ${transitionFast} ${profileOpen ? "pointer-events-auto visible scale-100 opacity-100" : "pointer-events-none invisible scale-[0.98] opacity-0"}`}
+                style={{ transitionProperty: "opacity, transform, visibility" }}
+                role="menu"
+                aria-label="Your profile options"
+                aria-hidden={!profileOpen}
+              >
+                {profileNavLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    role="menuitem"
+                    className={`${profileLinkClass} text-slate-800 hover:bg-blue-50 hover:text-blue-900 ${pathname === item.href ? profileLinkActive : ""}`}
+                    onClick={closeProfile}
+                  >
+                    <span className="block text-sm font-semibold">{item.label}</span>
+                    <span className="mt-0.5 block text-xs text-slate-500 group-hover:text-blue-800/80">
+                      {item.description}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
             {sessionNavItems.map((item) => (
-              <Link key={item.href} href={item.href} className={navBtnClass}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isNavHrefActive(pathname, item.href) ? navBtnActive : navBtnInactive}
+              >
                 {item.label}
               </Link>
             ))}
@@ -250,7 +351,11 @@ export default function SiteHeaderShell({
               <ul className="mt-3 space-y-1" role="list">
                 {megaSegments.map((s) => (
                   <li key={s.href}>
-                    <Link href={s.href} className={megaLinkClass} onClick={closeMega}>
+                    <Link
+                      href={s.href}
+                      className={`${megaLinkClass} ${pathname === s.href ? megaLinkActive : ""}`}
+                      onClick={closeMega}
+                    >
                       <span className="font-medium">{s.label}</span>
                       <span className="text-xs text-slate-500 group-hover:text-blue-700/80">
                         {s.description}
@@ -313,7 +418,7 @@ export default function SiteHeaderShell({
           <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label="Mobile primary">
             <Link
               href="/"
-              className="block rounded-xl px-3 py-3 text-base font-medium text-slate-900 hover:bg-slate-50"
+              className={`block rounded-xl px-3 py-3 text-base font-medium ${pathname === "/" ? "bg-amber-50 text-amber-950 ring-1 ring-amber-200/80" : "text-slate-900 hover:bg-slate-50"}`}
               onClick={closeMobile}
             >
               Home
@@ -322,7 +427,10 @@ export default function SiteHeaderShell({
               type="button"
               className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-base font-medium text-slate-900 hover:bg-slate-50"
               aria-expanded={mobileMegaOpen}
-              onClick={() => setMobileMegaOpen((v) => !v)}
+              onClick={() => {
+                setMobileProfileOpen(false);
+                setMobileMegaOpen((v) => !v);
+              }}
             >
               Find jobs
               <svg
@@ -336,13 +444,15 @@ export default function SiteHeaderShell({
               </svg>
             </button>
             {mobileMegaOpen ? (
-              <div className="ml-2 border-l-2 border-blue-100 pl-3">
+              <div
+                className={`ml-2 border-l-2 pl-3 ${isJobsExplorePath(pathname) ? "border-amber-300" : "border-blue-100"}`}
+              >
                 <p className="px-2 py-1 text-xs font-semibold uppercase text-slate-500">Areas</p>
                 {megaAreas.map((a) => (
                   <Link
                     key={a.href}
                     href={a.href}
-                    className="block rounded-lg px-2 py-2.5 text-sm text-slate-700 hover:bg-blue-50"
+                    className={`block rounded-lg px-2 py-2.5 text-sm ${pathname === a.href ? "bg-amber-50 font-medium text-amber-950 ring-1 ring-amber-200/80" : "text-slate-700 hover:bg-blue-50"}`}
                     onClick={closeMobile}
                   >
                     {a.area}
@@ -356,7 +466,7 @@ export default function SiteHeaderShell({
                   <Link
                     key={s.href}
                     href={s.href}
-                    className="block rounded-lg px-2 py-2.5 text-sm text-slate-700 hover:bg-blue-50"
+                    className={`block rounded-lg px-2 py-2.5 text-sm ${pathname === s.href ? "bg-amber-50 font-medium text-amber-950 ring-1 ring-amber-200/80" : "text-slate-700 hover:bg-blue-50"}`}
                     onClick={closeMobile}
                   >
                     {s.label}
@@ -364,7 +474,7 @@ export default function SiteHeaderShell({
                 ))}
                 <Link
                   href="/jobs-in-chennai"
-                  className="mt-2 block rounded-xl bg-blue-600 px-3 py-3 text-center text-sm font-semibold text-white"
+                  className={`mt-2 block rounded-xl bg-blue-600 px-3 py-3 text-center text-sm font-semibold text-white ${pathname === "/jobs-in-chennai" ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-white" : ""}`}
                   onClick={closeMobile}
                 >
                   Full job search
@@ -385,11 +495,48 @@ export default function SiteHeaderShell({
             >
               Blog
             </Link>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-base font-medium text-slate-900 hover:bg-slate-50"
+              aria-expanded={mobileProfileOpen}
+              onClick={() => {
+                setMobileMegaOpen(false);
+                setMobileProfileOpen((v) => !v);
+              }}
+            >
+              Your Profile
+              <svg
+                className={`h-5 w-5 shrink-0 text-slate-500 ${mobileProfileOpen ? "rotate-180" : ""} ${transitionFast}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            {mobileProfileOpen ? (
+              <div
+                className={`ml-2 border-l-2 pl-3 ${isProfileHubPath(pathname) ? "border-amber-300" : "border-slate-200"}`}
+              >
+                {profileNavLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block rounded-lg px-2 py-2.5 text-sm ${pathname === item.href ? "bg-amber-50 font-medium text-amber-950 ring-1 ring-amber-200/80" : "text-slate-800 hover:bg-slate-50"}`}
+                    onClick={closeMobile}
+                  >
+                    <span className="font-semibold">{item.label}</span>
+                    <span className="mt-0.5 block text-xs text-slate-500">{item.description}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             {sessionNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-slate-900 hover:bg-slate-50"
+                className={`block rounded-xl px-3 py-3 text-base font-medium ${isNavHrefActive(pathname, item.href) ? "bg-amber-50 text-amber-950 ring-1 ring-amber-200/80" : "text-slate-900 hover:bg-slate-50"}`}
                 onClick={closeMobile}
               >
                 {item.label}

@@ -1,10 +1,10 @@
 import SiteHeaderShell, { type NavItem } from "@/components/site-header-shell";
-import { locations } from "@/features/core/mock-db";
+import { listLocations } from "@/features/core/repository";
 import { getSession } from "@/lib/auth";
 import { locationsToMegaAreas, megaSegmentLinks } from "@/lib/nav-config";
 
 export default async function SiteHeader() {
-  const session = await getSession();
+  const [session, locations] = await Promise.all([getSession(), listLocations()]);
   const megaAreas = locationsToMegaAreas(locations);
 
   const sessionNavItems: NavItem[] = [];

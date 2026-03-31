@@ -35,6 +35,13 @@
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   --home-section-gap: 3rem;
+  /* Home section bands: `HomeSectionShell` maps variants (default, muted, tint, trust, elevated, plain) to surfaces; padding uses these. */
+  --home-section-pad-y: 3rem;
+  --home-section-pad-y-md: 4rem;
+
+  /* Fat footer (site-footer) — Option A brand-consistent; override for WinStar-style browns/red */
+  --footer-dark: #0f172a;
+  --footer-accent: #2563eb;
 }
 
 @theme inline {
@@ -66,4 +73,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* FAQ accordion — marker hidden; chevron in summary */
+.home-faq-details summary {
+  list-style: none;
+}
+.home-faq-details summary::-webkit-details-marker {
+  display: none;
 }

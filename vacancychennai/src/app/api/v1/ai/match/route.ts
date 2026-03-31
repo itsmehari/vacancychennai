@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { suggestCandidatesForJob } from "@/features/core/mock-db";
+import { suggestCandidatesForJobMatches } from "@/features/core/repository";
 
 export async function GET(request: NextRequest) {
   const jobId = request.nextUrl.searchParams.get("jobId");
@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "jobId is required" }, { status: 400 });
   }
 
-  const suggestions = suggestCandidatesForJob(jobId).map((result) => ({
+  const matches = await suggestCandidatesForJobMatches(jobId);
+  const suggestions = matches.map((result) => ({
     candidateId: result.candidate.id,
     name: result.candidate.name,
     score: result.score,
@@ -21,4 +22,3 @@ export async function GET(request: NextRequest) {
     suggestions,
   });
 }
-

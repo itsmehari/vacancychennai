@@ -1,8 +1,8 @@
 import { baseMetadata } from "@/lib/seo";
 
 export const metadata = baseMetadata(
-  "Terms of Use - Vacancy Chennai",
-  "Terms of use for Vacancy Chennai.",
+  "Terms of use — Vacancy Chennai",
+  "Terms for using Vacancy Chennai as a job seeker, employer, or visitor — listings, applications, and fair use.",
   "/terms",
 );
 

@@ -1,11 +1,11 @@
 create extension if not exists "pgcrypto";
 
-create type if not exists user_role as enum ('candidate', 'employer', 'admin');
-create type if not exists account_status as enum ('active', 'suspended', 'deleted');
-create type if not exists job_status as enum ('draft', 'review', 'published', 'paused', 'closed');
-create type if not exists job_type as enum ('full_time', 'part_time', 'internship', 'contract', 'temporary');
-create type if not exists application_stage as enum ('applied', 'screening', 'interview', 'offer', 'rejected');
-create type if not exists listing_tier as enum ('free', 'featured', 'urgent');
+create type user_role as enum ('candidate', 'employer', 'admin');
+create type account_status as enum ('active', 'suspended', 'deleted');
+create type job_status as enum ('draft', 'review', 'published', 'paused', 'closed');
+create type job_type as enum ('full_time', 'part_time', 'internship', 'contract', 'temporary');
+create type application_stage as enum ('applied', 'screening', 'interview', 'offer', 'rejected');
+create type listing_tier as enum ('free', 'featured', 'urgent');
 
 create table if not exists users (
   id uuid primary key default gen_random_uuid(),

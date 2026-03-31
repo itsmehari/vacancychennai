@@ -10,9 +10,6 @@ import {
   listEmployerApplications,
   setApplicationStage,
 } from "@/features/core/repository";
-import {
-  addAuditLog,
-} from "@/features/core/mock-db";
 import { incrementMetric } from "@/lib/metrics";
 
 export async function quickApplyAction(formData: FormData) {
@@ -74,23 +71,17 @@ export async function updateApplicationStageAction(formData: FormData) {
     redirect("/employer/dashboard?error=invalid-application");
   }
 
-  if (typeof updated === "object" && "id" in updated) {
-    await addAudit({
-      actorRole: "employer",
-      actorId: employer.actorId,
-      action: "update",
-      entityType: "application",
-      entityId: updated.id,
-    });
-  } else {
-    addAuditLog({
-      actorRole: "employer",
-      actorId: employer.actorId,
-      action: "update",
-      entityType: "application",
-      entityId: applicationId,
-    });
-  }
+  const auditId =
+    typeof updated === "object" && updated !== null && "id" in updated
+      ? String((updated as { id: string }).id)
+      : applicationId;
+  await addAudit({
+    actorRole: "employer",
+    actorId: employer.actorId,
+    action: "update",
+    entityType: "application",
+    entityId: auditId,
+  });
 
   revalidatePath("/employer/dashboard");
   redirect("/employer/dashboard?success=app-updated");

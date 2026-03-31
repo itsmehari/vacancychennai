@@ -1,8 +1,17 @@
+import JobCard from "@/components/job-card";
+import InnerPageHero from "@/components/marketing/inner-page-hero";
+import {
+  getEmployerCompanyNameMap,
+  listLocations,
+  listPublishedJobs,
+} from "@/features/core/repository";
+import { filterPublishedJobList, getLocationByAreaSlug } from "@/lib/job-filters";
+import { buildJobsItemListJsonLd } from "@/lib/jobs-itemlist-jsonld";
+import { baseMetadata } from "@/lib/seo";
+import { btnPrimary, sectionCard } from "@/lib/ui";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import JobCard from "@/components/job-card";
-import { getPublishedJobsByLocationSlug } from "@/features/core/mock-db";
-import { baseMetadata } from "@/lib/seo";
+import Link from "next/link";
 
 type Props = {
   params: Promise<{ locationPage: string }>;
@@ -19,10 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!slug) {
     return baseMetadata("Page not found", "Invalid route", `/${locationPage}`);
   }
+  const locations = await listLocations();
+  if (!getLocationByAreaSlug(slug, locations)) {
+    return baseMetadata(
+      "Page not found",
+      "This area is not listed on Vacancy Chennai.",
+      `/${locationPage}`,
+    );
+  }
   const pretty = slug.replaceAll("-", " ");
   return baseMetadata(
-    `Jobs in ${pretty} - Vacancy Chennai`,
-    `Find latest full-time, part-time, and fresher jobs in ${pretty}, Chennai.`,
+    `Jobs in ${pretty} — Vacancy Chennai`,
+    `Moderated hyperlocal listings in ${pretty}, Chennai — full-time, part-time, and internships. Quick apply; filter on Vacancy Chennai.`,
     `/${locationPage}`,
   );
 }
@@ -32,51 +49,76 @@ export default async function AreaPage({ params }: Props) {
   const slug = getSlugFromPath(locationPage);
   if (!slug) notFound();
 
-  const jobs = getPublishedJobsByLocationSlug(slug);
+  const [published, locations, employerNames] = await Promise.all([
+    listPublishedJobs(),
+    listLocations(),
+    getEmployerCompanyNameMap(),
+  ]);
+
+  if (!getLocationByAreaSlug(slug, locations)) {
+    notFound();
+  }
+
+  const locationsById = new Map(locations.map((l) => [l.id, l]));
+
+  const jobs = filterPublishedJobList(published, locations, { locationSlug: slug });
   const readable = slug.replaceAll("-", " ");
+  const title = `Jobs in ${readable}`;
 
   if (jobs.length === 0) {
     return (
-      <section className="rounded-lg bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-bold capitalize">Jobs in {readable}</h1>
-        <p className="mt-2 text-slate-700">
-          No live listings right now. New jobs are posted daily on Vacancy Chennai.
-        </p>
-      </section>
+      <>
+        <InnerPageHero
+          eyebrow="Chennai · Area"
+          title={title}
+          description="No live listings in this area right now. New jobs are posted regularly — browse all Chennai roles or try another neighbourhood."
+          actions={
+            <Link href="/jobs-in-chennai" className={btnPrimary}>
+              All Chennai jobs
+            </Link>
+          }
+        />
+        <div className="pb-4 pt-8">
+          <div className={`${sectionCard} text-center`}>
+            <p className="text-sm text-slate-600">Check back soon or expand your search on the main jobs board.</p>
+          </div>
+        </div>
+      </>
     );
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `Jobs in ${readable}`,
-    itemListElement: jobs.map((job, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in"}/jobs/${job.id}`,
-      name: job.title,
-    })),
-  };
+  const jsonLd = buildJobsItemListJsonLd(jobs, title);
 
   return (
-    <div className="space-y-5">
+    <>
       <script
         type="application/ld+json"
-        // Safe because the payload is internally generated and serialized.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <section className="rounded-lg bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-bold capitalize">Jobs in {readable}</h1>
-        <p className="mt-2 text-slate-700">
-          Explore location-first hiring in Chennai with quick apply.
-        </p>
+      <InnerPageHero
+        eyebrow="Chennai · Area"
+        title={title}
+        description="Moderated, location-first listings — quick apply with name and phone."
+        actions={
+          <Link href="/jobs-in-chennai" className={btnPrimary}>
+            All areas
+          </Link>
+        }
+      />
+      <section className="grid gap-4 pb-4 pt-8 md:grid-cols-2">
+        {jobs.map((job) => {
+          const loc = locationsById.get(job.locationId);
+          return (
+            <JobCard
+              key={job.id}
+              job={job}
+              employerCompanyName={employerNames.get(job.employerId)}
+              locationArea={loc?.area}
+              locationZone={loc?.zone}
+            />
+          );
+        })}
       </section>
-      <section className="grid gap-4 md:grid-cols-2">
-        {jobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
-      </section>
-    </div>
+    </>
   );
 }
-

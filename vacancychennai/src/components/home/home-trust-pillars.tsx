@@ -1,4 +1,6 @@
-import { cardSurface, transitionFast } from "@/lib/ui";
+import HomeSectionShell from "@/components/home/home-section-shell";
+import SectionHeader from "@/components/home/section-header";
+import { transitionFast } from "@/lib/ui";
 
 const pillars = [
   {
@@ -19,7 +21,7 @@ const pillars = [
 ] as const;
 
 function PillarIcon({ name }: { name: (typeof pillars)[number]["icon"] }) {
-  const c = "h-8 w-8 text-blue-600";
+  const c = "h-7 w-7 text-blue-700";
   if (name === "map") {
     return (
       <svg className={c} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
@@ -36,38 +38,39 @@ function PillarIcon({ name }: { name: (typeof pillars)[number]["icon"] }) {
   }
   return (
     <svg className={c} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 2 3 14h8l-1 8 10-12h-8l1-8z" />
     </svg>
   );
 }
 
 export default function HomeTrustPillars() {
   return (
-    <section className="space-y-6" aria-labelledby="home-trust-heading">
-      <h2
-        id="home-trust-heading"
-        className="text-2xl font-semibold tracking-tight text-slate-900"
-      >
-        Why use Vacancy Chennai
-      </h2>
-      <div className="grid gap-4 md:grid-cols-3">
-        {pillars.map((p) => (
-          <div
-            key={p.title}
-            className={`${cardSurface} p-6 ${transitionFast} hover:border-blue-200`}
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-md)] bg-blue-50">
-              <PillarIcon name={p.icon} />
+    <HomeSectionShell variant="trust" fullBleed>
+      <section className="space-y-8" aria-labelledby="home-trust-heading">
+        <SectionHeader
+          id="home-trust-heading"
+          eyebrow="Why us"
+          title="Why use Vacancy Chennai"
+          description="Local signals, human moderation, and quick apply — built for Chennai’s job market."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {pillars.map((p) => (
+            <div
+              key={p.title}
+              className={`rounded-[var(--radius-lg)] border border-slate-200/80 bg-transparent p-6 ${transitionFast} hover:border-blue-300 hover:bg-white/50`}
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-md)] bg-blue-50 ring-1 ring-blue-100/80">
+                <PillarIcon name={p.icon} />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">{p.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{p.body}</p>
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">{p.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">{p.body}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+        <p className="text-center text-sm font-medium text-slate-600">
+          Built for Chennai workers and the employers who hire locally.
+        </p>
+      </section>
+    </HomeSectionShell>
   );
 }

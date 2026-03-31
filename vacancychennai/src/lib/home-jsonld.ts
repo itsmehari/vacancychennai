@@ -1,7 +1,21 @@
 import { homeFaqItems } from "@/lib/home-content";
+import { HOME_SCHEMA_DESCRIPTION, HOME_SEO_TITLE } from "@/lib/home-seo-copy";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
 const logoUrl = process.env.NEXT_PUBLIC_SITE_LOGO_URL;
+
+const chennaiAreaServed = {
+  "@type": "City",
+  name: "Chennai",
+  containedInPlace: {
+    "@type": "State",
+    name: "Tamil Nadu",
+    containedInPlace: {
+      "@type": "Country",
+      name: "India",
+    },
+  },
+};
 
 export function buildHomeJsonLdGraph() {
   const website: Record<string, unknown> = {
@@ -9,10 +23,12 @@ export function buildHomeJsonLdGraph() {
     "@id": `${siteUrl}/#website`,
     name: "Vacancy Chennai",
     url: siteUrl,
-    description:
-      "Hyperlocal job listings for Chennai — browse by area, category, segment, and quick apply.",
+    inLanguage: "en-IN",
+    description: HOME_SCHEMA_DESCRIPTION,
+    publisher: { "@id": `${siteUrl}/#organization` },
     potentialAction: {
       "@type": "SearchAction",
+      name: "Search jobs by category",
       target: {
         "@type": "EntryPoint",
         urlTemplate: `${siteUrl}/jobs-in-chennai?category={search_term_string}`,
@@ -26,7 +42,23 @@ export function buildHomeJsonLdGraph() {
     "@id": `${siteUrl}/#organization`,
     name: "Vacancy Chennai",
     url: siteUrl,
+    description: HOME_SCHEMA_DESCRIPTION,
+    areaServed: chennaiAreaServed,
     ...(logoUrl ? { logo: logoUrl } : {}),
+  };
+
+  const webPage: Record<string, unknown> = {
+    "@type": "WebPage",
+    "@id": `${siteUrl}/#webpage`,
+    url: `${siteUrl}/`,
+    name: HOME_SEO_TITLE,
+    description: HOME_SCHEMA_DESCRIPTION,
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    about: { "@id": `${siteUrl}/#organization` },
+    mainEntity: { "@id": `${siteUrl}/#website` },
+    ...(logoUrl
+      ? { primaryImageOfPage: { "@type": "ImageObject", url: logoUrl } }
+      : {}),
   };
 
   const faqPage = {
@@ -44,6 +76,6 @@ export function buildHomeJsonLdGraph() {
 
   return {
     "@context": "https://schema.org",
-    "@graph": [website, organization, faqPage],
+    "@graph": [organization, website, webPage, faqPage],
   };
 }
