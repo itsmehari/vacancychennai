@@ -1,0 +1,10 @@
+{
+  "installCommand": "cd vacancychennai && npm ci",
+  "buildCommand": "cd vacancychennai && npm run build",
+  "crons": [
+    {
+      "path": "/api/cron/notifications",
+      "schedule": "0 4 * * *"
+    }
+  ]
+}
