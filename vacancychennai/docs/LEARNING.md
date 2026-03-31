@@ -7,7 +7,8 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | **This file** | Pitfalls, patterns, “why we did X” — living reference while building. |
 | [`PROJECT_UPDATE.md`](./PROJECT_UPDATE.md) | Changelog: what shipped, in roughly reverse chronological order. |
 | [`AGENTS.md`](../AGENTS.md) | Cursor/agent rules for this app (Next.js warning + project conventions). |
-| [Cursor skill](../../.cursor/skills/vacancychennai-proj-skill/SKILL.md) | When the agent should load Vacancy Chennai context (triggers + file map). |
+| [Cursor skill — Vacancy Chennai](../../.cursor/skills/vacancychennai-proj-skill/SKILL.md) | When the agent should load Vacancy Chennai context (triggers + file map). |
+| [Cursor skill — Next 16 proxy](../../.cursor/skills/nextjs-16-proxy-migration/SKILL.md) | `middleware.ts` → `proxy.ts` migration and conventions. |
 
 ## Next.js App Router
 
@@ -94,4 +95,43 @@ Engineering and design notes from implementation work (including the 2026 home/m
 
 ## Scheduled job digests, alerts, SMS (cron)
 
-- **Route:** `GET`/`POST` **`/api/cron/notifications`** (`src/app/api/cro
+- **Route:** `GET`/`POST` **`/api/cron/notifications`** (`src/app/api/cron/notifications/route.ts`, **`runtime: "nodejs"`**). Authorize with **`Authorization: Bearer <CRON_SECRET>`** or **`?secret=<CRON_SECRET>`**. Returns 401 if `CRON_SECRET` is unset or wrong.
+- **Logic:** `runScheduledNotifications()` in `src/lib/notifications/run-scheduled-notifications.ts` loads **`email_subscriptions`** (`email_digest`, `job_alerts`, `sms_reminder`), loads new **published** jobs since a window via **`listPublishedJobsCreatedSince`** in `repository.ts` (default window **`NOTIFICATION_DIGEST_WINDOW_HOURS`**, fallback 24).
+- **Email:** One digest per unique email when subscribed to digest and/or job alerts (deduped). Uses **`sendJobDigestEmail`** in `src/lib/email/send-digest-email.ts` (needs Resend + **`NEXT_PUBLIC_SITE_URL`**).
+- **SMS:** **`sendTwilioSms`** in `src/lib/sms/twilio-sms.ts` when **`TWILIO_ACCOUNT_SID`**, **`TWILIO_AUTH_TOKEN`**, **`TWILIO_FROM_NUMBER`** are set. If Twilio is missing, optional **`ADMIN_SMS_DIGEST_EMAIL`** receives a **fallback** summary via Resend (`sendSmsFallbackDigestEmail`).
+- **Vercel:** Root **`vacancychennai/vercel.json`** defines a daily cron hitting the notifications path; set **`CRON_SECRET`** in the project env (Vercel cron sends the Bearer token when configured).
+- **Subscriptions storage:** Migration **`007_signup_password_reset_subscriptions.sql`** (and earlier schema) — `subscribeAlertsAction` in `account-actions.ts` upserts **`email_subscriptions`**.
+
+## References in repo
+
+| Topic        | Location |
+|-------------|----------|
+| Home SEO strings | `src/lib/home-seo-copy.ts` |
+| Home / FAQ JSON-LD | `src/lib/home-jsonld.ts` |
+| Job list JSON-LD | `src/lib/jobs-itemlist-jsonld.ts` |
+| Area URL helper | `src/lib/area-job-path.ts` |
+| Metadata helpers | `src/lib/seo.ts` (`baseMetadata`, `homePageMetadata`, `jobsInChennaiListingMetadata`) |
+| Blog content | `src/lib/blog-posts.ts` |
+| Blog schema  | `src/lib/blog-jsonld.ts` |
+| Footer config | `src/lib/footer-config.ts` |
+| Nav mega / profile config | `src/lib/nav-config.ts` |
+| Crawlers | `src/app/robots.ts`, `src/app/sitemap.ts` |
+| Auth actions (login, resend, DB vs mock) | `src/features/auth/actions.ts` |
+| Email verify route | `src/app/api/auth/email/verify/route.ts` |
+| Resend + templates | `src/lib/email/resend-client.ts`, `send-auth-email.ts` |
+| Verification tokens (DB) | `src/lib/email/verification-tokens.ts` |
+| Admin / employer register & subscribe actions | `src/features/auth/account-actions.ts` |
+| Job digest + SMS fallback email | `src/lib/email/send-digest-email.ts` |
+| Twilio SMS | `src/lib/sms/twilio-sms.ts` |
+| Cron notification runner | `src/lib/notifications/run-scheduled-notifications.ts` |
+| Cron HTTP entry | `src/app/api/cron/notifications/route.ts` |
+| Next request proxy (city headers) | `src/proxy.ts` |
+| Vercel cron schedule | `vacancychennai/vercel.json` |
+| Login query copy | `src/lib/auth-login-errors.ts` |
+| Email send rate limits | `src/lib/rate-limit.ts` |
+| Email verification migration | `database/migrations/006_email_verification.sql` |
+| Repository (DB + mock) | `src/features/core/repository.ts` — jobs, locations, audits, AI match suggestions |
+| Area filter + slug resolve | `src/lib/job-filters.ts` — `filterPublishedJobList`, `getLocationByAreaSlug` |
+| Dynamic area page | `src/app/[locationPage]/page.tsx` |
+| Agent rules | `AGENTS.md` (repo: `vacancychennai/AGENTS.md`) |
+| Cursor skills | `vacancychennai-proj-skill`, `nextjs-16-proxy-migration` under repo `.cursor/skills/` |

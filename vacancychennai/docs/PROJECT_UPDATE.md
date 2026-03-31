@@ -4,6 +4,34 @@ Chronological log of notable product and codebase changes. **Latest first.** Pai
 
 ---
 
+## 2026-03 — Admin password reset, scheduled digests/SMS, Next.js proxy
+
+### Admin auth
+
+- **`008_admin_password_reset_purpose.sql`:** `email_verification_tokens.purpose` may include **`admin_password_reset`**.
+- **`verification-tokens.ts`:** `validateAdminPasswordResetToken`, `finalizeAdminPasswordReset`; **`send-auth-email.ts`:** `sendAdminPasswordResetEmail` → `/admin/reset-password?token=…`.
+- **`account-actions.ts`:** `requestAdminPasswordResetAction`, `resetAdminPasswordAction` (rate limits + Resend parity with employer reset).
+- **Pages:** `/admin/forgot-password`, `/admin/reset-password`; admin login **Forgot password?** plus `?reset=1` / `?forgot=1` info banners.
+- **`auth-login-errors.ts`:** Generic success copy for password-reset email sent (`forgot=1`) so employer and admin share wording.
+
+### Scheduled notifications (cron)
+
+- **`/api/cron/notifications`:** Secured with **`CRON_SECRET`** (`Authorization: Bearer` or `?secret=`). Runs **`runScheduledNotifications`**: loads **`email_subscriptions`**, **`listPublishedJobsCreatedSince`** (window from **`NOTIFICATION_DIGEST_WINDOW_HOURS`**, default 24h).
+- **Email:** `send-digest-email.ts` → Resend digest to deduped addresses (`email_digest` + `job_alerts`).
+- **SMS:** `twilio-sms.ts` when Twilio env is set; else optional **`ADMIN_SMS_DIGEST_EMAIL`** fallback email listing SMS subscriber numbers.
+- **`vercel.json`:** Daily cron path to the notifications API (UTC schedule in file).
+- **`.env.example`:** Documents cron, Twilio, digest window, fallback email.
+
+### Next.js 16 convention
+
+- **`src/middleware.ts` removed; `src/proxy.ts` added** — `export function proxy` + same matcher (city / request-id headers). Removes build deprecation warning for the old middleware file name.
+
+### Docs
+
+- **`docs/LEARNING.md`**, **`docs/PROJECT_UPDATE.md`**, **`AGENTS.md`**, **vacancychennai-proj-skill**, root **`LEARNING.md` / `PROJECT_UPDATE.md` pointers**, and **`.cursor/skills/nextjs-16-proxy-migration/SKILL.md`** updated.
+
+---
+
 ## 2026-04 — Postgres parity gaps, audits, hyperlocal route hardening
 
 ### Repository and APIs
