@@ -1,6 +1,8 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "cd vacancychennai && npm ci",
   "buildCommand": "cd vacancychennai && npm run build",
+  "outputDirectory": "vacancychennai/.next",
   "crons": [
     {
       "path": "/api/cron/notifications",
