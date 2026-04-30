@@ -7,6 +7,11 @@ import {
   JobStatus,
   Location,
 } from "@/types/domain";
+import {
+  curatedEmployer,
+  curatedLocations,
+  curatedPublishedJobs,
+} from "@/features/core/static-curated-jobs";
 
 const now = () => new Date().toISOString();
 
@@ -51,22 +56,7 @@ export const locations: Location[] = [
     lat: 13.1143,
     lng: 80.1548,
   },
-  {
-    id: "loc-parrys",
-    zone: "Chennai Central",
-    area: "Parrys",
-    pincode: "600001",
-    lat: 13.0891,
-    lng: 80.2925,
-  },
-  {
-    id: "loc-kilpauk",
-    zone: "Chennai Central",
-    area: "Kilpauk",
-    pincode: "600010",
-    lat: 13.0838,
-    lng: 80.2413,
-  },
+  ...curatedLocations,
 ];
 
 export const employers: EmployerProfile[] = [
@@ -76,12 +66,7 @@ export const employers: EmployerProfile[] = [
     email: "employer@vacancychennai.in",
     password: "demo123",
   },
-  {
-    id: "emp-advocate-cn",
-    companyName: "Advocate Office",
-    email: "external.advocate.office@vacancychennai.in",
-    password: "nologin",
-  },
+  curatedEmployer,
 ];
 
 export const candidates: CandidateProfile[] = [
@@ -167,74 +152,10 @@ export const jobs: Job[] = [
     listingTier: "free",
     createdAt: now(),
   },
-  {
-    id: "job-office-mgr-advocate-parrys",
-    employerId: "emp-advocate-cn",
-    title: "Office Manager",
-    category: "Admin",
-    industry: "Legal",
-    jobType: "full-time",
-    salaryMin: 30000,
-    salaryMax: 30000,
-    locationId: "loc-parrys",
-    landmarkText:
-      "Advocate offices at Parrys and Kilpauk, Chennai — 2 positions (one per location).",
-    description: [
-      "Vacancy: Office Manager — 2 positions (one at Parrys, one at Kilpauk).",
-      "",
-      "Gender: Open to all (male / female).",
-      "Salary: ₹30,000 per month.",
-      "Timings: 9:00 AM – 6:00 PM.",
-      "Age: Up to 45 years.",
-      "",
-      "Requirements:",
-      "• Minimum relevant work experience is mandatory.",
-      "• Preference for candidates residing nearby.",
-      "• Position is for an advocate office.",
-      "",
-      "How to apply:",
-      "Send your resume via WhatsApp to 8248622449.",
-      "Kindly avoid unnecessary phone calls — WhatsApp only.",
-    ].join("\n"),
-    status: "published",
-    featured: false,
-    listingTier: "free",
+  ...curatedPublishedJobs.map((j) => ({
+    ...j,
     createdAt: now(),
-  },
-  {
-    id: "job-office-mgr-advocate-kilpauk",
-    employerId: "emp-advocate-cn",
-    title: "Office Manager",
-    category: "Admin",
-    industry: "Legal",
-    jobType: "full-time",
-    salaryMin: 30000,
-    salaryMax: 30000,
-    locationId: "loc-kilpauk",
-    landmarkText:
-      "Advocate offices at Parrys and Kilpauk, Chennai — 2 positions (one per location).",
-    description: [
-      "Vacancy: Office Manager — 2 positions (one at Parrys, one at Kilpauk).",
-      "",
-      "Gender: Open to all (male / female).",
-      "Salary: ₹30,000 per month.",
-      "Timings: 9:00 AM – 6:00 PM.",
-      "Age: Up to 45 years.",
-      "",
-      "Requirements:",
-      "• Minimum relevant work experience is mandatory.",
-      "• Preference for candidates residing nearby.",
-      "• Position is for an advocate office.",
-      "",
-      "How to apply:",
-      "Send your resume via WhatsApp to 8248622449.",
-      "Kindly avoid unnecessary phone calls — WhatsApp only.",
-    ].join("\n"),
-    status: "published",
-    featured: false,
-    listingTier: "free",
-    createdAt: now(),
-  },
+  })),
 ];
 
 export const applications: JobApplication[] = [

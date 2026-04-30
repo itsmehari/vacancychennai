@@ -19,7 +19,12 @@ import {
   updateCandidateProfile,
   updateJobStatus,
 } from "@/features/core/mock-db";
-import type { CandidateProfile, Job, JobApplication, JobStatus } from "@/types/domain";
+import {
+  curatedEmployerCompanyNameMap,
+  curatedLocations,
+  curatedPublishedJobs,
+} from "@/features/core/static-curated-jobs";
+import type { CandidateProfile, Job, JobApplication, JobStatus, Location } from "@/types/domain";
 
 type DbJobRow = {
   id: string;
@@ -38,6 +43,37 @@ type DbJobRow = {
   listing_tier: "free" | "featured" | "urgent";
   created_at: string;
 };
+
+function locationDedupeKey(l: Location) {
+  return `${l.zone.toLowerCase()}|${l.area.toLowerCase()}`;
+}
+
+/** Append statically curated areas when missing from Postgres (same zone+area). */
+function mergeLocationsWithCurated(dbLocations: Location[]): Location[] {
+  const seen = new Set(dbLocations.map(locationDedupeKey));
+  const out = [...dbLocations];
+  for (const loc of curatedLocations) {
+    const key = locationDedupeKey(loc);
+    if (!seen.has(key)) {
+      out.push(loc);
+      seen.add(key);
+    }
+  }
+  return out;
+}
+
+/** Published jobs: DB rows plus curated listings (by id, curated fill gaps only). */
+function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
+  const byId = new Map(dbJobs.map((j) => [j.id, j]));
+  for (const job of curatedPublishedJobs) {
+    if (job.status === "published" && !byId.has(job.id)) {
+      byId.set(job.id, job);
+    }
+  }
+  return [...byId.values()].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
 
 function mapDbJobRow(row: DbJobRow): Job {
   return {
@@ -69,7 +105,7 @@ export async function listLocations() {
     lat: number;
     lng: number;
   }>(`select id, zone, area, pincode, lat, lng from locations where is_active = true`);
-  return rows.map((row) => ({
+  const dbLocations = rows.map((row) => ({
     id: row.id,
     zone: row.zone,
     area: row.area,
@@ -77,6 +113,7 @@ export async function listLocations() {
     lat: Number(row.lat),
     lng: Number(row.lng),
   }));
+  return mergeLocationsWithCurated(dbLocations);
 }
 
 export async function listPublishedJobs(): Promise<Job[]> {
@@ -84,7 +121,7 @@ export async function listPublishedJobs(): Promise<Job[]> {
   const rows = await dbQuery<DbJobRow>(
     `select * from jobs where status = 'published' order by created_at desc`,
   );
-  return rows.map(mapDbJobRow);
+  return mergePublishedJobsWithCurated(rows.map(mapDbJobRow));
 }
 
 /** Published jobs whose `created_at` is at or after `sinceIso` (inclusive), newest first. */
@@ -101,7 +138,11 @@ export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<J
      order by created_at desc`,
     [sinceIso],
   );
-  return rows.map(mapDbJobRow);
+  const merged = mergePublishedJobsWithCurated(rows.map(mapDbJobRow));
+  const sinceMs = new Date(sinceIso).getTime();
+  return merged
+    .filter((job) => new Date(job.createdAt).getTime() >= sinceMs)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function createJob(input: {
@@ -529,8 +570,9 @@ export async function findJob(jobId: string): Promise<Job | null> {
   if (!hasDatabase()) return getJobById(jobId) ?? null;
   const rows = await dbQuery<DbJobRow>(`select * from jobs where id = $1 limit 1`, [jobId]);
   const row = rows[0];
-  if (!row) return null;
-  return mapDbJobRow(row);
+  if (row) return mapDbJobRow(row);
+  const curated = curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published");
+  return curated ?? null;
 }
 
 /** Jobs owned by employer user (`users.id` session actor). */
@@ -613,7 +655,11 @@ export async function getEmployerCompanyNameMap(): Promise<Map<string, string>> 
   const rows = await dbQuery<{ id: string; company_name: string }>(
     `select id, company_name from employer_profiles`,
   );
-  return new Map(rows.map((r) => [r.id, r.company_name]));
+  const map = new Map(rows.map((r) => [r.id, r.company_name]));
+  for (const [id, name] of curatedEmployerCompanyNameMap()) {
+    map.set(id, name);
+  }
+  return map;
 }
 
 export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string> {
@@ -624,7 +670,11 @@ export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string
     `select company_name from employer_profiles where id = $1 limit 1`,
     [job.employerId],
   );
-  return rows[0]?.company_name ?? "Local employer";
+  return (
+    rows[0]?.company_name ??
+    curatedEmployerCompanyNameMap().get(job.employerId) ??
+    "Local employer"
+  );
 }
 
 export async function findLocationById(locationId: string) {
@@ -641,14 +691,16 @@ export async function findLocationById(locationId: string) {
     [locationId],
   );
   const row = rows[0];
-  if (!row) return undefined;
-  return {
-    id: row.id,
-    zone: row.zone,
-    area: row.area,
-    pincode: row.pincode,
-    lat: Number(row.lat),
-    lng: Number(row.lng),
-  };
+  if (row) {
+    return {
+      id: row.id,
+      zone: row.zone,
+      area: row.area,
+      pincode: row.pincode,
+      lat: Number(row.lat),
+      lng: Number(row.lng),
+    };
+  }
+  return curatedLocations.find((l) => l.id === locationId);
 }
 

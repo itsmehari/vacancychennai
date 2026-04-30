@@ -10,6 +10,7 @@ import {
   listEmployerApplications,
   setApplicationStage,
 } from "@/features/core/repository";
+import { isCuratedWhatsAppOnlyJob } from "@/features/core/static-curated-jobs";
 import { incrementMetric } from "@/lib/metrics";
 
 export async function quickApplyAction(formData: FormData) {
@@ -23,6 +24,11 @@ export async function quickApplyAction(formData: FormData) {
   if (!job || job.status !== "published" || !applicantName || !applicantPhone) {
     incrementMetric("applyFailure");
     redirect(`/jobs/${jobId}?error=invalid-application`);
+  }
+
+  if (isCuratedWhatsAppOnlyJob(jobId)) {
+    incrementMetric("applyFailure");
+    redirect(`/jobs/${jobId}?error=whatsapp-only`);
   }
 
   const session = await getSession();

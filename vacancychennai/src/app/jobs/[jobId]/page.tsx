@@ -9,6 +9,10 @@ import {
   getApplyPrefillForActor,
   resolveEmployerDisplayNameForJob,
 } from "@/features/core/repository";
+import {
+  curatedAdvocateWhatsAppDigits,
+  isCuratedWhatsAppOnlyJob,
+} from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
 import { baseMetadata } from "@/lib/seo";
 import { btnPrimary, formInput, pillMeta, sectionCard } from "@/lib/ui";
@@ -48,6 +52,8 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   const session = await getSession();
   const prefill =
     session?.role === "candidate" ? await getApplyPrefillForActor(session.actorId) : null;
+  const whatsappOnly = isCuratedWhatsAppOnlyJob(job.id);
+  const waHref = `https://wa.me/${curatedAdvocateWhatsAppDigits}`;
 
   const jobPostingLd = {
     "@context": "https://schema.org",
@@ -126,80 +132,109 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
         <aside className="space-y-4 lg:sticky lg:top-24">
           <section className={sectionCard}>
-            <h2 className="text-lg font-semibold text-slate-900">Quick apply</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              No heavy resume required. Name + phone is enough. Signed-in candidates can pre-fill from their
-              profile.
-            </p>
-            {prefill && (prefill.profileHeadline || prefill.skillsPreview) ? (
-              <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700 ring-1 ring-slate-100">
-                <p className="font-semibold text-slate-800">From your profile</p>
-                {prefill.profileHeadline ? (
-                  <p className="mt-1">
-                    <span className="text-slate-500">Headline: </span>
-                    {prefill.profileHeadline}
-                  </p>
-                ) : null}
-                {prefill.skillsPreview ? (
-                  <p className="mt-1">
-                    <span className="text-slate-500">Skills: </span>
-                    {prefill.skillsPreview}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-            {query.success === "applied" && (
-              <div className="mt-4 space-y-3">
-                <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
-                  Application submitted successfully.
+            {whatsappOnly ? (
+              <>
+                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  The employer asked for applications on WhatsApp only. Send your résumé in chat; avoid phone
+                  calls unless they request a call back.
                 </p>
-                <JobSeekerProfileCta variant="inline" dataCta="job-detail-post-apply" />
-              </div>
+                <a
+                  href={waHref}
+                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cta="job-whatsapp-apply"
+                >
+                  Open WhatsApp
+                </a>
+                <p className="mt-3 text-xs text-slate-500">
+                  The same number is listed in the description if you prefer to copy it.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-semibold text-slate-900">Quick apply</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  No heavy resume required. Name + phone is enough. Signed-in candidates can pre-fill from their
+                  profile.
+                </p>
+                {prefill && (prefill.profileHeadline || prefill.skillsPreview) ? (
+                  <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700 ring-1 ring-slate-100">
+                    <p className="font-semibold text-slate-800">From your profile</p>
+                    {prefill.profileHeadline ? (
+                      <p className="mt-1">
+                        <span className="text-slate-500">Headline: </span>
+                        {prefill.profileHeadline}
+                      </p>
+                    ) : null}
+                    {prefill.skillsPreview ? (
+                      <p className="mt-1">
+                        <span className="text-slate-500">Skills: </span>
+                        {prefill.skillsPreview}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                {query.success === "applied" && (
+                  <div className="mt-4 space-y-3">
+                    <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
+                      Application submitted successfully.
+                    </p>
+                    <JobSeekerProfileCta variant="inline" dataCta="job-detail-post-apply" />
+                  </div>
+                )}
+                {query.error === "whatsapp-only" && (
+                  <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
+                    This role is WhatsApp-only — use the button above or the number in the description.
+                  </p>
+                )}
+                {query.error && query.error !== "whatsapp-only" && (
+                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
+                    Could not submit application. Please check your details.
+                  </p>
+                )}
+                <form action={quickApplyAction} className="mt-4 grid gap-3">
+                  <input type="hidden" name="jobId" value={job.id} />
+                  <input
+                    className={formInput}
+                    name="applicantName"
+                    placeholder="Your full name"
+                    required
+                    defaultValue={prefill?.applicantName}
+                    autoComplete="name"
+                  />
+                  <input
+                    className={formInput}
+                    name="applicantPhone"
+                    placeholder="Phone number"
+                    required
+                    defaultValue={prefill?.applicantPhone}
+                    autoComplete="tel"
+                  />
+                  <input
+                    className={formInput}
+                    name="applicantEmail"
+                    type="email"
+                    placeholder="Email (optional)"
+                    defaultValue={prefill?.applicantEmail}
+                    autoComplete="email"
+                  />
+                  <input
+                    className={formInput}
+                    name="resumeLink"
+                    placeholder="Resume link (optional)"
+                    defaultValue={prefill?.resumeLink}
+                  />
+                  <button type="submit" className={btnPrimary}>
+                    Apply now
+                  </button>
+                </form>
+                <div className="mt-6 border-t border-slate-100 pt-4">
+                  <JobSeekerProfileCta variant="inline" dataCta="job-detail-profile-hint" />
+                </div>
+              </>
             )}
-            {query.error && (
-              <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
-                Could not submit application. Please check your details.
-              </p>
-            )}
-            <form action={quickApplyAction} className="mt-4 grid gap-3">
-              <input type="hidden" name="jobId" value={job.id} />
-              <input
-                className={formInput}
-                name="applicantName"
-                placeholder="Your full name"
-                required
-                defaultValue={prefill?.applicantName}
-                autoComplete="name"
-              />
-              <input
-                className={formInput}
-                name="applicantPhone"
-                placeholder="Phone number"
-                required
-                defaultValue={prefill?.applicantPhone}
-                autoComplete="tel"
-              />
-              <input
-                className={formInput}
-                name="applicantEmail"
-                type="email"
-                placeholder="Email (optional)"
-                defaultValue={prefill?.applicantEmail}
-                autoComplete="email"
-              />
-              <input
-                className={formInput}
-                name="resumeLink"
-                placeholder="Resume link (optional)"
-                defaultValue={prefill?.resumeLink}
-              />
-              <button type="submit" className={btnPrimary}>
-                Apply now
-              </button>
-            </form>
-            <div className="mt-6 border-t border-slate-100 pt-4">
-              <JobSeekerProfileCta variant="inline" dataCta="job-detail-profile-hint" />
-            </div>
           </section>
         </aside>
       </div>
