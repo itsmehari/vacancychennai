@@ -124,6 +124,7 @@ export const jobs: Job[] = [
     featured: true,
     listingTier: "featured",
     createdAt: now(),
+    updatedAt: now(),
   },
   {
     id: "job-002",
@@ -141,6 +142,7 @@ export const jobs: Job[] = [
     featured: false,
     listingTier: "free",
     createdAt: now(),
+    updatedAt: now(),
   },
   {
     id: "job-003",
@@ -158,14 +160,17 @@ export const jobs: Job[] = [
     featured: false,
     listingTier: "free",
     createdAt: now(),
+    updatedAt: now(),
   },
   ...curatedPublishedJobs.map((j) => ({
     ...j,
     createdAt: now(),
+    updatedAt: now(),
   })),
   ...curatedExternalPublishedJobs.map((j) => ({
     ...j,
     createdAt: now(),
+    updatedAt: now(),
   })),
 ];
 
@@ -290,15 +295,17 @@ export function getJobById(id: string) {
 }
 
 export function addJob(
-  job: Omit<Job, "id" | "status" | "featured" | "listingTier" | "createdAt">,
+  job: Omit<Job, "id" | "status" | "featured" | "listingTier" | "createdAt" | "updatedAt">,
 ): Job {
+  const ts = now();
   const created: Job = {
     ...job,
     id: `job-${String(jobs.length + 1).padStart(3, "0")}`,
     status: "review",
     featured: false,
     listingTier: "free",
-    createdAt: now(),
+    createdAt: ts,
+    updatedAt: ts,
   };
   jobs.unshift(created);
   return created;
@@ -308,6 +315,7 @@ export function updateJobStatus(jobId: string, status: JobStatus) {
   const target = jobs.find((job) => job.id === jobId);
   if (!target) return undefined;
   target.status = status;
+  target.updatedAt = now();
   return target;
 }
 
@@ -339,6 +347,7 @@ export function setJobFeatured(jobId: string, tier: "featured" | "urgent") {
   if (!job) return undefined;
   job.featured = true;
   job.listingTier = tier;
+  job.updatedAt = now();
   return job;
 }
 

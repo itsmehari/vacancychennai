@@ -74,6 +74,7 @@ export const curatedExternalPublishedJobs: Job[] = rows.map((row) => {
   const description = undisclosed ? `${row.description}${SALARY_NOTE}` : row.description;
   const salaryMin = row.salaryMin > 0 ? row.salaryMin : SALARY_PLACEHOLDER_MIN;
   const salaryMax = row.salaryMax > 0 ? row.salaryMax : SALARY_PLACEHOLDER_MAX;
+  const postedAtIso = parsePostedAt(row.postedOrVerifiedDate);
 
   return {
     id,
@@ -90,7 +91,8 @@ export const curatedExternalPublishedJobs: Job[] = rows.map((row) => {
     status: "published",
     featured: false,
     listingTier: "free",
-    createdAt: parsePostedAt(row.postedOrVerifiedDate),
+    createdAt: postedAtIso,
+    updatedAt: postedAtIso,
   };
 });
 

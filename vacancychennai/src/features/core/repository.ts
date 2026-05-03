@@ -44,6 +44,7 @@ type DbJobRow = {
   is_featured: boolean;
   listing_tier: "free" | "featured" | "urgent";
   created_at: string;
+  updated_at: string;
 };
 
 function locationDedupeKey(l: Location) {
@@ -78,7 +79,7 @@ function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
     }
   }
   return [...byId.values()].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
 }
 
@@ -99,6 +100,7 @@ function mapDbJobRow(row: DbJobRow): Job {
     featured: row.is_featured,
     listingTier: row.listing_tier,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -124,9 +126,13 @@ export async function listLocations() {
 }
 
 export async function listPublishedJobs(): Promise<Job[]> {
-  if (!hasDatabase()) return jobs.filter((job) => job.status === "published");
+  if (!hasDatabase()) {
+    return jobs
+      .filter((job) => job.status === "published")
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }
   const rows = await dbQuery<DbJobRow>(
-    `select * from jobs where status = 'published' order by created_at desc`,
+    `select * from jobs where status = 'published' order by updated_at desc, created_at desc`,
   );
   return mergePublishedJobsWithCurated(rows.map(mapDbJobRow));
 }
@@ -149,7 +155,7 @@ export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<J
     const sinceMs = new Date(sinceIso).getTime();
     return jobs
       .filter((job) => job.status === "published" && new Date(job.createdAt).getTime() >= sinceMs)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }
   const rows = await dbQuery<DbJobRow>(
     `select * from jobs
@@ -161,7 +167,7 @@ export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<J
   const sinceMs = new Date(sinceIso).getTime();
   return merged
     .filter((job) => new Date(job.createdAt).getTime() >= sinceMs)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
 export async function createJob(input: {
@@ -219,7 +225,7 @@ export async function createJob(input: {
 export async function setJobStatus(jobId: string, status: JobStatus) {
   if (!hasDatabase()) return updateJobStatus(jobId, status);
   if (!isDatabaseUuid(jobId)) return undefined;
-  await dbExecute(`update jobs set status = $2 where id = $1`, [jobId, status]);
+  await dbExecute(`update jobs set status = $2, updated_at = now() where id = $1`, [jobId, status]);
   return { id: jobId, status };
 }
 
@@ -634,7 +640,7 @@ export async function listJobsForEmployerUser(userId: string): Promise<Job[]> {
     `select j.* from jobs j
      inner join employer_profiles ep on ep.id = j.employer_id
      where ep.user_id = $1
-     order by j.created_at desc`,
+     order by j.updated_at desc, j.created_at desc`,
     [userId],
   );
   return rows.map(mapDbJobRow);
@@ -642,7 +648,7 @@ export async function listJobsForEmployerUser(userId: string): Promise<Job[]> {
 
 export async function listAllJobs(): Promise<Job[]> {
   if (!hasDatabase()) return jobs;
-  const rows = await dbQuery<DbJobRow>(`select * from jobs order by created_at desc`);
+  const rows = await dbQuery<DbJobRow>(`select * from jobs order by updated_at desc, created_at desc`);
   return rows.map(mapDbJobRow);
 }
 

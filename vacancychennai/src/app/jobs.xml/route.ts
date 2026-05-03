@@ -24,7 +24,7 @@ export async function GET() {
   const items = jobs
     .map((job) => {
       const url = `${site}/jobs/${job.id}`;
-      const pub = new Date(job.createdAt);
+      const pub = new Date(job.updatedAt);
       const pubDate = Number.isNaN(pub.getTime()) ? new Date().toUTCString() : pub.toUTCString();
       const title = `${job.title} — Chennai`;
       const desc = `${job.category} · ${job.industry}. INR ${job.salaryMin.toLocaleString("en-IN")}–${job.salaryMax.toLocaleString("en-IN")}/month.`;

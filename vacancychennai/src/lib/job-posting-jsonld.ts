@@ -1,4 +1,6 @@
 import { jobsInAreaPath } from "@/lib/area-job-path";
+import { resolveOnetOccupationalCategoryUrl } from "@/lib/job-occupational-category";
+import { buildFactualJobIntro } from "@/lib/job-seo-intro";
 import type { Job, Location } from "@/types/domain";
 
 export type JobApplyMode = "quick-apply" | "external-url" | "direct-contact" | "whatsapp-only";
@@ -90,7 +92,20 @@ export function buildJobPostingJsonLd(opts: {
   if (postalCode) postalAddress.postalCode = postalCode;
   if (landmark) postalAddress.streetAddress = truncateDescription(landmark, 500);
 
-  const description = truncateDescription(opts.job.description, 50000);
+  const intro = buildFactualJobIntro({
+    job: opts.job,
+    location: opts.location,
+    employerName: opts.employerName,
+  });
+  const description = truncateDescription(`${intro}\n\n${opts.job.description}`, 50000);
+
+  const dateModifiedRaw = isoDatePosted(opts.job.updatedAt);
+  const postedMs = new Date(datePosted).getTime();
+  const modifiedMs = new Date(dateModifiedRaw).getTime();
+  const dateModified =
+    Number.isNaN(modifiedMs) || modifiedMs < postedMs ? datePosted : dateModifiedRaw;
+
+  const occupationalCategory = resolveOnetOccupationalCategoryUrl(opts.job);
 
   const hiringOrganization: Record<string, unknown> = {
     "@type": "Organization",
@@ -103,6 +118,7 @@ export function buildJobPostingJsonLd(opts: {
     title: opts.job.title.trim(),
     description,
     datePosted,
+    dateModified,
     validThrough,
     employmentType: mapJobTypeToGoogleEmploymentType(opts.job.jobType),
     hiringOrganization,
@@ -128,6 +144,7 @@ export function buildJobPostingJsonLd(opts: {
     },
     industry: opts.job.industry?.trim() || undefined,
     directApply: opts.applyMode === "quick-apply",
+    ...(occupationalCategory ? { occupationalCategory } : {}),
   };
 
   if (opts.applyMode === "external-url" && opts.externalApplyUrl?.trim()) {

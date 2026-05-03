@@ -30,6 +30,7 @@ import {
   buildJobPostingJsonLd,
   type JobApplyMode,
 } from "@/lib/job-posting-jsonld";
+import { buildFactualJobIntro } from "@/lib/job-seo-intro";
 import { jobDetailPageMetadata } from "@/lib/seo";
 import { btnPrimary, formInput, linkInline, pillMeta, sectionCard } from "@/lib/ui";
 import Link from "next/link";
@@ -88,6 +89,8 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
     description,
     path: `/jobs/${jobId}`,
     keywords: [...keywords],
+    publishedTime: job.createdAt,
+    modifiedTime: job.updatedAt,
   });
 }
 
@@ -138,6 +141,12 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     jobTitle: job.title,
     jobPath: `/jobs/${job.id}`,
     areaLabel,
+  });
+
+  const factualIntro = buildFactualJobIntro({
+    job,
+    location: location ?? null,
+    employerName,
   });
 
   const metaLine = [
@@ -210,7 +219,9 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               <span className={pillMeta}>{job.jobType}</span>
             </div>
             <div className="mt-6 border-t border-slate-100 pt-6">
-              <h3 className="text-sm font-semibold text-slate-900">Description</h3>
+              <h3 className="text-sm font-semibold text-slate-900">About this listing</h3>
+              <p className="mt-2 text-slate-700 leading-relaxed">{factualIntro}</p>
+              <h3 className="mt-8 text-sm font-semibold text-slate-900">Role details (employer)</h3>
               <div className="mt-2 whitespace-pre-wrap text-slate-800 leading-relaxed">{job.description}</div>
             </div>
           </section>

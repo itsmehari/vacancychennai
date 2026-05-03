@@ -58,10 +58,28 @@ export function jobDetailPageMetadata(opts: {
   description: string;
   path: string;
   keywords?: string[];
+  /** Listing first seen — maps to `openGraph.publishedTime` when article OG is used. */
+  publishedTime?: string;
+  /** Last update — `openGraph.modifiedTime` (requires `type: "article"` in Next metadata). */
+  modifiedTime?: string;
 }): Metadata {
   const base = baseMetadata(opts.title, opts.description, opts.path);
-  if (!opts.keywords?.length) return base;
-  return { ...base, keywords: opts.keywords };
+  let meta: Metadata = base;
+  if (opts.keywords?.length) meta = { ...meta, keywords: opts.keywords };
+  const modified = opts.modifiedTime?.trim();
+  const published = (opts.publishedTime ?? opts.modifiedTime)?.trim();
+  if (modified && published && meta.openGraph) {
+    meta = {
+      ...meta,
+      openGraph: {
+        ...meta.openGraph,
+        type: "article",
+        publishedTime: published,
+        modifiedTime: modified,
+      },
+    };
+  }
+  return meta;
 }
 
 /** Home page (`/`) — SEO-optimized title/description, OG, Twitter, optional share image. */

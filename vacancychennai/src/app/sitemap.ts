@@ -28,7 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const publishedJobs = await listPublishedJobs();
   const jobDetailUrls: MetadataRoute.Sitemap = publishedJobs.slice(0, JOB_DETAIL_SITEMAP_CAP).map((job) => ({
     url: `${base}/jobs/${job.id}`,
-    lastModified: new Date(job.createdAt),
+    lastModified: new Date(
+      Math.max(new Date(job.createdAt).getTime(), new Date(job.updatedAt).getTime()),
+    ),
     changeFrequency: "weekly",
     priority: 0.55,
   }));

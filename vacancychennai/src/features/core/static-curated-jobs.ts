@@ -6,6 +6,7 @@ import { curatedExternalEmployerCompanyNameMap } from "@/features/core/curated-e
  * Update here to change copy; no DB migration required for these rows.
  */
 const LISTING_CREATED_AT = "2026-04-30T00:00:00.000Z";
+const LISTING_UPDATED_AT = "2026-05-03T00:00:00.000Z";
 
 export const curatedEmployer: EmployerProfile = {
   id: "emp-advocate-cn",
@@ -108,6 +109,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: false,
     listingTier: "free",
     createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
   },
   {
     id: "job-office-mgr-advocate-kilpauk",
@@ -126,6 +128,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: false,
     listingTier: "free",
     createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
   },
   {
     id: "job-dugout-photographer-videographer",
@@ -144,6 +147,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: false,
     listingTier: "free",
     createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
   },
 ];
 

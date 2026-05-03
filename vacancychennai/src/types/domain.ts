@@ -34,6 +34,8 @@ export type Job = {
   featured: boolean;
   listingTier: "free" | "featured" | "urgent";
   createdAt: string;
+  /** Postgres `jobs.updated_at`; mirrors edits, status changes, promos. JSON-LD `dateModified`. */
+  updatedAt: string;
 };
 
 export type ApplicationStage =
