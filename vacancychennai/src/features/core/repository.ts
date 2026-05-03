@@ -81,6 +81,11 @@ function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
   );
 }
 
+/** Postgres `jobs.id` is `uuid`; curated/mock ids (`job-ext-*`, `job-office-*`, …) must skip the DB lookup. */
+function isUuidPrimaryKey(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+}
+
 function mapDbJobRow(row: DbJobRow): Job {
   return {
     id: row.id,
@@ -199,6 +204,7 @@ export async function createJob(input: {
 
 export async function setJobStatus(jobId: string, status: JobStatus) {
   if (!hasDatabase()) return updateJobStatus(jobId, status);
+  if (!isUuidPrimaryKey(jobId)) return undefined;
   await dbExecute(`update jobs set status = $2 where id = $1`, [jobId, status]);
   return { id: jobId, status };
 }
@@ -574,9 +580,11 @@ export async function getApplyPrefillForActor(actorId: string): Promise<{
 
 export async function findJob(jobId: string): Promise<Job | null> {
   if (!hasDatabase()) return getJobById(jobId) ?? null;
-  const rows = await dbQuery<DbJobRow>(`select * from jobs where id = $1 limit 1`, [jobId]);
-  const row = rows[0];
-  if (row) return mapDbJobRow(row);
+  if (isUuidPrimaryKey(jobId)) {
+    const rows = await dbQuery<DbJobRow>(`select * from jobs where id = $1 limit 1`, [jobId]);
+    const row = rows[0];
+    if (row) return mapDbJobRow(row);
+  }
   const curated = curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published");
   if (curated) return curated;
   const externalCurated = curatedExternalPublishedJobs.find(
