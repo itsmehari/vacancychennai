@@ -14,7 +14,7 @@ import Link from "next/link";
 
 export const metadata = baseMetadata(
   "Part-time jobs in Chennai",
-  "Flexible shifts across Chennai.",
+  "Flexible shifts from OMR to Tambaram, Porur, Velachery, Ambattur, and neighbouring pockets — moderated listings, quick apply, free for job seekers.",
   "/part-time-jobs-chennai",
 );
 
@@ -40,7 +40,7 @@ export default async function PartTimeJobsPage() {
       <InnerPageHero
         eyebrow="Job seekers"
         title="Part-time jobs in Chennai"
-        description="Flexible shifts and hourly-friendly roles across the city — filter further on the main jobs board."
+        description="Flexible shifts and hourly-friendly roles along Chennai corridors — pick an area match on this hub, then sharpen filters on the main jobs board."
         actions={
           <Link href="/jobs-in-chennai?jobType=part-time" className={btnPrimary}>
             Filter part-time only
@@ -77,7 +77,7 @@ export default async function PartTimeJobsPage() {
         <PartnerResumeDoctorAside
           utmContent="hub_part_time"
           headline="Side-gig readability"
-          body="Flexible roles still need ATS-safe résumés so hiring managers skim shift fit without parsing chaos."
+          body="Flexible roles still need ATS-safe CV layouts so hiring managers skim shift fit without parsing chaos."
           linkLabel="Format via ResumeDoctor"
         />
       </div>

@@ -1,26 +1,11 @@
 import HomeSectionShell from "@/components/home/home-section-shell";
 import SectionHeader from "@/components/home/section-header";
+import { homeTrustHeader, homeTrustPillarsCopy } from "@/lib/home-marketing-copy";
 import { transitionFast } from "@/lib/ui";
 
-const pillars = [
-  {
-    title: "Hyperlocal first",
-    body: "Zones, areas, and landmarks so you know if a job is near home or your commute.",
-    icon: "map",
-  },
-  {
-    title: "Moderated listings",
-    body: "We review employer posts to reduce spam and misleading ads.",
-    icon: "shield",
-  },
-  {
-    title: "Fast apply",
-    body: "Quick apply with essentials — optimised for high-volume local roles.",
-    icon: "bolt",
-  },
-] as const;
+type PillarIcon = (typeof homeTrustPillarsCopy)[number]["icon"];
 
-function PillarIcon({ name }: { name: (typeof pillars)[number]["icon"] }) {
+function PillarIcon({ name }: { name: PillarIcon }) {
   const c = "h-7 w-7 text-blue-700";
   if (name === "map") {
     return (
@@ -49,27 +34,28 @@ export default function HomeTrustPillars() {
       <section className="space-y-8" aria-labelledby="home-trust-heading">
         <SectionHeader
           id="home-trust-heading"
-          eyebrow="Why us"
-          title="Why use Vacancy Chennai"
-          description="Local signals, human moderation, and quick apply — built for Chennai’s job market."
+          eyebrow={homeTrustHeader.eyebrow}
+          title={homeTrustHeader.title}
+          description={homeTrustHeader.description}
         />
         <div className="grid gap-4 md:grid-cols-3">
-          {pillars.map((p) => (
+          {homeTrustPillarsCopy.map((p) => (
             <div
               key={p.title}
               className={`rounded-[var(--radius-lg)] border border-slate-200/80 bg-transparent p-6 ${transitionFast} hover:border-blue-300 hover:bg-white/50`}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-md)] bg-blue-50 ring-1 ring-blue-100/80">
-                <PillarIcon name={p.icon} />
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-white shadow-[var(--shadow-card)] ring-1 ring-slate-200/80">
+                  <PillarIcon name={p.icon} />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900">{p.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-700">{p.body}</p>
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-slate-900">{p.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{p.body}</p>
             </div>
           ))}
         </div>
-        <p className="text-center text-sm font-medium text-slate-600">
-          Built for Chennai workers and the employers who hire locally.
-        </p>
       </section>
     </HomeSectionShell>
   );

@@ -18,6 +18,7 @@ import {
   resolveEmployerDisplayNameForJob,
 } from "@/features/core/repository";
 import { buildHomeJsonLdGraph } from "@/lib/home-jsonld";
+import { formatTopChennaiAreasLine } from "@/lib/home-top-areas";
 import { uniqueCategoriesFromJobs } from "@/lib/job-filters";
 import { homePageMetadata } from "@/lib/seo";
 
@@ -70,6 +71,7 @@ export default async function Home() {
   const showcaseLocation = showcaseJob ? locationsById.get(showcaseJob.locationId) : undefined;
 
   const jsonLd = buildHomeJsonLdGraph();
+  const dynamicAreaInsight = formatTopChennaiAreasLine(published, locations, 4);
 
   return (
     <>
@@ -83,6 +85,7 @@ export default async function Home() {
           areaCount={areaCount}
           categories={categories}
           locations={locations}
+          dynamicAreaInsight={dynamicAreaInsight}
         />
         {showcaseJob && showcaseLocation ? (
           <HomeShowcaseBento
@@ -99,7 +102,7 @@ export default async function Home() {
           sectionId="featured"
           variant="featured"
           title="Featured jobs"
-          description="Highlighted roles from local employers."
+          description="Chennai employers boosting visibility — real micro-locations highlighted."
           jobs={featuredJobs}
           viewAllHref="/jobs-in-chennai"
           dataCtaViewAll="view-all-featured"

@@ -1,8 +1,24 @@
-import Image from "next/image";
 import Link from "next/link";
+import { ChennaiHeroIllustration } from "@/components/home/chennai-hero-illustration";
 import HomeBreakout from "@/components/home/home-breakout";
 import HomeHeroFloatingSearch from "@/components/home/home-hero-floating-search";
 import type { Location } from "@/types/domain";
+import {
+  homeHeroCtaBrowseJobs,
+  homeHeroCtaCreateAccount,
+  homeHeroCtaLearnMore,
+  homeHeroEyebrow,
+  homeHeroFootnoteTracked,
+  homeHeroIndustryPills,
+  homeHeroProfileTeaserLead,
+  homeHeroProfileTeaserRest,
+  homeHeroSocialProofLine,
+  homeHeroStatsLabels,
+  homeHeroSubcopy,
+  homeHeroTitleAfter,
+  homeHeroTitleBefore,
+  homeHeroTitleHighlight,
+} from "@/lib/home-marketing-copy";
 import { focusRingOnDark, linkInline, transitionFast } from "@/lib/ui";
 
 type Props = {
@@ -10,6 +26,8 @@ type Props = {
   areaCount: number;
   categories: string[];
   locations: Location[];
+  /** Live insight from listings, e.g. “Most openings right now: …”. */
+  dynamicAreaInsight: string | null;
 };
 
 /** Deep navy + amber — distinct from inner pages; pairs with white floating search card. */
@@ -28,36 +46,6 @@ const learnMoreLink = `group inline-flex min-h-[44px] items-center gap-2 text-sm
 
 const secondarySolidCta = `inline-flex min-h-[44px] items-center justify-center rounded-full bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 ${focusRingOnDark} ${transitionFast}`;
 
-const PORTRAITS: { src: string; alt: string; variant: "circle" | "pill"; className: string }[] = [
-  {
-    src: "https://i.pravatar.cc/480?img=32",
-    alt: "",
-    variant: "circle",
-    className: "absolute right-[8%] top-[2%] h-[88px] w-[88px] sm:h-[100px] sm:w-[100px] md:right-[12%] md:h-[112px] md:w-[112px]",
-  },
-  {
-    src: "https://i.pravatar.cc/480?img=45",
-    alt: "",
-    variant: "pill",
-    className:
-      "absolute left-[4%] top-[22%] h-[140px] w-[72px] sm:h-[168px] sm:w-[84px] md:left-[8%] md:h-[200px] md:w-[96px]",
-  },
-  {
-    src: "https://i.pravatar.cc/480?img=12",
-    alt: "",
-    variant: "pill",
-    className:
-      "absolute right-0 top-[38%] h-[155px] w-[78px] sm:h-[184px] sm:w-[88px] md:right-[4%] md:h-[220px] md:w-[100px]",
-  },
-  {
-    src: "https://i.pravatar.cc/480?img=68",
-    alt: "",
-    variant: "pill",
-    className:
-      "absolute bottom-[6%] left-[18%] h-[130px] w-[70px] sm:bottom-[8%] sm:h-[156px] sm:w-[80px] md:left-[22%] md:h-[176px] md:w-[88px]",
-  },
-];
-
 function formatStat(n: number): string {
   if (n >= 1000) {
     const k = n / 1000;
@@ -67,7 +55,13 @@ function formatStat(n: number): string {
   return String(n);
 }
 
-export default function HomeHero({ jobCount, areaCount, categories, locations }: Props) {
+export default function HomeHero({
+  jobCount,
+  areaCount,
+  categories,
+  locations,
+  dynamicAreaInsight,
+}: Props) {
   const jobsDisplay = jobCount > 0 ? formatStat(jobCount) : "—";
   const areasDisplay = areaCount > 0 ? String(areaCount) : "—";
 
@@ -88,27 +82,29 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
       />
 
       <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-12 md:pb-32 md:pt-16 lg:pb-36 lg:pt-20">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] lg:gap-12 xl:gap-16">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] lg:gap-12 xl:gap-16">
           <div className="relative z-10 min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200/90 md:text-sm">
-              Chennai · Hyperlocal hiring
+              {homeHeroEyebrow}
             </p>
-            <h1 className="mt-4 max-w-xl text-balance text-3xl font-bold leading-[1.12] tracking-tight text-white md:text-4xl md:leading-[1.08] lg:text-[2.75rem] lg:leading-[1.06]">
-              The best jobsite for your{" "}
+            <h1 className="mt-4 max-w-2xl text-balance text-3xl font-bold leading-[1.12] tracking-tight text-white md:text-4xl md:leading-[1.08] lg:text-[2.65rem] lg:leading-[1.06]">
+              {homeHeroTitleBefore}
               <span className="relative inline-block align-baseline">
                 <span
                   className="relative z-10 inline-block rounded-full bg-[var(--color-cta-amber)] px-3 py-0.5 text-slate-900 shadow-sm md:px-4 md:py-1"
                   style={{ boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone" }}
                 >
-                  future
+                  {homeHeroTitleHighlight}
                 </span>
-              </span>{" "}
-              in the city
+              </span>
+              {homeHeroTitleAfter}
             </h1>
-            <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-400 md:text-lg">
-              Browse by area, category, or role. Quick apply with name and phone — listings are moderated for
-              safer local hiring across Chennai.
-            </p>
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-400 md:text-lg">{homeHeroSubcopy}</p>
+            {dynamicAreaInsight ? (
+              <p className="mt-3 max-w-lg border-l-2 border-amber-400/50 pl-3 text-sm font-medium leading-relaxed text-amber-100/90 md:text-base">
+                {dynamicAreaInsight}
+              </p>
+            ) : null}
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
@@ -116,10 +112,10 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
                 className={primaryOutlineCta}
                 data-cta="hero-browse-all-jobs"
               >
-                Browse all jobs
+                {homeHeroCtaBrowseJobs}
               </Link>
               <Link href="/#home-hiw-heading" className={learnMoreLink} data-cta="hero-learn-more">
-                How applying works
+                {homeHeroCtaLearnMore}
                 <span
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-cta-amber)]/80 text-[var(--color-cta-amber)] transition-transform group-hover:translate-x-0.5"
                   aria-hidden
@@ -134,11 +130,11 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
                 className={secondarySolidCta}
                 data-cta="hero-create-account"
               >
-                Create free account
+                {homeHeroCtaCreateAccount}
               </Link>
             </div>
             <p className="mt-3 max-w-lg text-sm text-slate-400">
-              Track applications with the same email you use to quick-apply.{" "}
+              {homeHeroFootnoteTracked}{" "}
               <Link href="/candidate/login" className={`${linkInline} text-amber-200/90 hover:text-white`}>
                 Sign in
               </Link>
@@ -149,63 +145,33 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
                 className={`${linkInline} font-medium text-amber-200/85 hover:text-white`}
                 data-cta="hero-job-seeker-profile"
               >
-                Job seeker profile
-              </Link>{" "}
-              — save headline, skills, and a résumé for faster applies.
+                {homeHeroProfileTeaserLead}
+              </Link>
+              {homeHeroProfileTeaserRest}
             </p>
 
-            <p className="mt-8 text-xs font-medium text-slate-500 md:text-sm">
-              Trusted by job seekers across OMR, Tambaram, Porur &amp; more
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-6 opacity-60 md:gap-8">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Retail</span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">IT &amp; BPO</span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Logistics</span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Hospitality</span>
+            <p className="mt-8 text-xs font-medium text-slate-500 md:text-sm">{homeHeroSocialProofLine}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-6 opacity-65 md:gap-8">
+              {homeHeroIndustryPills.map((pill) => (
+                <span
+                  key={pill}
+                  className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400"
+                >
+                  {pill}
+                </span>
+              ))}
             </div>
 
-            <div className="mt-8 flex justify-center gap-3 sm:hidden" aria-hidden>
-              {PORTRAITS.map((p) => (
-                <div
-                  key={`m-${p.src}`}
-                  className={`h-14 w-14 shrink-0 overflow-hidden ring-2 ring-white/15 ${
-                    p.variant === "circle" ? "rounded-full" : "rounded-2xl"
-                  }`}
-                >
-                  <Image
-                    src={p.src}
-                    alt=""
-                    width={112}
-                    height={112}
-                    className="h-full w-full object-cover"
-                    sizes="56px"
-                  />
-                </div>
-              ))}
+            <div className="mt-10 flex justify-center sm:hidden">
+              <ChennaiHeroIllustration className="mx-auto h-auto w-[min(100%,280px)] opacity-90" />
             </div>
           </div>
 
           <div
-            className="relative mx-auto hidden h-[min(420px,55vh)] w-full max-w-[340px] sm:mx-0 sm:block lg:max-w-none lg:justify-self-end"
+            className="relative mx-auto hidden w-full max-w-[320px] justify-self-end sm:block lg:max-w-none"
             aria-hidden
           >
-            {PORTRAITS.map((p) => (
-              <div
-                key={p.src}
-                className={`${p.className} overflow-hidden shadow-xl shadow-black/40 ring-2 ring-white/10 ${
-                  p.variant === "circle" ? "rounded-full" : "rounded-[999px]"
-                }`}
-              >
-                <Image
-                  src={p.src}
-                  alt={p.alt}
-                  width={480}
-                  height={480}
-                  className="h-full w-full object-cover object-center"
-                  sizes="(max-width: 1024px) 200px, 240px"
-                />
-              </div>
-            ))}
+            <ChennaiHeroIllustration className="h-auto w-full max-h-[min(420px,52vh)] drop-shadow-2xl" />
           </div>
         </div>
 
@@ -221,20 +187,20 @@ export default function HomeHero({ jobCount, areaCount, categories, locations }:
               {jobsDisplay}
               {jobCount > 0 ? <span className="text-[var(--color-cta-amber)]">+</span> : null}
             </p>
-            <p className="mt-1 text-sm text-slate-400">Live job listings</p>
+            <p className="mt-1 text-sm text-slate-400">{homeHeroStatsLabels.listings}</p>
           </div>
           <div className="px-2 py-5 text-center sm:py-4 sm:px-6">
             <p className="text-3xl font-bold tabular-nums tracking-tight text-white md:text-4xl">
               {areasDisplay}
               {areaCount > 0 ? <span className="text-[var(--color-cta-amber)]">+</span> : null}
             </p>
-            <p className="mt-1 text-sm text-slate-400">Chennai areas covered</p>
+            <p className="mt-1 text-sm text-slate-400">{homeHeroStatsLabels.areas}</p>
           </div>
           <div className="px-2 py-5 text-center sm:py-4 sm:pl-6">
             <p className="text-3xl font-bold tracking-tight text-white md:text-4xl">
               Free<span className="text-[var(--color-cta-amber)]">.</span>
             </p>
-            <p className="mt-1 text-sm text-slate-400">No fee for job seekers</p>
+            <p className="mt-1 text-sm text-slate-400">{homeHeroStatsLabels.free}</p>
           </div>
         </div>
       </div>

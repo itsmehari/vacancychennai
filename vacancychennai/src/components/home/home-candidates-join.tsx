@@ -7,7 +7,7 @@ import { btnPrimary, btnSecondary, cardSurface, transitionFast } from "@/lib/ui"
 const steps = [
   {
     title: "Browse hyperlocal listings",
-    body: "Filter by area and category, or start from Freshers or Part-time hubs.",
+    body: "Filter by area and category, or start from the Freshers or Part-time Chennai hubs.",
     icon: (
       <svg className="h-5 w-5 text-blue-700" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437a.75.75 0 0 0 .503-.723v-9.75a.75.75 0 0 0-.503-.723l-4.875-2.437a.75.75 0 0 0-.752 0l-4.875 2.437a.75.75 0 0 0-.503.723v9.75c0 .316.2.597.503.723l4.875 2.437a.75.75 0 0 0 .752 0l4.875-2.437a.75.75 0 0 0 .503-.723v-9.75a.75.75 0 0 0-.503-.723l-4.875-2.437a.75.75 0 0 0-.752 0l-4.875 2.437a.75.75 0 0 0-.503.723V15" />

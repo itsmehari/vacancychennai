@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function ShowcaseProfileCard() {
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200/90 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-card)]">
@@ -9,19 +7,16 @@ export default function ShowcaseProfileCard() {
       />
       <div className="relative px-5 pb-5 pt-0 md:px-6 md:pb-6">
         <div className="-mt-10 flex justify-center md:-mt-11">
-          <div className="relative size-20 overflow-hidden rounded-full border-4 border-white shadow-md ring-1 ring-slate-200/80 md:size-[5.5rem]">
-            <Image
-              src="https://i.pravatar.cc/256?img=12"
-              alt=""
-              width={256}
-              height={256}
-              className="size-full object-cover"
-            />
+          <div
+            className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-teal-600 to-emerald-700 text-xl font-bold text-white shadow-md ring-1 ring-slate-200/80 md:size-[5.5rem]"
+            aria-hidden
+          >
+            KV
           </div>
         </div>
         <div className="mt-3 text-center">
           <h3 className="text-base font-semibold text-slate-900">Karthik Venkat</h3>
-          <p className="text-sm text-slate-600">Senior product designer · Chennai</p>
+          <p className="text-sm text-slate-600">Senior product designer · OMR corridor</p>
         </div>
         <div className="mt-3 flex justify-center gap-3" aria-label="Social links (sample)">
           {[

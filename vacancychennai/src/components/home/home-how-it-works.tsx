@@ -1,27 +1,15 @@
 import Link from "next/link";
 import HomeSectionShell from "@/components/home/home-section-shell";
 import SectionHeader from "@/components/home/section-header";
+import {
+  homeHowItWorksCandidateSteps,
+  homeHowItWorksEmployerSteps,
+  homeHowItWorksHeader,
+  type HomeStepIcon,
+} from "@/lib/home-marketing-copy";
 import { btnPrimary, btnSecondary, transitionFast } from "@/lib/ui";
 
-type IconKind = "search" | "doc" | "user" | "building" | "clipboard" | "users";
-
-const candidateSteps: { n: number; text: string; icon: IconKind }[] = [
-  { n: 1, text: "Browse by area, category, or segment (freshers / part-time).", icon: "search" },
-  { n: 2, text: "Open a job and read location, salary range, and landmark.", icon: "doc" },
-  {
-    n: 3,
-    text: "Apply with quick apply (name + phone) or sign in to track applications.",
-    icon: "user",
-  },
-];
-
-const employerSteps: { n: number; text: string; icon: IconKind }[] = [
-  { n: 1, text: "Create an employer account and sign in.", icon: "building" },
-  { n: 2, text: "Post a job with area, role, and salary — listings are moderated.", icon: "clipboard" },
-  { n: 3, text: "Review applicants from your dashboard and shortlist or reject.", icon: "users" },
-];
-
-function StepIcon({ kind }: { kind: IconKind }) {
+function StepIcon({ kind }: { kind: HomeStepIcon }) {
   const c = "h-5 w-5 text-slate-600";
   if (kind === "search") {
     return (
@@ -69,7 +57,7 @@ function StepList({
   steps,
   lineClass,
 }: {
-  steps: { n: number; text: string; icon: IconKind }[];
+  steps: readonly { n: number; text: string; icon: HomeStepIcon }[];
   lineClass: string;
 }) {
   return (
@@ -104,35 +92,35 @@ export default function HomeHowItWorks() {
       <section className="space-y-8" aria-labelledby="home-hiw-heading">
         <SectionHeader
           id="home-hiw-heading"
-          eyebrow="Simple paths"
-          title="How it works"
-          description="Two simple paths — whether you are hiring or looking for work in Chennai."
+          eyebrow={homeHowItWorksHeader.eyebrow}
+          title={homeHowItWorksHeader.title}
+          description={homeHowItWorksHeader.description}
         />
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-        <div className="rounded-[var(--radius-lg)] border border-blue-200/80 bg-gradient-to-b from-blue-50/80 to-white p-6 md:p-8">
-          <h3 className="text-lg font-semibold text-slate-900">For job seekers</h3>
-          <StepList steps={candidateSteps} lineClass="bg-blue-200" />
-          <div className="mt-8 flex flex-col gap-2 border-t border-blue-100/80 pt-6 sm:flex-row sm:flex-wrap">
-            <Link href="/candidate/login" className={btnSecondary} data-cta="hiw-candidate-login">
-              Candidate login
-            </Link>
-            <Link href="/jobs-in-chennai" className={btnPrimary} data-cta="hiw-browse-jobs">
-              Browse jobs
-            </Link>
+          <div className="rounded-[var(--radius-lg)] border border-blue-200/80 bg-gradient-to-b from-blue-50/80 to-white p-6 md:p-8">
+            <h3 className="text-lg font-semibold text-slate-900">For job seekers</h3>
+            <StepList steps={homeHowItWorksCandidateSteps} lineClass="bg-blue-200" />
+            <div className="mt-8 flex flex-col gap-2 border-t border-blue-100/80 pt-6 sm:flex-row sm:flex-wrap">
+              <Link href="/candidate/login" className={btnSecondary} data-cta="hiw-candidate-login">
+                Candidate login
+              </Link>
+              <Link href="/jobs-in-chennai" className={btnPrimary} data-cta="hiw-browse-jobs">
+                Browse Chennai jobs
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="rounded-[var(--radius-lg)] border border-amber-200/80 bg-gradient-to-b from-amber-50/60 to-white p-6 md:p-8">
-          <h3 className="text-lg font-semibold text-slate-900">For employers</h3>
-          <StepList steps={employerSteps} lineClass="bg-amber-200/90" />
-          <div className="mt-8 flex flex-col gap-2 border-t border-amber-100/90 pt-6 sm:flex-row sm:flex-wrap">
-            <Link href="/employer/login" className={btnSecondary} data-cta="hiw-employer-login">
-              Employer login
-            </Link>
-            <Link href="/pricing" className={btnPrimary} data-cta="hiw-pricing">
-              View pricing
-            </Link>
+          <div className="rounded-[var(--radius-lg)] border border-amber-200/80 bg-gradient-to-b from-amber-50/60 to-white p-6 md:p-8">
+            <h3 className="text-lg font-semibold text-slate-900">For employers</h3>
+            <StepList steps={homeHowItWorksEmployerSteps} lineClass="bg-amber-200/90" />
+            <div className="mt-8 flex flex-col gap-2 border-t border-amber-100/90 pt-6 sm:flex-row sm:flex-wrap">
+              <Link href="/employer/login" className={btnSecondary} data-cta="hiw-employer-login">
+                Employer login
+              </Link>
+              <Link href="/pricing" className={btnPrimary} data-cta="hiw-pricing">
+                View pricing
+              </Link>
+            </div>
           </div>
-        </div>
         </div>
       </section>
     </HomeSectionShell>

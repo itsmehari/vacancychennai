@@ -1,40 +1,10 @@
 import Link from "next/link";
 import HomeSectionShell from "@/components/home/home-section-shell";
 import SectionHeader from "@/components/home/section-header";
+import { homeSegmentCards, homeSegmentsHeader } from "@/lib/home-marketing-copy";
 import { btnPrimary, cardInteractive, transitionFast } from "@/lib/ui";
 
-const segments = [
-  {
-    title: "Freshers & entry-level",
-    description: "Roles suited for early-career and first-job seekers in Chennai.",
-    href: "/freshers-jobs-chennai",
-    cta: "See freshers jobs",
-    dataCta: "segment-freshers",
-    icon: "graduation",
-    accent: "blue" as const,
-    badge: null as string | null,
-  },
-  {
-    title: "Part-time & flexible",
-    description: "Shift-friendly and flexible listings across the city.",
-    href: "/part-time-jobs-chennai",
-    cta: "See part-time jobs",
-    dataCta: "segment-part-time",
-    icon: "clock",
-    accent: "amber" as const,
-    badge: null as string | null,
-  },
-  {
-    title: "All Chennai jobs",
-    description: "Full catalog with filters for category, type, and salary.",
-    href: "/jobs-in-chennai",
-    cta: "Browse all jobs",
-    dataCta: "segment-all-jobs",
-    icon: "briefcase",
-    accent: "slate" as const,
-    badge: "Most popular" as string | null,
-  },
-];
+type SegmentIconName = (typeof homeSegmentCards)[number]["icon"];
 
 const accentStyles = {
   blue: {
@@ -57,13 +27,7 @@ const accentStyles = {
   },
 } as const;
 
-function SegmentIcon({
-  name,
-  className,
-}: {
-  name: (typeof segments)[number]["icon"];
-  className: string;
-}) {
+function SegmentIcon({ name, className }: { name: SegmentIconName; className: string }) {
   if (name === "graduation") {
     return (
       <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
@@ -99,43 +63,43 @@ export default function HomeSegmentCards() {
       <section className="space-y-8" aria-labelledby="home-segments-heading">
         <SectionHeader
           id="home-segments-heading"
-          eyebrow="Start here"
-          title="Find jobs by situation"
-          description="Jump straight into the list that matches how you want to work."
+          eyebrow={homeSegmentsHeader.eyebrow}
+          title={homeSegmentsHeader.title}
+          description={homeSegmentsHeader.description}
         />
         <div className="grid gap-5 md:grid-cols-3">
-        {segments.map((item) => {
-          const a = accentStyles[item.accent];
-          return (
-            <article
-              key={item.href}
-              className={`group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-card)] ${a.bar} ${cardInteractive} motion-reduce:hover:translate-y-0`}
-            >
-              <div className={`h-1 w-full bg-gradient-to-r ${a.top}`} aria-hidden />
-              <div className="flex flex-1 flex-col p-6 pt-5">
-                {item.badge ? (
-                  <span className="mb-3 inline-flex w-fit rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                    {item.badge}
-                  </span>
-                ) : null}
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${a.iconWrap} ${transitionFast} group-hover:scale-105 motion-reduce:group-hover:scale-100`}
-                  >
-                    <SegmentIcon name={item.icon} className={`h-7 w-7 ${a.icon}`} />
+          {homeSegmentCards.map((item) => {
+            const a = accentStyles[item.accent];
+            return (
+              <article
+                key={item.href}
+                className={`group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-card)] ${a.bar} ${cardInteractive} motion-reduce:hover:translate-y-0`}
+              >
+                <div className={`h-1 w-full bg-gradient-to-r ${a.top}`} aria-hidden />
+                <div className="flex flex-1 flex-col p-6 pt-5">
+                  {item.badge ? (
+                    <span className="mb-3 inline-flex w-fit rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      {item.badge}
+                    </span>
+                  ) : null}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${a.iconWrap} ${transitionFast} group-hover:scale-105 motion-reduce:group-hover:scale-100`}
+                    >
+                      <SegmentIcon name={item.icon} className={`h-7 w-7 ${a.icon}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
-                  </div>
+                  <Link href={item.href} className={`${btnPrimary} mt-6 w-full`} data-cta={item.dataCta}>
+                    {item.cta}
+                  </Link>
                 </div>
-                <Link href={item.href} className={`${btnPrimary} mt-6 w-full`} data-cta={item.dataCta}>
-                  {item.cta}
-                </Link>
-              </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })}
         </div>
       </section>
     </HomeSectionShell>

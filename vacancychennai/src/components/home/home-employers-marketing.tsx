@@ -1,12 +1,7 @@
 import Link from "next/link";
 import HomeSectionShell from "@/components/home/home-section-shell";
+import { homeEmployersBullets } from "@/lib/home-marketing-copy";
 import { btnPrimary, btnSecondary } from "@/lib/ui";
-
-const bullets = [
-  "Reach candidates who actually live near your workplace — less no-show, faster joins.",
-  "Affordable listings and featured options for urgent or high-visibility roles.",
-  "Moderation helps keep spam and fake listings off the platform.",
-];
 
 function CheckIcon() {
   return (
@@ -40,14 +35,14 @@ export default function HomeEmployersMarketing() {
               id="home-employers-heading"
               className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-4xl md:leading-[1.15]"
             >
-              Hiring in Chennai? Post where locals are already looking
+              Hiring in Chennai? Meet candidates who pin your corridor on the map
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-700 md:text-[1.05rem]">
-              Vacancy Chennai is built for SMEs, shops, clinics, logistics, and offices that need nearby talent —
-              not a nationwide flood of irrelevant resumes.
+              Vacancy Chennai is weighted for storefronts, clinics, logistics fleets, SMEs, and office parks that want
+              nearby talent — moderated boards so Tambaram commuters are not drowned by irrelevant PAN-India spam.
             </p>
             <ul className="mt-8 space-y-4">
-              {bullets.map((b) => (
+              {homeEmployersBullets.map((b) => (
                 <li key={b} className="flex gap-3 text-sm leading-relaxed text-slate-800 md:text-base">
                   <CheckIcon />
                   <span>{b}</span>

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { focusRing, transitionFast } from "@/lib/ui";
 import { SHOWCASE_HREF } from "./showcase-ctas";
@@ -43,14 +42,17 @@ export default function ShowcaseTestimonialCard() {
         </div>
       </div>
       <div className="pointer-events-none absolute -right-2 top-4 w-[42%] max-w-[200px] md:right-2 md:top-6">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-1 ring-orange-200/50">
-          <Image
-            src="https://i.pravatar.cc/320?img=47"
-            alt=""
-            width={320}
-            height={427}
-            className="h-full w-full object-cover"
-          />
+        <div
+          className="relative flex aspect-[3/4] flex-col justify-end rounded-2xl border-2 border-white bg-gradient-to-b from-orange-600/85 to-slate-800 p-4 shadow-lg ring-1 ring-orange-200/50"
+          aria-hidden
+        >
+          <p className="text-xs font-semibold uppercase tracking-wide text-orange-100/90">
+            Verified hire
+          </p>
+          <p className="mt-2 text-lg font-bold text-white tabular-nums">Velachery</p>
+          <p className="mt-1 text-[11px] leading-snug text-orange-50/95">
+            Local shortlist • Chennai moderated
+          </p>
         </div>
       </div>
     </article>

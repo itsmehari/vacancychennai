@@ -47,7 +47,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-poppins), var(--font-noto-tamil), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 
   --color-vc-surface: var(--color-surface);
@@ -72,7 +72,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-poppins), var(--font-noto-tamil), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* FAQ accordion — marker hidden; chevron in summary */

@@ -40,7 +40,7 @@ export default async function FreshersJobsPage() {
       <InnerPageHero
         eyebrow="Job seekers"
         title="Freshers & entry-level jobs"
-        description="Roles with starting salary up to ₹25,000/month — great for first jobs and early-career moves in Chennai."
+        description="Roles with starting salary up to ₹25,000/month — first jobs and early-career moves along GST Road radials, the OMR corridor, and well-connected hubs."
         actions={
           <Link href="/jobs-in-chennai" className={btnPrimary}>
             All Chennai jobs
@@ -77,7 +77,7 @@ export default async function FreshersJobsPage() {
         <PartnerResumeDoctorAside
           utmContent="hub_freshers"
           headline="First CV sprint"
-          body="Before you bulk-apply across Chennai corridors, tighten sections and ATS structure so moderated employers see coherent timelines fast."
+          body="Before you bulk apply across Chennai corridors, tighten headings and ATS structure so moderated employers skim your timeline without filler."
           linkLabel="Try ResumeDoctor (ATS-ready)"
         />
       </div>

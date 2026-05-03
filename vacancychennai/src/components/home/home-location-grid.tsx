@@ -3,6 +3,7 @@ import HomeSectionShell from "@/components/home/home-section-shell";
 import SectionHeader from "@/components/home/section-header";
 import type { Location } from "@/types/domain";
 import { jobsInAreaPath } from "@/lib/area-job-path";
+import { homeLocationSection } from "@/lib/home-marketing-copy";
 import { cardInteractive, focusRing, transitionFast } from "@/lib/ui";
 
 type Props = {
@@ -35,9 +36,9 @@ export default function HomeLocationGrid({ locations }: Props) {
       <section className="space-y-8" aria-labelledby="home-locations-heading">
         <SectionHeader
           id="home-locations-heading"
-          eyebrow="Hyperlocal"
-          title="Browse by area"
-          description="Hyperlocal pages for major Chennai zones — OMR, Tambaram, Porur, Ambattur, and more."
+          eyebrow={homeLocationSection.eyebrow}
+          title={homeLocationSection.title}
+          description={homeLocationSection.description}
         />
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-slate-200/80 pb-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Zones</p>
