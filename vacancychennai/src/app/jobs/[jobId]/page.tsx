@@ -10,7 +10,13 @@ import {
   resolveEmployerDisplayNameForJob,
 } from "@/features/core/repository";
 import {
+  getCuratedExternalApplyUrl,
+  isCuratedExternalApplyUrlJob,
+} from "@/features/core/curated-external-job-postings";
+import {
   curatedAdvocateWhatsAppDigits,
+  getCuratedDirectEmployerContact,
+  isCuratedDirectEmployerContactJob,
   isCuratedWhatsAppOnlyJob,
 } from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
@@ -35,7 +41,13 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
   ]);
   const area = location?.area ?? "Chennai";
   const typeLabel = job.jobType.replace("-", " ");
-  const description = `${typeLabel} in ${area}. ₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/mo · ${employerName}. Quick apply on Vacancy Chennai.`;
+  const salaryBit = `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/mo`;
+  const applyBit = isCuratedExternalApplyUrlJob(jobId)
+    ? "Apply on the employer careers page (link on Vacancy Chennai)."
+    : isCuratedDirectEmployerContactJob(jobId)
+      ? "Contact the employer as listed on Vacancy Chennai."
+      : "Quick apply on Vacancy Chennai.";
+  const description = `${typeLabel} in ${area}. ${salaryBit} · ${employerName}. ${applyBit}`;
   return baseMetadata(`${job.title} | Vacancy Chennai`, description.slice(0, 160), `/jobs/${jobId}`);
 }
 
@@ -53,6 +65,11 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   const prefill =
     session?.role === "candidate" ? await getApplyPrefillForActor(session.actorId) : null;
   const whatsappOnly = isCuratedWhatsAppOnlyJob(job.id);
+  const externalApplyUrl = isCuratedExternalApplyUrlJob(job.id)
+    ? getCuratedExternalApplyUrl(job.id)
+    : undefined;
+  const directEmployerContact = isCuratedDirectEmployerContactJob(job.id);
+  const directContact = directEmployerContact ? getCuratedDirectEmployerContact(job.id) : null;
   const waHref = `https://wa.me/${curatedAdvocateWhatsAppDigits}`;
 
   const jobPostingLd = {
@@ -152,6 +169,59 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                   The same number is listed in the description if you prefer to copy it.
                 </p>
               </>
+            ) : externalApplyUrl ? (
+              <>
+                {query.error === "external-apply-url" ? (
+                  <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
+                    Vacancy Chennai quick apply is off for this listing — use the employer careers link below.
+                  </p>
+                ) : null}
+                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  This job is aggregated from an external careers source. Continue on the employer site to submit
+                  your application.
+                </p>
+                <a
+                  href={externalApplyUrl}
+                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cta="job-external-careers-apply"
+                >
+                  Open employer careers page
+                </a>
+                <p className="mt-3 text-xs text-slate-500">
+                  Vacancy Chennai does not receive applications for this role — always verify details on the live
+                  posting.
+                </p>
+              </>
+            ) : directEmployerContact && directContact ? (
+              <>
+                {query.error === "direct-employer-contact" ? (
+                  <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
+                    Quick apply is turned off for this listing — use email or phone below.
+                  </p>
+                ) : null}
+                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  This role is listed for direct contact with the employer. Use email or phone below (Vacancy
+                  Chennai quick apply is not used for this posting).
+                </p>
+                <a
+                  href={`mailto:${directContact.email}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
+                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
+                  data-cta="job-direct-email-apply"
+                >
+                  Email {directContact.email}
+                </a>
+                <a
+                  href={`tel:${directContact.phoneE164.replace(/\s/g, "")}`}
+                  className={`${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`}
+                  data-cta="job-direct-phone-apply"
+                >
+                  Call {directContact.phoneLabel}
+                </a>
+              </>
             ) : (
               <>
                 <h2 className="text-lg font-semibold text-slate-900">Quick apply</h2>
@@ -189,11 +259,14 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                     This role is WhatsApp-only — use the button above or the number in the description.
                   </p>
                 )}
-                {query.error && query.error !== "whatsapp-only" && (
-                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
-                    Could not submit application. Please check your details.
-                  </p>
-                )}
+                {query.error &&
+                  query.error !== "whatsapp-only" &&
+                  query.error !== "direct-employer-contact" &&
+                  query.error !== "external-apply-url" && (
+                    <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
+                      Could not submit application. Please check your details.
+                    </p>
+                  )}
                 <form action={quickApplyAction} className="mt-4 grid gap-3">
                   <input type="hidden" name="jobId" value={job.id} />
                   <input

@@ -19,6 +19,7 @@ import {
   updateCandidateProfile,
   updateJobStatus,
 } from "@/features/core/mock-db";
+import { curatedExternalPublishedJobs } from "@/features/core/curated-external-job-postings";
 import {
   curatedEmployerCompanyNameMap,
   curatedLocations,
@@ -66,6 +67,11 @@ function mergeLocationsWithCurated(dbLocations: Location[]): Location[] {
 function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
   const byId = new Map(dbJobs.map((j) => [j.id, j]));
   for (const job of curatedPublishedJobs) {
+    if (job.status === "published" && !byId.has(job.id)) {
+      byId.set(job.id, job);
+    }
+  }
+  for (const job of curatedExternalPublishedJobs) {
     if (job.status === "published" && !byId.has(job.id)) {
       byId.set(job.id, job);
     }
@@ -572,7 +578,11 @@ export async function findJob(jobId: string): Promise<Job | null> {
   const row = rows[0];
   if (row) return mapDbJobRow(row);
   const curated = curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published");
-  return curated ?? null;
+  if (curated) return curated;
+  const externalCurated = curatedExternalPublishedJobs.find(
+    (j) => j.id === jobId && j.status === "published",
+  );
+  return externalCurated ?? null;
 }
 
 /** Jobs owned by employer user (`users.id` session actor). */

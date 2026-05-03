@@ -10,7 +10,11 @@ import {
   listEmployerApplications,
   setApplicationStage,
 } from "@/features/core/repository";
-import { isCuratedWhatsAppOnlyJob } from "@/features/core/static-curated-jobs";
+import { isCuratedExternalApplyUrlJob } from "@/features/core/curated-external-job-postings";
+import {
+  isCuratedDirectEmployerContactJob,
+  isCuratedWhatsAppOnlyJob,
+} from "@/features/core/static-curated-jobs";
 import { incrementMetric } from "@/lib/metrics";
 
 export async function quickApplyAction(formData: FormData) {
@@ -29,6 +33,16 @@ export async function quickApplyAction(formData: FormData) {
   if (isCuratedWhatsAppOnlyJob(jobId)) {
     incrementMetric("applyFailure");
     redirect(`/jobs/${jobId}?error=whatsapp-only`);
+  }
+
+  if (isCuratedDirectEmployerContactJob(jobId)) {
+    incrementMetric("applyFailure");
+    redirect(`/jobs/${jobId}?error=direct-employer-contact`);
+  }
+
+  if (isCuratedExternalApplyUrlJob(jobId)) {
+    incrementMetric("applyFailure");
+    redirect(`/jobs/${jobId}?error=external-apply-url`);
   }
 
   const session = await getSession();

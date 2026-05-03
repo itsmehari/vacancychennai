@@ -8,7 +8,12 @@ import {
   Location,
 } from "@/types/domain";
 import {
+  curatedExternalEmployers,
+  curatedExternalPublishedJobs,
+} from "@/features/core/curated-external-job-postings";
+import {
   curatedEmployer,
+  curatedEmployerDugout,
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
@@ -67,6 +72,8 @@ export const employers: EmployerProfile[] = [
     password: "demo123",
   },
   curatedEmployer,
+  curatedEmployerDugout,
+  ...curatedExternalEmployers,
 ];
 
 export const candidates: CandidateProfile[] = [
@@ -153,6 +160,10 @@ export const jobs: Job[] = [
     createdAt: now(),
   },
   ...curatedPublishedJobs.map((j) => ({
+    ...j,
+    createdAt: now(),
+  })),
+  ...curatedExternalPublishedJobs.map((j) => ({
     ...j,
     createdAt: now(),
   })),
