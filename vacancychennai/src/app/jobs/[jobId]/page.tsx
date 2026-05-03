@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import JobCard from "@/components/job-card";
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import { quickApplyAction } from "@/features/applications/actions";
@@ -7,6 +8,9 @@ import {
   findJob,
   findLocationById,
   getApplyPrefillForActor,
+  getEmployerCompanyNameMap,
+  listLocations,
+  listRelatedPublishedJobs,
   resolveEmployerDisplayNameForJob,
 } from "@/features/core/repository";
 import {
@@ -20,14 +24,26 @@ import {
   isCuratedWhatsAppOnlyJob,
 } from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
-import { baseMetadata } from "@/lib/seo";
-import { btnPrimary, formInput, pillMeta, sectionCard } from "@/lib/ui";
+import { jobsInAreaPath } from "@/lib/area-job-path";
+import {
+  buildJobBreadcrumbListJsonLd,
+  buildJobPostingJsonLd,
+  type JobApplyMode,
+} from "@/lib/job-posting-jsonld";
+import { jobDetailPageMetadata } from "@/lib/seo";
+import { btnPrimary, formInput, linkInline, pillMeta, sectionCard } from "@/lib/ui";
 import Link from "next/link";
 
 type Props = {
   params: Promise<{ jobId: string }>;
   searchParams: Promise<{ success?: string; error?: string }>;
 };
+
+function truncateMetaDescription(raw: string, max = 158): string {
+  const t = raw.trim().replace(/\s+/g, " ");
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 3).trimEnd()}...`;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ jobId: string }> }): Promise<Metadata> {
   const { jobId } = await params;
@@ -41,14 +57,38 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
   ]);
   const area = location?.area ?? "Chennai";
   const typeLabel = job.jobType.replace("-", " ");
-  const salaryBit = `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/mo`;
-  const applyBit = isCuratedExternalApplyUrlJob(jobId)
-    ? "Apply on the employer careers page (link on Vacancy Chennai)."
+  const salaryBit = `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`;
+  const applyHint = isCuratedExternalApplyUrlJob(jobId)
+    ? "Apply via the employer careers page linked on Vacancy Chennai."
     : isCuratedDirectEmployerContactJob(jobId)
-      ? "Contact the employer as listed on Vacancy Chennai."
-      : "Quick apply on Vacancy Chennai.";
-  const description = `${typeLabel} in ${area}. ${salaryBit} · ${employerName}. ${applyBit}`;
-  return baseMetadata(`${job.title} | Vacancy Chennai`, description.slice(0, 160), `/jobs/${jobId}`);
+      ? "Contact the employer using email or phone on Vacancy Chennai."
+      : isCuratedWhatsAppOnlyJob(job.id)
+        ? "Apply through WhatsApp using the details on Vacancy Chennai."
+        : "Quick apply on Vacancy Chennai — moderated Chennai listings.";
+  const description = truncateMetaDescription(
+    `${job.title}: ${job.category} · ${job.industry}. ${typeLabel} in ${area}, Chennai. ${salaryBit}. ${employerName}. ${applyHint}`,
+  );
+  const titleBase = `${job.title} · ${area}`;
+  const metaTitle =
+    titleBase.length > 52 ? `${titleBase.slice(0, 49)}… | Vacancy Chennai` : `${titleBase} | Vacancy Chennai`;
+  const keywords = Array.from(
+    new Set(
+      [
+        `${job.title} jobs Chennai`,
+        `${area} jobs Chennai`,
+        `${job.category} jobs Chennai`,
+        `${job.industry} jobs Chennai`,
+        "Chennai jobs",
+        "Vacancy Chennai",
+      ].filter(Boolean),
+    ),
+  );
+  return jobDetailPageMetadata({
+    title: metaTitle,
+    description,
+    path: `/jobs/${jobId}`,
+    keywords: [...keywords],
+  });
 }
 
 export default async function JobDetailPage({ params, searchParams }: Props) {
@@ -57,10 +97,14 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   const job = await findJob(jobId);
   if (!job || job.status !== "published") notFound();
 
-  const [location, employerName] = await Promise.all([
+  const [location, employerName, relatedJobs, locations, employerNames] = await Promise.all([
     findLocationById(job.locationId),
     resolveEmployerDisplayNameForJob(job),
+    listRelatedPublishedJobs(job.id, job.locationId, 6),
+    listLocations(),
+    getEmployerCompanyNameMap(),
   ]);
+  const locationsById = new Map(locations.map((l) => [l.id, l]));
   const session = await getSession();
   const prefill =
     session?.role === "candidate" ? await getApplyPrefillForActor(session.actorId) : null;
@@ -72,38 +116,29 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   const directContact = directEmployerContact ? getCuratedDirectEmployerContact(job.id) : null;
   const waHref = `https://wa.me/${curatedAdvocateWhatsAppDigits}`;
 
-  const jobPostingLd = {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
-    title: job.title,
-    description: job.description,
-    datePosted: job.createdAt,
-    employmentType: job.jobType.toUpperCase().replace("-", "_"),
-    hiringOrganization: {
-      "@type": "Organization",
-      name: employerName,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: location?.area,
-        addressRegion: "Chennai",
-        postalCode: location?.pincode,
-        addressCountry: "IN",
-      },
-    },
-    baseSalary: {
-      "@type": "MonetaryAmount",
-      currency: "INR",
-      value: {
-        "@type": "QuantitativeValue",
-        minValue: job.salaryMin,
-        maxValue: job.salaryMax,
-        unitText: "MONTH",
-      },
-    },
-  };
+  const applyMode: JobApplyMode = whatsappOnly
+    ? "whatsapp-only"
+    : externalApplyUrl
+      ? "external-url"
+      : directEmployerContact
+        ? "direct-contact"
+        : "quick-apply";
+
+  const jobPostingLd = buildJobPostingJsonLd({
+    job,
+    employerName,
+    location: location ?? null,
+    canonicalPath: `/jobs/${job.id}`,
+    applyMode,
+    externalApplyUrl,
+  });
+
+  const areaLabel = location?.area ?? "Chennai";
+  const breadcrumbLd = buildJobBreadcrumbListJsonLd({
+    jobTitle: job.title,
+    jobPath: `/jobs/${job.id}`,
+    areaLabel,
+  });
 
   const metaLine = [
     location?.area,
@@ -115,6 +150,10 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingLd) }}
@@ -129,6 +168,36 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
           </Link>
         }
       />
+
+      <nav aria-label="Breadcrumb" className={`${sectionCard} mt-6 text-sm text-slate-600`}>
+        <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <li>
+            <Link href="/" className={linkInline}>
+              Home
+            </Link>
+          </li>
+          <li aria-hidden className="text-slate-300">
+            /
+          </li>
+          <li>
+            <Link href="/jobs-in-chennai" className={linkInline}>
+              Jobs in Chennai
+            </Link>
+          </li>
+          <li aria-hidden className="text-slate-300">
+            /
+          </li>
+          <li>
+            <Link href={jobsInAreaPath(areaLabel)} className={linkInline}>
+              {areaLabel} jobs
+            </Link>
+          </li>
+          <li aria-hidden className="text-slate-300">
+            /
+          </li>
+          <li className="font-medium text-slate-800">{job.title}</li>
+        </ol>
+      </nav>
 
       <div className="grid gap-6 pb-6 pt-8 lg:grid-cols-[1fr_min(340px,100%)] lg:items-start lg:gap-8">
         <div className="space-y-4">
@@ -311,6 +380,50 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
           </section>
         </aside>
       </div>
+
+      {relatedJobs.length > 0 ? (
+        <section className="pb-10 pt-2" aria-labelledby="related-jobs-heading">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 id="related-jobs-heading" className="text-lg font-semibold text-slate-900">
+                More jobs in {areaLabel}
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">Other moderated openings in the same area.</p>
+            </div>
+            <Link href={jobsInAreaPath(areaLabel)} className={`${linkInline} text-sm font-semibold`}>
+              All {areaLabel} jobs →
+            </Link>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {relatedJobs.map((rj) => {
+              const loc = locationsById.get(rj.locationId);
+              return (
+                <JobCard
+                  key={rj.id}
+                  job={rj}
+                  employerCompanyName={employerNames.get(rj.employerId)}
+                  locationArea={loc?.area}
+                  locationZone={loc?.zone}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ) : (
+        <section className="pb-10 pt-2">
+          <p className="text-sm text-slate-600">
+            Looking for more roles?{" "}
+            <Link href={jobsInAreaPath(areaLabel)} className={linkInline}>
+              Browse {areaLabel} jobs
+            </Link>{" "}
+            or{" "}
+            <Link href="/jobs-in-chennai" className={linkInline}>
+              the full Chennai board
+            </Link>
+            .
+          </p>
+        </section>
+      )}
     </>
   );
 }

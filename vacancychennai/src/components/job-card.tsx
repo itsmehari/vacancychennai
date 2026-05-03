@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getEmployerById, getLocationById } from "@/features/core/mock-db";
 import { Job } from "@/types/domain";
-import { btnPrimary, cardInteractive, cardSurface, pillMeta, transitionFast } from "@/lib/ui";
+import { btnPrimary, cardInteractive, cardSurface, focusRing, pillMeta, transitionFast } from "@/lib/ui";
 
 type Props = {
   job: Job;
@@ -37,7 +37,15 @@ export default function JobCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-medium text-slate-500">{employerName}</p>
-            <h3 className="mt-0.5 text-lg font-semibold text-slate-900">{job.title}</h3>
+            <h3 className="mt-0.5 text-lg font-semibold text-slate-900">
+              <Link
+                href={`/jobs/${job.id}`}
+                className={`text-inherit hover:underline ${focusRing} rounded-sm`}
+                data-cta={`job-title-${job.id}`}
+              >
+                {job.title}
+              </Link>
+            </h3>
             <div className="mt-2 flex flex-wrap gap-1.5">
               <span className={pillMeta}>{job.category}</span>
               <span className={pillMeta}>{job.industry}</span>

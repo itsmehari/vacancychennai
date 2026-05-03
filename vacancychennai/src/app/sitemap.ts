@@ -3,7 +3,8 @@ import { listLocations, listPublishedJobs } from "@/features/core/repository";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { blogPosts } from "@/lib/blog-posts";
 
-const JOB_DETAIL_SITEMAP_CAP = 500;
+/** Google allows up to 50,000 URLs per sitemap file — include all published listings. */
+const JOB_DETAIL_SITEMAP_CAP = 50_000;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
@@ -44,6 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.55 },
     { url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.55 },
     ...blogEntries,
+    {
+      url: `${base}/jobs.xml`,
+      lastModified: now,
+      changeFrequency: "hourly",
+      priority: 0.65,
+    },
     ...jobDetailUrls,
     { url: `${base}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },

@@ -131,6 +131,18 @@ export async function listPublishedJobs(): Promise<Job[]> {
   return mergePublishedJobsWithCurated(rows.map(mapDbJobRow));
 }
 
+/** Same `locationId` (hyperlocal cluster) — primary internal-link target for job detail SEO. */
+export async function listRelatedPublishedJobs(
+  excludeJobId: string,
+  locationId: string,
+  limit = 6,
+): Promise<Job[]> {
+  const published = await listPublishedJobs();
+  return published
+    .filter((j) => j.id !== excludeJobId && j.locationId === locationId)
+    .slice(0, limit);
+}
+
 /** Published jobs whose `created_at` is at or after `sinceIso` (inclusive), newest first. */
 export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<Job[]> {
   if (!hasDatabase()) {

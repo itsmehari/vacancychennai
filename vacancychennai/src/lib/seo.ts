@@ -52,6 +52,18 @@ export function jobsInChennaiListingMetadata(): Metadata {
   };
 }
 
+/** `/jobs/[jobId]` — rich title/description + keyword hints for hyperlocal queries. */
+export function jobDetailPageMetadata(opts: {
+  title: string;
+  description: string;
+  path: string;
+  keywords?: string[];
+}): Metadata {
+  const base = baseMetadata(opts.title, opts.description, opts.path);
+  if (!opts.keywords?.length) return base;
+  return { ...base, keywords: opts.keywords };
+}
+
 /** Home page (`/`) — SEO-optimized title/description, OG, Twitter, optional share image. */
 export function homePageMetadata(): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
