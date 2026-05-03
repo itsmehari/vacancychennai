@@ -684,6 +684,13 @@ export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string
   if (!hasDatabase()) {
     return getMockEmployerById(job.employerId)?.companyName ?? "Local employer";
   }
+  if (!isUuidPrimaryKey(job.employerId)) {
+    return (
+      curatedEmployerCompanyNameMap().get(job.employerId) ??
+      getMockEmployerById(job.employerId)?.companyName ??
+      "Local employer"
+    );
+  }
   const rows = await dbQuery<{ company_name: string }>(
     `select company_name from employer_profiles where id = $1 limit 1`,
     [job.employerId],
@@ -697,6 +704,11 @@ export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string
 
 export async function findLocationById(locationId: string) {
   if (!hasDatabase()) return getMockLocationById(locationId);
+  if (!isUuidPrimaryKey(locationId)) {
+    return (
+      getMockLocationById(locationId) ?? curatedLocations.find((l) => l.id === locationId)
+    );
+  }
   const rows = await dbQuery<{
     id: string;
     zone: string;
@@ -719,6 +731,8 @@ export async function findLocationById(locationId: string) {
       lng: Number(row.lng),
     };
   }
-  return curatedLocations.find((l) => l.id === locationId);
+  return (
+    getMockLocationById(locationId) ?? curatedLocations.find((l) => l.id === locationId)
+  );
 }
 
