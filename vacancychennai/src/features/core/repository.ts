@@ -1,4 +1,5 @@
 import { dbExecute, dbQuery, hasDatabase } from "@/lib/db";
+import { isDatabaseUuid } from "@/lib/is-database-uuid";
 import { resumeFileKeyIndicatesUpload } from "@/lib/resume-blob";
 import {
   addApplication,
@@ -79,11 +80,6 @@ function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
   return [...byId.values()].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
-}
-
-/** Postgres `jobs.id` is `uuid`; curated/mock ids (`job-ext-*`, `job-office-*`, …) must skip the DB lookup. */
-function isUuidPrimaryKey(id: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
 function mapDbJobRow(row: DbJobRow): Job {
@@ -171,6 +167,12 @@ export async function createJob(input: {
   if (!hasDatabase()) {
     return addJob(input);
   }
+  const dbLocationId = await resolveLocationIdForDbColumn(input.locationId);
+  if (!dbLocationId) {
+    throw new Error(
+      "Work location could not be mapped to the database; pick a Chennai area from the list or contact support.",
+    );
+  }
   const epRows = await dbQuery<{ id: string }>(
     `select id from employer_profiles where user_id = $1 limit 1`,
     [input.employerId],
@@ -188,7 +190,7 @@ export async function createJob(input: {
     returning id`,
     [
       employerProfileId,
-      input.locationId,
+      dbLocationId,
       input.landmarkText,
       input.title,
       input.category,
@@ -204,7 +206,7 @@ export async function createJob(input: {
 
 export async function setJobStatus(jobId: string, status: JobStatus) {
   if (!hasDatabase()) return updateJobStatus(jobId, status);
-  if (!isUuidPrimaryKey(jobId)) return undefined;
+  if (!isDatabaseUuid(jobId)) return undefined;
   await dbExecute(`update jobs set status = $2 where id = $1`, [jobId, status]);
   return { id: jobId, status };
 }
@@ -218,6 +220,9 @@ export async function createApplication(input: {
   resumeLink?: string;
 }) {
   if (!hasDatabase()) return addApplication(input);
+  if (!isDatabaseUuid(input.jobId)) {
+    return addApplication(input);
+  }
   let candidateProfileId: string | null = null;
   if (input.candidateId) {
     const cp = await dbQuery<{ id: string }>(
@@ -479,6 +484,21 @@ export async function getCandidateResumeFileKey(userId: string): Promise<string 
   return rows[0]?.resume_file_key ?? null;
 }
 
+/** Map bundled `loc-*` ids to a Neon `locations.id` uuid when saving candidate_profiles.location_id. */
+async function resolveLocationIdForDbColumn(locationId: string): Promise<string | null> {
+  const trimmed = locationId.trim();
+  if (!trimmed) return null;
+  if (isDatabaseUuid(trimmed)) return trimmed;
+  const loc =
+    getMockLocationById(trimmed) ?? curatedLocations.find((l) => l.id === trimmed);
+  if (!loc) return null;
+  const rows = await dbQuery<{ id: string }>(
+    `select id from locations where lower(trim(area)) = lower(trim($1)) and is_active = true order by created_at asc limit 1`,
+    [loc.area],
+  );
+  return rows[0]?.id ?? null;
+}
+
 export async function upsertCandidateProfileAfterEdit(input: {
   userId: string;
   name: string;
@@ -523,6 +543,8 @@ export async function upsertCandidateProfileAfterEdit(input: {
     input.name,
   ]);
 
+  const dbLocationId = await resolveLocationIdForDbColumn(input.locationId);
+
   await dbExecute(
     `insert into candidate_profiles (user_id, location_id, skills, bio, experience_level, resume_url, resume_file_key, profile_completed)
      values ($1, $2, $3, $4, $5, $6, $7, true)
@@ -537,7 +559,7 @@ export async function upsertCandidateProfileAfterEdit(input: {
        updated_at = now()`,
     [
       input.userId,
-      input.locationId || null,
+      dbLocationId,
       input.skills,
       input.headline || null,
       input.experienceLevel || null,
@@ -580,7 +602,7 @@ export async function getApplyPrefillForActor(actorId: string): Promise<{
 
 export async function findJob(jobId: string): Promise<Job | null> {
   if (!hasDatabase()) return getJobById(jobId) ?? null;
-  if (isUuidPrimaryKey(jobId)) {
+  if (isDatabaseUuid(jobId)) {
     const rows = await dbQuery<DbJobRow>(`select * from jobs where id = $1 limit 1`, [jobId]);
     const row = rows[0];
     if (row) return mapDbJobRow(row);
@@ -657,6 +679,7 @@ export async function promoteOwnedJob(
     const updated = setJobFeatured(jobId, tier);
     return Boolean(updated && updated.employerId === employerUserId);
   }
+  if (!isDatabaseUuid(jobId)) return false;
   const r = await dbExecute(
     `update jobs set is_featured = true, listing_tier = $3::listing_tier, updated_at = now()
      where id = $1 and employer_id = (select id from employer_profiles where user_id = $2 limit 1)`,
@@ -684,7 +707,7 @@ export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string
   if (!hasDatabase()) {
     return getMockEmployerById(job.employerId)?.companyName ?? "Local employer";
   }
-  if (!isUuidPrimaryKey(job.employerId)) {
+  if (!isDatabaseUuid(job.employerId)) {
     return (
       curatedEmployerCompanyNameMap().get(job.employerId) ??
       getMockEmployerById(job.employerId)?.companyName ??
@@ -704,7 +727,7 @@ export async function resolveEmployerDisplayNameForJob(job: Job): Promise<string
 
 export async function findLocationById(locationId: string) {
   if (!hasDatabase()) return getMockLocationById(locationId);
-  if (!isUuidPrimaryKey(locationId)) {
+  if (!isDatabaseUuid(locationId)) {
     return (
       getMockLocationById(locationId) ?? curatedLocations.find((l) => l.id === locationId)
     );
