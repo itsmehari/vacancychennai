@@ -5,7 +5,6 @@ import {
   footerLogos,
   footerNewsletter,
   footerSiteLinkColumns,
-  footerSocialLinks,
   type FooterSocialId,
 } from "@/lib/footer-config";
 import {
@@ -14,6 +13,7 @@ import {
   footerLinkDark,
   transitionFast,
 } from "@/lib/ui";
+import { resolvedFooterSocialLinks } from "@/lib/site-social";
 
 function SocialGlyph({ id, className }: { id: FooterSocialId; className?: string }) {
   const c = className ?? "h-6 w-6";
@@ -42,7 +42,7 @@ const newsletterBtnClass = `inline-flex min-h-[44px] min-w-[5.5rem] items-center
 
 export default function SiteFooter() {
   const year = new Date().getFullYear();
-  const activeSocial = footerSocialLinks.filter((s) => s.href.trim().length > 0);
+  const activeSocial = resolvedFooterSocialLinks().filter((s) => s.href.trim().length > 0);
 
   return (
     <footer className="border-t border-slate-800">

@@ -1,5 +1,6 @@
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
+import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
 import { baseMetadata } from "@/lib/seo";
 import { btnPrimary, btnSecondary, focusRingOnDark, linkInline, sectionCard, transitionFast } from "@/lib/ui";
 import Link from "next/link";
@@ -48,6 +49,15 @@ export default function JobSeekerProfilePage() {
             follows the rules on the resume database and pricing pages — we do not promise recruiter browsing
             until that product surface ships.
           </p>
+          <div className="mt-6 max-w-xl">
+            <PartnerResumeDoctorAside
+              utmContent="profile_checklist"
+              headline="Prep the file you'll upload here"
+              body="Résumés that parse cleanly on national portals behave better on moderated boards — iterate layout and bullets externally, then attach the final PDF or DOC."
+              linkLabel="Use ResumeDoctor's ATS tooling"
+              disclosure={true}
+            />
+          </div>
         </section>
 
         <JobSeekerProfileCta variant="card" dataCta="job-seeker-landing" />

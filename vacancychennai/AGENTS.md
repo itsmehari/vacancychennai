@@ -25,13 +25,15 @@ Conventions learned from shipping the marketing shell, auth/dashboard polish, bl
 
 ## Blog and SEO
 
-- **Posts:** Add or edit entries only in `src/lib/blog-posts.ts` (slug, title, teaser, `publishedAt`, `readMinutes`, `paragraphs`).
-- **Article page SEO:** `src/app/blog/[slug]/page.tsx` uses `buildBlogPostingJsonLd` from `src/lib/blog-jsonld.ts` and extends Open Graph with `type: "article"`. New fields on `BlogPost` may require updates in both places.
+- **Posts:** Add or edit entries only in `src/lib/blog-posts.ts` (slug, title, teaser, `publishedAt`, `readMinutes`, `paragraphs`; optional `sections`, `relatedHubLinks`, `resumeDoctorRetrofitAside`).
+- **Article page SEO:** `src/app/blog/[slug]/page.tsx` uses `buildBlogPostingJsonLd` plus `buildBlogBreadcrumbListJsonLd` (`src/lib/blog-jsonld.ts`). Open Graph `type: "article"`.
 - **Home + hubs:** Homepage strings live in `src/lib/home-seo-copy.ts`; graph in `src/lib/home-jsonld.ts`. Listing pages use `buildJobsItemListJsonLd` from `src/lib/jobs-itemlist-jsonld.ts`. Jobs hub metadata + `hreflang`: `jobsInChennaiListingMetadata()` in `src/lib/seo.ts`.
 - **Hyperlocal paths:** Use `jobsInAreaPath` from `src/lib/area-job-path.ts` for any `/jobs-in-*` link or sitemap line — never duplicate slug logic.
 - **Dynamic area page (`app/[locationPage]/page.tsx`):** After parsing the `jobs-in-*` segment into a slug, require a real location with `getLocationByAreaSlug(slug, locations)` from `src/lib/job-filters.ts` (using `listLocations()` from the repository). Call `notFound()` and align `generateMetadata` when the slug is unknown. Do not rely on `filterPublishedJobList`’s zone substring fallback alone for public area URLs — short slugs can falsely match zone text.
-- **Sitemap / robots:** `src/app/sitemap.ts` is **async** (includes area URLs via `listLocations()`). `src/app/robots.ts` exposes sitemap URL and disallows private routes.
-- **Sitemap:** Still imports `blogPosts` for `/blog/*` URLs. After adding posts, sitemap updates automatically.
+- **Sitemap / robots:** `src/app/sitemap.ts` merges static routes + area URLs (`listLocations`) + **`/blog/{slug}`** + **capped `/jobs/{id}`** (`listPublishedJobs`). `robots.ts` exposes sitemap.
+- **RSS:** `GET /rss.xml` is implemented in `src/app/rss.xml/route.ts`; `<link rel="alternate" type="application/rss+xml">` is set via root `layout.tsx` metadata `alternates.types`.
+- **Analytics:** Env-gated GA4 scripts in `src/components/site-analytics.tsx`; partner outbound taps `src/components/partner-outbound-analytics.tsx`.
+- **Social / sameAs:** Public profile URLs resolve from `NEXT_PUBLIC_SOCIAL_*` and optional `NEXT_PUBLIC_ORG_SAME_AS` via `src/lib/site-social.ts` (footer icons + Organization `sameAs` in `home-jsonld`).
 
 ## Images
 

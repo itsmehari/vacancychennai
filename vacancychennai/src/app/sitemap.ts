@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
-import { listLocations } from "@/features/core/repository";
+import { listLocations, listPublishedJobs } from "@/features/core/repository";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { blogPosts } from "@/lib/blog-posts";
+
+const JOB_DETAIL_SITEMAP_CAP = 500;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
@@ -22,6 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
+  const publishedJobs = await listPublishedJobs();
+  const jobDetailUrls: MetadataRoute.Sitemap = publishedJobs.slice(0, JOB_DETAIL_SITEMAP_CAP).map((job) => ({
+    url: `${base}/jobs/${job.id}`,
+    lastModified: new Date(job.createdAt),
+    changeFrequency: "weekly",
+    priority: 0.55,
+  }));
+
   return [
     { url: `${base}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${base}/jobs-in-chennai`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
@@ -34,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.55 },
     { url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.55 },
     ...blogEntries,
+    ...jobDetailUrls,
     { url: `${base}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },

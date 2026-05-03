@@ -67,11 +67,7 @@ export const footerSiteLinkColumns: FooterSiteColumn[] = [
 /** Tier 2: add `{ name, imgSrc?, href? }` to show the hiring partners strip */
 export const footerLogos: FooterLogo[] = [];
 
-export const footerSocialLinks: FooterSocialLink[] = [
-  { id: "linkedin", href: "", label: "Vacancy Chennai on LinkedIn" },
-  { id: "twitter", href: "", label: "Vacancy Chennai on X" },
-  { id: "facebook", href: "", label: "Vacancy Chennai on Facebook" },
-];
+
 
 export const footerNewsletter = {
   headline: "Receive the latest jobs and offers by:",

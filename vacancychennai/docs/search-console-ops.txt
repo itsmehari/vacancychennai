@@ -1,0 +1,9 @@
+Vacancy Chennai — Search Console (manual QA)
+===========================================
+1. In Google Search Console, verify hostname matches NEXT_PUBLIC_SITE_URL (production).
+2. Submit sitemap: https://vacancychennai.in/sitemap.xml (replace host if staging).
+3. URL Inspection: "/", "/jobs-in-chennai", one /jobs-in-* area, newest /blog/*. , one /jobs/{id}.
+
+RSS subscribers
+===============
+Public feed (auto): /rss.xml — linked via layout alternates (application/rss+xml).

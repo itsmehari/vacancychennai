@@ -1,6 +1,7 @@
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
+import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
 import {
   getEmployerCompanyNameMap,
   listLocations,
@@ -71,6 +72,14 @@ export default async function PartTimeJobsPage() {
             })}
           </div>
         )}
+      </div>
+      <div className="mx-auto mt-10 max-w-2xl pb-6">
+        <PartnerResumeDoctorAside
+          utmContent="hub_part_time"
+          headline="Side-gig readability"
+          body="Flexible roles still need ATS-safe résumés so hiring managers skim shift fit without parsing chaos."
+          linkLabel="Format via ResumeDoctor"
+        />
       </div>
       <div className="pb-8 pt-4">
         <JobSeekerProfileCta variant="inline" dataCta="part-time-hub-profile" />

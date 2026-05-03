@@ -1,0 +1,19 @@
+Editorial outline for ResumeDoctor.in blog (Chennai hubs → Vacancy Chennai)
+==============================================================================
+
+Title suggestion: Chennai job boards employers actually check (and how seekers search by corridor)
+
+Audience: Job seekers polishing résumés on ResumeDoctor ready to hunt locally.
+
+Body beats:
+1. Indian portals versus hyperlocal moderated boards — why area-first beats “Chennai” alone.
+2. Deep link callouts — https://vacancychennai.in/jobs-in-chennai ,
+   freshers hub, part-time hub, job seeker profile explainer.
+
+UTM outbound pattern (mirror Vacancy Chennai plan):
+  utm_source=resumedoctor
+  utm_medium=referral
+  utm_campaign=partner_crosslink
+  utm_content=rd_blog_chennai_hubs_v1
+
+Do not replicate identical reciprocal footer blocks across every ResumeDoctor URL.

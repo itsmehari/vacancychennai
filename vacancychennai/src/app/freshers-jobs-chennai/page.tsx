@@ -1,6 +1,7 @@
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
+import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
 import {
   getEmployerCompanyNameMap,
   listLocations,
@@ -71,6 +72,14 @@ export default async function FreshersJobsPage() {
             })}
           </div>
         )}
+      </div>
+      <div className="mx-auto mt-10 max-w-2xl pb-6">
+        <PartnerResumeDoctorAside
+          utmContent="hub_freshers"
+          headline="First CV sprint"
+          body="Before you bulk-apply across Chennai corridors, tighten sections and ATS structure so moderated employers see coherent timelines fast."
+          linkLabel="Try ResumeDoctor (ATS-ready)"
+        />
       </div>
       <div className="pb-8 pt-4">
         <JobSeekerProfileCta variant="inline" dataCta="freshers-hub-profile" />

@@ -1,4 +1,21 @@
-import type { BlogPost } from "@/lib/blog-posts";
+import { getBlogPostArticleBody, type BlogPost } from "@/lib/blog-posts";
+
+/** Breadcrumbs for article pages (`BreadcrumbList` JSON-LD). */
+export function buildBlogBreadcrumbListJsonLd(
+  post: BlogPost,
+  siteUrl: string,
+): Record<string, unknown> {
+  const root = siteUrl.replace(/\/$/, "");
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${root}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${root}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: `${root}/blog/${post.slug}` },
+    ],
+  };
+}
 
 /** Single BlogPosting node for JSON-LD (schema.org). */
 export function buildBlogPostingJsonLd(post: BlogPost, siteUrl: string): Record<string, unknown> {
@@ -11,7 +28,7 @@ export function buildBlogPostingJsonLd(post: BlogPost, siteUrl: string): Record<
         ? `${siteUrl.replace(/\/$/, "")}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`
         : null;
 
-  const articleBody = post.paragraphs.join("\n\n");
+  const articleBody = getBlogPostArticleBody(post);
   const wordCount = articleBody.trim().split(/\s+/).filter(Boolean).length;
 
   const jsonLd: Record<string, unknown> = {

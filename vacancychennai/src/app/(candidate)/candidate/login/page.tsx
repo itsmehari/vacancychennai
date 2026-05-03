@@ -3,6 +3,7 @@ import AuthPageShell from "@/components/layout/auth-page-shell";
 import Link from "next/link";
 import { loginQueryErrorMessage, loginQueryInfoMessage } from "@/lib/auth-login-errors";
 import { hasDatabase } from "@/lib/db";
+import { resumeDoctorReferralUrl } from "@/lib/partner-resumedoctor";
 import { shouldShowDemoLoginHint } from "@/lib/demo-login-hint";
 import { CandidateLoginForm } from "./candidate-login-form";
 
@@ -33,6 +34,7 @@ export default async function CandidateLoginPage({ searchParams }: Props) {
   const showDemoHint = shouldShowDemoLoginHint();
   const magicLinkMode = hasDatabase();
   const fromHomeSignup = query.new === "1" || query.new === "true";
+  const resumeDoctorUrl = resumeDoctorReferralUrl("auth_candidate_login");
 
   return (
     <AuthPageShell>
@@ -78,6 +80,21 @@ export default async function CandidateLoginPage({ searchParams }: Props) {
           showDevNote={showDemoHint}
           magicLinkMode={magicLinkMode}
         />
+        <p className="mt-5 text-center text-xs leading-relaxed text-slate-500">
+          Updating your résumé before uploads?{" "}
+          <a
+            href={resumeDoctorUrl}
+            className="font-medium text-blue-600 underline-offset-2 hover:text-blue-800 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-partner-link="resume-doctor"
+            data-utm-content="auth_candidate_login"
+          >
+            ResumeDoctor ATS builder
+          </a>
+          {" — "}
+          <span className="text-slate-500">sister product.</span>
+        </p>
         <p className="mt-4 text-center text-sm text-slate-600">
           <Link href="/employer/login" className="font-medium text-blue-600 hover:text-blue-800">
             Employer login

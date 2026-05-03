@@ -1,8 +1,10 @@
+import { BlogArticleBody } from "@/components/blog/blog-article-body";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
+import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
 import { getAllBlogSlugs, getBlogPostBySlug } from "@/lib/blog-posts";
-import { buildBlogPostingJsonLd } from "@/lib/blog-jsonld";
+import { buildBlogBreadcrumbListJsonLd, buildBlogPostingJsonLd } from "@/lib/blog-jsonld";
 import { baseMetadata } from "@/lib/seo";
-import { sectionCard } from "@/lib/ui";
+import { linkInline, sectionCard } from "@/lib/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -40,6 +42,7 @@ export default async function BlogArticlePage({ params }: Props) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
   const blogPostingLd = buildBlogPostingJsonLd(post, siteUrl);
+  const breadcrumbLd = buildBlogBreadcrumbListJsonLd(post, siteUrl);
 
   const dateLabel = new Date(post.publishedAt).toLocaleDateString("en-IN", {
     year: "numeric",
@@ -47,8 +50,14 @@ export default async function BlogArticlePage({ params }: Props) {
     day: "numeric",
   });
 
+  const rd = post.resumeDoctorRetrofitAside;
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingLd) }}
@@ -67,6 +76,29 @@ export default async function BlogArticlePage({ params }: Props) {
         }
       />
       <article className="pb-8 pt-8">
+        <nav aria-label="Breadcrumb" className={`${sectionCard} mb-6 text-sm text-slate-600`}>
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <li>
+              <Link href="/" className={linkInline}>
+                Home
+              </Link>
+            </li>
+            <li aria-hidden className="text-slate-300">
+              /
+            </li>
+            <li>
+              <Link href="/blog" className={linkInline}>
+                Blog
+              </Link>
+            </li>
+            <li aria-hidden className="text-slate-300">
+              /
+            </li>
+            <li className="font-medium text-slate-800" aria-current="page">
+              {post.title}
+            </li>
+          </ol>
+        </nav>
         <div className={`${sectionCard} mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600`}>
           <time dateTime={post.publishedAt}>{dateLabel}</time>
           <span aria-hidden className="text-slate-300">
@@ -74,13 +106,18 @@ export default async function BlogArticlePage({ params }: Props) {
           </span>
           <span>{post.readMinutes} min read</span>
         </div>
-        <div className={`${sectionCard} space-y-4`}>
-          {post.paragraphs.map((p, i) => (
-            <p key={i} className="leading-relaxed text-slate-800">
-              {p}
-            </p>
-          ))}
-        </div>
+        <BlogArticleBody post={post} />
+        {rd ? (
+          <div className="mt-10 max-w-2xl">
+            <PartnerResumeDoctorAside
+              utmContent={rd.utmContent}
+              headline={rd.headline}
+              body={rd.body}
+              linkLabel={rd.linkLabel}
+              disclosure={rd.disclosure}
+            />
+          </div>
+        ) : null}
         <p className="mt-8 text-center">
           <Link href="/blog" className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline">
             Back to hiring insights

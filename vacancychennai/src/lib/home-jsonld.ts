@@ -1,5 +1,6 @@
 import { homeFaqItems } from "@/lib/home-content";
 import { HOME_SCHEMA_DESCRIPTION, HOME_SEO_TITLE } from "@/lib/home-seo-copy";
+import { organizationSameAsUrls } from "@/lib/site-social";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
 const logoUrl = process.env.NEXT_PUBLIC_SITE_LOGO_URL;
@@ -45,6 +46,10 @@ export function buildHomeJsonLdGraph() {
     description: HOME_SCHEMA_DESCRIPTION,
     areaServed: chennaiAreaServed,
     ...(logoUrl ? { logo: logoUrl } : {}),
+    ...(() => {
+      const same = organizationSameAsUrls();
+      return same.length ? { sameAs: same } : {};
+    })(),
   };
 
   const webPage: Record<string, unknown> = {
