@@ -1,6 +1,10 @@
 import type { ComponentPropsWithoutRef } from "react";
 import type { BlogPost, BlogSection } from "@/lib/blog-posts";
 import { BlogRelatedHubLinks } from "@/components/blog/blog-related-hub-links";
+import {
+  FirstResumePlaybookEarlyInteractive,
+  FirstResumePlaybookLateInteractive,
+} from "@/components/blog/first-resume-playbook-widgets";
 import { OmrHiringPlaybookWidgets } from "@/components/blog/omr-hiring-playbook-widgets";
 import { hostnameIsResumeDoctor } from "@/lib/partner-resumedoctor";
 import { sectionCard } from "@/lib/ui";
@@ -60,7 +64,7 @@ function SectionedArticle({ post }: { post: PostWithSections }) {
         className={`${sectionCard} mb-8 border-blue-100 bg-slate-50/80 p-5`}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-blue-800">On this page</p>
-        <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+        <ol className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map((s, i) => (
             <li key={s.id} className="text-sm">
               <a href={`#${s.id}`} className="font-medium text-blue-700 hover:text-blue-900 hover:underline">
@@ -72,15 +76,30 @@ function SectionedArticle({ post }: { post: PostWithSections }) {
       </nav>
 
       <div className="space-y-12">
-        {sections.map((section) => (
+        {sections.map((section, sectionIndex) => (
           <div key={section.id}>
             <section
               id={section.id}
-              className={`${sectionCard} scroll-mt-24 space-y-4`}
+              className={`${
+                post.interactive === "first-resume-playbook"
+                  ? `${sectionCard} scroll-mt-28 space-y-4 border-slate-200/95 shadow-md ring-1 ring-slate-100/80`
+                  : `${sectionCard} scroll-mt-24 space-y-4`
+              }`}
               aria-labelledby={`heading-${section.id}`}
             >
-              <h2 id={`heading-${section.id}`} className="text-xl font-semibold tracking-tight text-slate-900">
-                {section.heading}
+              <h2
+                id={`heading-${section.id}`}
+                className="flex items-start gap-3 text-xl font-semibold tracking-tight text-slate-900"
+              >
+                {post.interactive === "first-resume-playbook" ? (
+                  <span
+                    className="mt-0.5 flex h-9 min-w-[2.25rem] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-sm"
+                    aria-hidden
+                  >
+                    {sectionIndex + 1}
+                  </span>
+                ) : null}
+                <span className="min-w-0 flex-1">{section.heading}</span>
               </h2>
 
               {section.table ? (
@@ -152,6 +171,36 @@ function SectionedArticle({ post }: { post: PostWithSections }) {
                 </aside>
               ) : null}
 
+              {section.crossLinks?.length ? (
+                <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">On Vacancy Chennai</p>
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                    {section.crossLinks.map((l) => (
+                      <li key={`${section.id}-${l.href}`}>
+                        <Link
+                          href={l.href}
+                          className="font-medium text-blue-700 underline-offset-2 hover:text-blue-900 hover:underline"
+                        >
+                          {l.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              {section.softPromo ? (
+                <p className="mt-5 border-t border-slate-100 pt-4 text-sm leading-relaxed text-slate-500">
+                  {section.softPromo.body}{" "}
+                  <Link
+                    href={section.softPromo.href}
+                    className="font-medium text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-blue-800 hover:decoration-blue-300"
+                  >
+                    {section.softPromo.linkLabel}
+                  </Link>
+                </p>
+              ) : null}
+
               {section.faq?.length ? (
                 <div className="space-y-2">
                   {section.faq.map((item, i) => (
@@ -183,6 +232,12 @@ function SectionedArticle({ post }: { post: PostWithSections }) {
               <div className="mt-8">
                 <OmrHiringPlaybookWidgets />
               </div>
+            ) : null}
+            {post.interactive === "first-resume-playbook" && section.id === "mindset-truth-over-fluff" ? (
+              <FirstResumePlaybookEarlyInteractive />
+            ) : null}
+            {post.interactive === "first-resume-playbook" && section.id === "format-ats-pdf-mistakes" ? (
+              <FirstResumePlaybookLateInteractive />
             ) : null}
           </div>
         ))}

@@ -1,4 +1,6 @@
 import { BlogArticleBody } from "@/components/blog/blog-article-body";
+import { BlogArticleShareStrip } from "@/components/blog/first-resume-playbook-widgets";
+import { BlogReadingProgress } from "@/components/blog/blog-reading-progress";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
 import { getAllBlogSlugs, getBlogPostBySlug } from "@/lib/blog-posts";
@@ -54,6 +56,7 @@ export default async function BlogArticlePage({ params }: Props) {
 
   return (
     <>
+      {post.interactive === "first-resume-playbook" ? <BlogReadingProgress /> : null}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
@@ -74,7 +77,21 @@ export default async function BlogArticlePage({ params }: Props) {
             ← All articles
           </Link>
         }
-      />
+      >
+        {post.interactive === "first-resume-playbook" ? (
+          <div className="mt-5 flex flex-wrap gap-2" aria-label="Article highlights">
+            <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-amber-100/95">
+              16 sections
+            </span>
+            <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-amber-100/95">
+              Path picker + headline lab
+            </span>
+            <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-amber-100/95">
+              Checklist & quick scan
+            </span>
+          </div>
+        ) : null}
+      </InnerPageHero>
       <article className="pb-8 pt-8">
         <nav aria-label="Breadcrumb" className={`${sectionCard} mb-6 text-sm text-slate-600`}>
           <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -107,6 +124,7 @@ export default async function BlogArticlePage({ params }: Props) {
           <span>{post.readMinutes} min read</span>
         </div>
         <BlogArticleBody post={post} />
+        {post.interactive === "first-resume-playbook" ? <BlogArticleShareStrip title={post.title} /> : null}
         {rd ? (
           <div className="mt-10 max-w-2xl">
             <PartnerResumeDoctorAside

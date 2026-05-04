@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const metadata = baseMetadata(
   "Hiring insights — Vacancy Chennai",
-  "Chennai hiring notes: OMR IT hiring, walk-ins, salary trends — practical guides for local employers and job seekers.",
+  "Chennai hiring notes: first-time résumés, OMR IT hiring, walk-ins, salary trends — practical guides for local employers and job seekers.",
   "/blog",
 );
 
@@ -16,7 +16,7 @@ export default function BlogIndexPage() {
       <InnerPageHero
         eyebrow="Blog"
         title="Hiring insights"
-        description="Practical notes for Chennai employers and job seekers — local context, not generic career advice."
+        description="Weekly hiring and career notes for Chennai — including first résumés for students and homemakers, plus local context for employers."
       />
       <ul className="space-y-4 pb-4 pt-8">
         {blogPosts.map((post) => (

@@ -9,10 +9,10 @@ export function BlogRelatedHubLinks({ links }: Props) {
   if (!links.length) return null;
   return (
     <nav
-      aria-label="Related job hubs"
+      aria-label="Related pages on Vacancy Chennai"
       className={`${sectionCard} mt-10 border-slate-200/90 bg-white/95 shadow-sm`}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Related hubs</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Explore the site</p>
       <ul className="mt-4 flex flex-wrap gap-3">
         {links.map((l) => (
           <li key={l.href}>
