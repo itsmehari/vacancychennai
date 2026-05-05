@@ -23,6 +23,14 @@ export const curatedEmployerDugout: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — applications go to employer phone (see curated direct-contact map). */
+export const curatedEmployerManoharan: EmployerProfile = {
+  id: "emp-manoharan-accounts",
+  companyName: "S Manoharan (Hiring Contact)",
+  email: "external.manoharan.accounts@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -91,6 +99,25 @@ const dugoutPhotographerDescription = [
   "Salary was not stated on the original listing; discuss with the employer.",
 ].join("\n");
 
+const accountsExecutiveDescription = [
+  "Urgent opening for Accounts role in Chennai.",
+  "",
+  "Experience required:",
+  "• 3 to 4 years in GST and TDS filing.",
+  "• Working knowledge of ZOHO is an added advantage.",
+  "",
+  "Salary and perks:",
+  "• As per market standards.",
+  "• CTC range: ₹4.80 to ₹5.50 lakhs per annum.",
+  "",
+  "Notice period:",
+  "• Immediate joiners are preferred.",
+  "",
+  "Apply directly:",
+  "• Contact person: S Manoharan",
+  "• Phone: +91 63803 51319",
+].join("\n");
+
 export const curatedPublishedJobs: Job[] = [
   {
     id: "job-office-mgr-advocate-parrys",
@@ -149,6 +176,24 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: LISTING_CREATED_AT,
     updatedAt: LISTING_UPDATED_AT,
   },
+  {
+    id: "job-accounts-gst-tds-manoharan",
+    employerId: curatedEmployerManoharan.id,
+    title: "Accounts Executive (GST / TDS)",
+    category: "Finance",
+    industry: "Accounting",
+    jobType: "full-time",
+    salaryMin: 40000,
+    salaryMax: 46000,
+    locationId: "loc-nungambakkam",
+    landmarkText: "Chennai — immediate joiner preferred.",
+    description: accountsExecutiveDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
+  },
 ];
 
 const whatsappOnlyJobIds = new Set(
@@ -164,6 +209,11 @@ const curatedDirectEmployerContact: Record<
     email: "reachdugout@gmail.com",
     phoneE164: "+919962002234",
     phoneLabel: "+91 99620 02234",
+  },
+  "job-accounts-gst-tds-manoharan": {
+    email: "external.manoharan.accounts@vacancychennai.in",
+    phoneE164: "+916380351319",
+    phoneLabel: "+91 63803 51319",
   },
 };
 
@@ -186,6 +236,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
   const m = new Map([
     [curatedEmployer.id, curatedEmployer.companyName],
     [curatedEmployerDugout.id, curatedEmployerDugout.companyName],
+    [curatedEmployerManoharan.id, curatedEmployerManoharan.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);
