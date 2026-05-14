@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_Tamil, Poppins } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import { PartnerOutboundAnalytics } from "@/components/partner-outbound-analytics";
-import { SiteAnalytics } from "@/components/site-analytics";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import { SITE_DEFAULT_DESCRIPTION } from "@/lib/home-seo-copy";
@@ -48,7 +48,7 @@ export default function RootLayout({
       className={`${poppins.variable} ${notoTamil.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-slate-50 font-sans text-slate-900 antialiased">
-        <SiteAnalytics />
+        <GoogleAnalytics />
         <PartnerOutboundAnalytics />
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
