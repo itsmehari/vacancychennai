@@ -15,6 +15,7 @@ export default function AboutPage() {
         eyebrow="Company"
         title="About Vacancy Chennai"
         description="We focus on location-first hiring so people shorten commutes across Velachery, Porur radials, the OMR stretch, Tambaram corridors, Ambattur industry pockets, and the suburbs in between."
+        backdropPhotoUrl="https://cdn.healthcarecareercollege.edu/wp-content/uploads/2025/02/The-Benefits-of-Working-in-the-Medical-Assistant-Career-Field.jpg"
       />
       <div className="space-y-6 pb-4 pt-8">
         <section className={sectionCard}>

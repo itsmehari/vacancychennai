@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl, getCanonicalSiteBase } from "@/lib/site-base-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in";
+  const base = getCanonicalSiteBase();
   return {
     rules: {
       userAgent: "*",
@@ -11,10 +12,15 @@ export default function robots(): MetadataRoute.Robots {
         "/admin/",
         "/candidate/dashboard",
         "/employer/dashboard",
+        "/employer/billing",
         "/employer/resume-database",
+        "/employer/forgot-password",
+        "/employer/reset-password",
+        "/admin/forgot-password",
+        "/admin/reset-password",
       ],
     },
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: absoluteUrl("/sitemap.xml"),
     host: new URL(base).host,
   };
 }

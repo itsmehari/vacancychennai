@@ -6,6 +6,10 @@ import { requireRole } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { incrementMetric } from "@/lib/metrics";
 import {
+  employerEligibleForPremiumTier,
+  resolvePublishBilling,
+} from "@/features/billing/publish-and-fulfill";
+import {
   listLocations,
   addAudit,
   createJob,
@@ -85,7 +89,20 @@ export async function updateJobStatusAction(formData: FormData) {
     redirect("/admin/dashboard?error=invalid-status");
   }
 
-  const updated = await setJobStatus(jobId, status);
+  let updated: { id: string; status: JobStatus } | undefined;
+  if (status === "published") {
+    const billing = await resolvePublishBilling(jobId);
+    if (!billing.ok) {
+      incrementMetric("publishBlockedNoPay");
+      redirect("/admin/dashboard?error=no-entitlement");
+    }
+    updated = await setJobStatus(jobId, status, {
+      billingSource: billing.billingSource === "republish" ? null : billing.billingSource,
+      listingDays: 120,
+    });
+  } else {
+    updated = await setJobStatus(jobId, status);
+  }
   if (!updated) {
     incrementMetric("moderationUpdates", 0);
     redirect("/admin/dashboard?error=job-not-found");
@@ -110,6 +127,10 @@ export async function promoteJobAction(formData: FormData) {
   const jobId = String(formData.get("jobId") ?? "");
   const tier = String(formData.get("tier") ?? "featured");
   const mappedTier = tier === "urgent" ? "urgent" : "featured";
+
+  if (!(await employerEligibleForPremiumTier(employer.actorId))) {
+    redirect("/employer/dashboard?error=promotion-billing");
+  }
 
   const ok = await promoteOwnedJob(jobId, employer.actorId, mappedTier);
   if (!ok) {

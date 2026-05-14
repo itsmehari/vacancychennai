@@ -45,6 +45,9 @@ type DbJobRow = {
   listing_tier: "free" | "featured" | "urgent";
   created_at: string;
   updated_at: string;
+  published_at?: string | null;
+  expires_at?: string | null;
+  billing_source?: string | null;
 };
 
 function locationDedupeKey(l: Location) {
@@ -101,6 +104,9 @@ function mapDbJobRow(row: DbJobRow): Job {
     listingTier: row.listing_tier,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    publishedAt: row.published_at ?? undefined,
+    expiresAt: row.expires_at ?? undefined,
+    billingSource: row.billing_source ?? undefined,
   };
 }
 
@@ -132,7 +138,10 @@ export async function listPublishedJobs(): Promise<Job[]> {
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }
   const rows = await dbQuery<DbJobRow>(
-    `select * from jobs where status = 'published' order by updated_at desc, created_at desc`,
+    `select * from jobs
+     where status = 'published'
+       and (expires_at is null or expires_at > now())
+     order by updated_at desc, created_at desc`,
   );
   return mergePublishedJobsWithCurated(rows.map(mapDbJobRow));
 }
@@ -159,7 +168,9 @@ export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<J
   }
   const rows = await dbQuery<DbJobRow>(
     `select * from jobs
-     where status = 'published' and created_at >= $1::timestamptz
+     where status = 'published'
+       and (expires_at is null or expires_at > now())
+       and created_at >= $1::timestamptz
      order by created_at desc`,
     [sinceIso],
   );
@@ -222,10 +233,35 @@ export async function createJob(input: {
   return { id: rows[0].id };
 }
 
-export async function setJobStatus(jobId: string, status: JobStatus) {
+export async function setJobStatus(
+  jobId: string,
+  status: JobStatus,
+  opts?: { billingSource?: string | null; listingDays?: number },
+) {
   if (!hasDatabase()) return updateJobStatus(jobId, status);
   if (!isDatabaseUuid(jobId)) return undefined;
-  await dbExecute(`update jobs set status = $2, updated_at = now() where id = $1`, [jobId, status]);
+  if (status === "published") {
+    const days = opts?.listingDays ?? 120;
+    const billing = opts?.billingSource ?? null;
+    await dbExecute(
+      `update jobs set
+        status = $2::job_status,
+        updated_at = now(),
+        published_at = case when published_at is null then now() else published_at end,
+        expires_at = case when expires_at is null then (now() + ($3::int * interval '1 day')) else expires_at end,
+        billing_source = case
+          when $4::text is not null and (billing_source is null or billing_source = '') then $4::varchar(32)
+          else billing_source
+        end
+      where id = $1::uuid`,
+      [jobId, status, days, billing],
+    );
+    return { id: jobId, status };
+  }
+  await dbExecute(`update jobs set status = $2::job_status, updated_at = now() where id = $1::uuid`, [
+    jobId,
+    status,
+  ]);
   return { id: jobId, status };
 }
 
@@ -621,9 +657,22 @@ export async function getApplyPrefillForActor(actorId: string): Promise<{
 export async function findJob(jobId: string): Promise<Job | null> {
   if (!hasDatabase()) return getJobById(jobId) ?? null;
   if (isDatabaseUuid(jobId)) {
-    const rows = await dbQuery<DbJobRow>(`select * from jobs where id = $1 limit 1`, [jobId]);
+    const rows = await dbQuery<DbJobRow>(
+      `select * from jobs where id = $1::uuid limit 1`,
+      [jobId],
+    );
     const row = rows[0];
-    if (row) return mapDbJobRow(row);
+    if (row) {
+      const job = mapDbJobRow(row);
+      if (
+        job.status === "published" &&
+        job.expiresAt &&
+        new Date(job.expiresAt).getTime() <= Date.now()
+      ) {
+        return null;
+      }
+      return job;
+    }
   }
   const curated = curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published");
   if (curated) return curated;

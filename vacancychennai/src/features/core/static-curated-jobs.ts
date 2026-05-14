@@ -31,6 +31,14 @@ export const curatedEmployerManoharan: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — Madipakkam campus; city hub listing uses Nanganallur (see landmark). */
+export const curatedEmployerSkbVidhyashram: EmployerProfile = {
+  id: "emp-skb-vidhyashram-madipakkam",
+  companyName: "SKB Vidhyashram Playschool",
+  email: "skbmadipakkam@gmail.com",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -55,6 +63,14 @@ export const curatedLocations: Location[] = [
     pincode: "600034",
     lat: 13.0604,
     lng: 80.2496,
+  },
+  {
+    id: "loc-nanganallur",
+    zone: "South Chennai",
+    area: "Nanganallur",
+    pincode: "600091",
+    lat: 12.9821,
+    lng: 80.1881,
   },
 ];
 
@@ -116,6 +132,53 @@ const accountsExecutiveDescription = [
   "Apply directly:",
   "• Contact person: S Manoharan",
   "• Phone: +91 63803 51319",
+].join("\n");
+
+const skbPitch = [
+  "School focus (from the employer’s campus hiring post):",
+  "• Passion for education and new perspectives.",
+  "• Hands-on learning, art-integrated education, and safe spaces for children.",
+  "",
+  "Requirements:",
+  "• Strong communication and teaching skills.",
+  "• Activity-based teaching experience.",
+  "• Confidence, initiative, and creativity.",
+].join("\n");
+
+const skbPrincipalDescription = [
+  "SKB Vidhyashram Playschool — Madipakkam, Chennai is hiring a Principal.",
+  "",
+  "Location note: Vacancy Chennai lists this under the Nanganallur city hub; the campus is in Madipakkam.",
+  "",
+  skbPitch,
+  "",
+  "Apply by: 30 May 2026.",
+  "",
+  "How to apply:",
+  "• Use the Open WhatsApp button on this page (primary channel).",
+  "• You may also email skbmadipakkam@gmail.com with your CV and the role title in the subject line.",
+  "",
+  "Campus enquiries: tel:+919962187719",
+  "",
+  "Salary was not stated on the original posting; confirm with the school directly.",
+].join("\n");
+
+const skbTeacherDescription = [
+  "SKB Vidhyashram Playschool — Madipakkam, Chennai is hiring a Teacher on a part-time basis.",
+  "",
+  "Location note: Vacancy Chennai lists this under the Nanganallur city hub; the campus is in Madipakkam.",
+  "",
+  skbPitch,
+  "",
+  "Apply by: 30 May 2026.",
+  "",
+  "How to apply:",
+  "• Use the Open WhatsApp button on this page (primary channel).",
+  "• You may also email skbmadipakkam@gmail.com with your CV and the role title in the subject line.",
+  "",
+  "Campus enquiries: tel:+919962187719",
+  "",
+  "Salary was not stated on the original posting; confirm with the school directly.",
 ].join("\n");
 
 export const curatedPublishedJobs: Job[] = [
@@ -194,11 +257,51 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: LISTING_CREATED_AT,
     updatedAt: LISTING_UPDATED_AT,
   },
+  {
+    id: "job-skb-principal-playschool-madipakkam",
+    employerId: curatedEmployerSkbVidhyashram.id,
+    title: "Principal",
+    category: "Education",
+    industry: "Education",
+    jobType: "full-time",
+    salaryMin: 35000,
+    salaryMax: 70000,
+    locationId: "loc-nanganallur",
+    landmarkText: "SKB Vidhyashram Playschool — Madipakkam, Chennai (city hub: Nanganallur).",
+    description: skbPrincipalDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
+  },
+  {
+    id: "job-skb-teacher-parttime-playschool-madipakkam",
+    employerId: curatedEmployerSkbVidhyashram.id,
+    title: "Teacher (part-time)",
+    category: "Education",
+    industry: "Education",
+    jobType: "part-time",
+    salaryMin: 12000,
+    salaryMax: 28000,
+    locationId: "loc-nanganallur",
+    landmarkText: "SKB Vidhyashram Playschool — Madipakkam, Chennai (city hub: Nanganallur).",
+    description: skbTeacherDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: LISTING_CREATED_AT,
+    updatedAt: LISTING_UPDATED_AT,
+  },
 ];
 
-const whatsappOnlyJobIds = new Set(
-  curatedPublishedJobs.filter((j) => j.id.startsWith("job-office-mgr-advocate")).map((j) => j.id),
-);
+/** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
+const curatedWhatsAppApplyDigitsByJobId: Record<string, string> = {
+  "job-office-mgr-advocate-parrys": "918248622449",
+  "job-office-mgr-advocate-kilpauk": "918248622449",
+  "job-skb-principal-playschool-madipakkam": "916380383563",
+  "job-skb-teacher-parttime-playschool-madipakkam": "916380383563",
+};
 
 /** Apply via employer email / phone only — not Vacancy Chennai quick apply. */
 const curatedDirectEmployerContact: Record<
@@ -218,7 +321,11 @@ const curatedDirectEmployerContact: Record<
 };
 
 export function isCuratedWhatsAppOnlyJob(jobId: string): boolean {
-  return whatsappOnlyJobIds.has(jobId);
+  return jobId in curatedWhatsAppApplyDigitsByJobId;
+}
+
+export function getCuratedWhatsAppApplyDigits(jobId: string): string | undefined {
+  return curatedWhatsAppApplyDigitsByJobId[jobId];
 }
 
 export function isCuratedDirectEmployerContactJob(jobId: string): boolean {
@@ -229,7 +336,7 @@ export function getCuratedDirectEmployerContact(jobId: string) {
   return curatedDirectEmployerContact[jobId];
 }
 
-/** E.164 without + for wa.me */
+/** E.164 without + for wa.me (advocate listings only — prefer `getCuratedWhatsAppApplyDigits`). */
 export const curatedAdvocateWhatsAppDigits = "918248622449";
 
 export function curatedEmployerCompanyNameMap(): Map<string, string> {
@@ -237,6 +344,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployer.id, curatedEmployer.companyName],
     [curatedEmployerDugout.id, curatedEmployerDugout.companyName],
     [curatedEmployerManoharan.id, curatedEmployerManoharan.companyName],
+    [curatedEmployerSkbVidhyashram.id, curatedEmployerSkbVidhyashram.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);

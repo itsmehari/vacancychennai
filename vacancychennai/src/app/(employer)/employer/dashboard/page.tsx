@@ -7,6 +7,7 @@ import {
   listLocations,
   suggestCandidatesForJobMatches,
 } from "@/features/core/repository";
+import { getEmployerBillingSummary } from "@/features/billing/employer-summary";
 import { promoteJobAction, createJobAction } from "@/features/jobs/actions";
 import { requireRole } from "@/lib/auth";
 import {
@@ -26,10 +27,11 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
   const session = await requireRole("employer", "/employer/login");
   const query = await searchParams;
 
-  const [myJobs, myApplications, locations] = await Promise.all([
+  const [myJobs, myApplications, locations, billing] = await Promise.all([
     listJobsForEmployerUser(session.actorId),
     listEmployerApplications(session.actorId),
     listLocations(),
+    getEmployerBillingSummary(session.actorId),
   ]);
 
   const jobMatchBlocks = await Promise.all(
@@ -67,12 +69,45 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
     <div className="space-y-6">
       <DashboardWelcome title="Employer dashboard" subtitle={`Welcome, ${session.displayName}`}>
         {successBanner}
-        {query.error && (
+        {query.error === "promotion-billing" ? (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
+            Listing upgrades need an active paid plan or publish credits when billing is enforced.{" "}
+            <Link href="/employer/billing" className="font-semibold underline-offset-2 hover:underline">
+              Open billing
+            </Link>
+            .
+          </p>
+        ) : query.error === "invalid-job" ? (
           <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
             Could not submit job. Please check required fields.
           </p>
-        )}
+        ) : query.error ? (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
+            Could not complete that action. Please try again or contact support.
+          </p>
+        ) : null}
       </DashboardWelcome>
+
+      {billing ? (
+        <section className={sectionCard}>
+          <h2 className="text-lg font-semibold text-slate-900">Credits & plans</h2>
+          <p className="mt-2 text-sm text-slate-700">
+            Prepaid publishes remaining:{" "}
+            <strong className="tabular-nums">{billing.prepaidPublishesRemaining}</strong>. Monthly pass:{" "}
+            {billing.monthlyPassActive ? (
+              <>
+                active (max <strong>{billing.maxLivePosts}</strong> live at once)
+              </>
+            ) : (
+              "not active"
+            )}
+            . Live listings: <strong className="tabular-nums">{billing.publishedLiveCount}</strong>.
+          </p>
+          <Link href="/employer/billing" className={`mt-3 inline-flex ${btnPrimary}`}>
+            Buy credits or plans
+          </Link>
+        </section>
+      ) : null}
 
       <section className={sectionCard}>
         <h2 className="text-xl font-semibold text-slate-900">Post a job</h2>
@@ -130,10 +165,10 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
               <form action={promoteJobAction} className="mt-3 flex flex-wrap gap-2">
                 <input type="hidden" name="jobId" value={job.id} />
                 <button className={btnDenseWarning} name="tier" value="featured" type="submit">
-                  Upgrade Featured (INR 299)
+                  Upgrade to featured
                 </button>
                 <button className={btnDenseDanger} name="tier" value="urgent" type="submit">
-                  Urgent Pack (INR 999)
+                  Mark urgent
                 </button>
               </form>
             </div>

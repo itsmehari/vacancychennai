@@ -58,6 +58,11 @@ export const profileNavLinks: ProfileNavLink[] = [
     description: "Sign in to track applications and update your profile",
   },
   {
+    href: "/employer/billing",
+    label: "Employer billing",
+    description: "Buy publish credits or a monthly pass",
+  },
+  {
     href: "/employer/login",
     label: "List Your Job",
     description: "Post a role and reach nearby candidates",

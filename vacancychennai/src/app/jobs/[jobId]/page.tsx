@@ -18,8 +18,8 @@ import {
   isCuratedExternalApplyUrlJob,
 } from "@/features/core/curated-external-job-postings";
 import {
-  curatedAdvocateWhatsAppDigits,
   getCuratedDirectEmployerContact,
+  getCuratedWhatsAppApplyDigits,
   isCuratedDirectEmployerContactJob,
   isCuratedWhatsAppOnlyJob,
 } from "@/features/core/static-curated-jobs";
@@ -117,7 +117,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     : undefined;
   const directEmployerContact = isCuratedDirectEmployerContactJob(job.id);
   const directContact = directEmployerContact ? getCuratedDirectEmployerContact(job.id) : null;
-  const waHref = `https://wa.me/${curatedAdvocateWhatsAppDigits}`;
+  const waDigits = getCuratedWhatsAppApplyDigits(job.id);
 
   const applyMode: JobApplyMode = whatsappOnly
     ? "whatsapp-only"
@@ -233,20 +233,27 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               <>
                 <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  The employer asked for applications on WhatsApp only. Send your résumé in chat; avoid phone
+                  The employer asked for applications on WhatsApp first. Send your résumé in chat; avoid phone
                   calls unless they request a call back.
                 </p>
-                <a
-                  href={waHref}
-                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cta="job-whatsapp-apply"
-                >
-                  Open WhatsApp
-                </a>
+                {waDigits ? (
+                  <a
+                    href={`https://wa.me/${waDigits}`}
+                    className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cta="job-whatsapp-apply"
+                  >
+                    Open WhatsApp
+                  </a>
+                ) : (
+                  <p className="mt-4 text-sm text-amber-900">
+                    WhatsApp apply is not configured for this listing — use the employer contact details in the
+                    description.
+                  </p>
+                )}
                 <p className="mt-3 text-xs text-slate-500">
-                  The same number is listed in the description if you prefer to copy it.
+                  Check the role details for email or any alternate contact the employer listed.
                 </p>
               </>
             ) : externalApplyUrl ? (

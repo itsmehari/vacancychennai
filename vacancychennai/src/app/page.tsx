@@ -1,6 +1,7 @@
 import HomeBlogCta from "@/components/home/home-blog-cta";
 import HomeCandidatesJoin from "@/components/home/home-candidates-join";
 import HomeCategoryChips from "@/components/home/home-category-chips";
+import HomeEmployerPricingStrip from "@/components/home/home-employer-pricing-strip";
 import HomeEmployersMarketing from "@/components/home/home-employers-marketing";
 import HomeFaq from "@/components/home/home-faq";
 import HomeHero from "@/components/home/home-hero";
@@ -123,6 +124,7 @@ export default async function Home() {
           />
         ) : null}
         <HomeHowItWorks />
+        <HomeEmployerPricingStrip />
         <HomeEmployersMarketing />
         <HomeCandidatesJoin />
         <HomeFaq />

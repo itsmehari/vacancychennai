@@ -1,10 +1,13 @@
-# Project updates — Vacancy Chennai
+## 2026-05 — Employer billing (SuperProfile links), publish gate, pricing
 
-Chronological log of notable product and codebase changes. **Latest first.** Pair with [`LEARNING.md`](./LEARNING.md) for pitfalls and patterns, [`AGENTS.md`](../AGENTS.md) for agent rules, and the [vacancychennai-proj-skill](../../.cursor/skills/vacancychennai-proj-skill/SKILL.md) for Cursor triggers.
+- **`010_billing_listing_usage.sql`:** `jobs.published_at`, `expires_at`, `billing_source`; `entitlement_usages`; `payment_orders.provider_payment_id` unique for idempotency.
+- **SKU catalog:** [`src/lib/billing/skus.ts`](../src/lib/billing/skus.ts); policy [`docs/EMPLOYER_BILLING_POLICY.md`](./EMPLOYER_BILLING_POLICY.md).
+- **APIs:** `POST /api/billing/checkout` (single SuperProfile URL via `SUPERPROFILE_PAYMENT_URL`), optional `POST /api/billing/webhook/superprofile`; cron **`/api/cron/billing`** (pass expiry emails when Resend is set).
+- **Gates:** `BILLING_ENFORCED` + `resolvePublishBilling` on admin publish; `employerEligibleForPremiumTier` before listing tier promote.
+- **UI:** `/employer/billing`, homepage **`HomeEmployerPricingStrip`**, `/pricing` tier + FAQ refresh; admin **grant 1 credit** + **Mark paid** for SuperProfile pending orders; nav profile link to billing.
+- **Docs:** [`BILLING_SMOKE_TESTS.md`](./BILLING_SMOKE_TESTS.md), [`MARKETING_90D_CHENNAI.md`](./MARKETING_90D_CHENNAI.md), [`BILLING_OPS_RUNBOOK.md`](./BILLING_OPS_RUNBOOK.md). **Env:** `SUPERPROFILE_PAYMENT_URL` (HTTPS), optional `SUPERPROFILE_WEBHOOK_SECRET`, `BILLING_ENFORCED`.
 
 ---
-
-## 2026-04 — Job seeker profile PRD (Blob, apply pre-fill, CTAs, privacy)
 
 ### Identity
 

@@ -111,6 +111,14 @@ Engineering and design notes from implementation work (including the 2026 home/m
 - **Vercel:** Root **`vacancychennai/vercel.json`** defines a daily cron hitting the notifications path; set **`CRON_SECRET`** in the project env (Vercel cron sends the Bearer token when configured).
 - **Subscriptions storage:** Migration **`007_signup_password_reset_subscriptions.sql`** (and earlier schema) — `subscribeAlertsAction` in `account-actions.ts` upserts **`email_subscriptions`**.
 
+## Employer billing (SuperProfile links)
+
+- **Migrations:** **`010_billing_listing_usage.sql`** adds `jobs.published_at` / `expires_at` / `billing_source`, **`entitlement_usages`**, and **`payment_orders.provider_payment_id`**. Run **`npm run db:migrate`** before `next build` when **`DATABASE_URL`** is set — otherwise queries that reference `expires_at` will fail at prerender (e.g. sitemap).
+- **SKU amounts:** [`src/lib/billing/skus.ts`](../src/lib/billing/skus.ts); policy copy in [`docs/EMPLOYER_BILLING_POLICY.md`](./EMPLOYER_BILLING_POLICY.md).
+- **Publish gate:** Set **`BILLING_ENFORCED=true`** (with DB) so admin **`Publish`** requires credits or an active monthly pass (`resolvePublishBilling` in `src/features/billing/publish-and-fulfill.ts` + `updateJobStatusAction` in `src/features/jobs/actions.ts`). Default is off so dev/staging are not blocked.
+- **Checkout:** `POST /api/billing/checkout` creates a **`payment_orders`** row (`provider = superprofile`) and returns a **SuperProfile URL** from env **`SUPERPROFILE_PAYMENT_URL`** (one HTTPS link for every SKU; see [`src/lib/billing/superprofile-links.ts`](../src/lib/billing/superprofile-links.ts)), with `vc_ref` = order id for reconciliation. Client **`SuperProfileSkuButton`** opens that URL. Optional webhook **`POST /api/billing/webhook/superprofile`** (`Authorization: Bearer <SUPERPROFILE_WEBHOOK_SECRET>`) or admin **Mark paid** on `/admin/dashboard` grants entitlements via **`fulfillPaymentOrderById`**. Cron **`/api/cron/billing`** (same **`CRON_SECRET`** as notifications) sends pass-expiry reminder emails when Resend is configured.
+- **Promote tier:** `promoteJobAction` checks **`employerEligibleForPremiumTier`** when billing is enforced.
+
 ## References in repo
 
 | Topic        | Location |
@@ -132,6 +140,7 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | Admin / employer register & subscribe actions | `src/features/auth/account-actions.ts` |
 | Job digest + SMS fallback email | `src/lib/email/send-digest-email.ts` |
 | Twilio SMS | `src/lib/sms/twilio-sms.ts` |
+| Employer billing + publish gate | `src/lib/billing/skus.ts`, `src/lib/billing/superprofile-links.ts`, `src/lib/billing/flags.ts`, `src/features/billing/publish-and-fulfill.ts`, `src/app/api/billing/*`, `/employer/billing` |
 | Cron notification runner | `src/lib/notifications/run-scheduled-notifications.ts` |
 | Cron HTTP entry | `src/app/api/cron/notifications/route.ts` |
 | Next request proxy (city headers) | `src/proxy.ts` |

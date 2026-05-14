@@ -36,6 +36,12 @@ export type Job = {
   createdAt: string;
   /** Postgres `jobs.updated_at`; mirrors edits, status changes, promos. JSON-LD `dateModified`. */
   updatedAt: string;
+  /** First publish instant (DB). */
+  publishedAt?: string | null;
+  /** Listing visibility end (DB). */
+  expiresAt?: string | null;
+  /** First-publish billing: post_credit | volume_pack | monthly_pass | waived | admin_grant | republish */
+  billingSource?: string | null;
 };
 
 export type ApplicationStage =
