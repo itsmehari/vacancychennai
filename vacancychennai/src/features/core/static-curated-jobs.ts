@@ -39,6 +39,14 @@ export const curatedEmployerSkbVidhyashram: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — apply by phone (see curated direct-contact map). */
+export const curatedEmployerSouthIndianRestaurantNavalur: EmployerProfile = {
+  id: "emp-south-indian-restaurant-navalur",
+  companyName: "South Indian Restaurant (Navalur)",
+  email: "external.south-indian-restaurant.navalur@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -71,6 +79,14 @@ export const curatedLocations: Location[] = [
     pincode: "600091",
     lat: 12.9821,
     lng: 80.1881,
+  },
+  {
+    id: "loc-navalur",
+    zone: "OMR / ECR",
+    area: "Navalur",
+    pincode: "603103",
+    lat: 12.849,
+    lng: 80.227,
   },
 ];
 
@@ -179,6 +195,27 @@ const skbTeacherDescription = [
   "Campus enquiries: tel:+919962187719",
   "",
   "Salary was not stated on the original posting; confirm with the school directly.",
+].join("\n");
+
+const NAVALUR_RESTAURANT_LISTING_AT = "2026-05-15T00:00:00.000Z";
+
+const southIndianRestaurantNavalurDescription = [
+  "Urgent recruitment — South Indian restaurant in Navalur, Chennai. Immediate joining is preferred.",
+  "",
+  "Open positions:",
+  "• Executive Chef",
+  "• Kitchen Assistant",
+  "• Kitchen Trainee",
+  "• Barista (experienced)",
+  "• Cashier",
+  "",
+  "Benefits:",
+  "• Staff meals provided.",
+  "",
+  "How to apply:",
+  "Call +91 81245 37432 to discuss the role and next steps.",
+  "",
+  "Salary was not stated on the original notice; confirm with the restaurant when you call.",
 ].join("\n");
 
 export const curatedPublishedJobs: Job[] = [
@@ -293,6 +330,24 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: LISTING_CREATED_AT,
     updatedAt: LISTING_UPDATED_AT,
   },
+  {
+    id: "job-south-indian-restaurant-navalur-urgent",
+    employerId: curatedEmployerSouthIndianRestaurantNavalur.id,
+    title: "Multiple openings — South Indian Restaurant (Navalur)",
+    category: "Hospitality",
+    industry: "Food & Beverage",
+    jobType: "full-time",
+    salaryMin: 15000,
+    salaryMax: 65000,
+    locationId: "loc-navalur",
+    landmarkText: "South Indian restaurant — Navalur, Chennai (OMR belt).",
+    description: southIndianRestaurantNavalurDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: NAVALUR_RESTAURANT_LISTING_AT,
+    updatedAt: NAVALUR_RESTAURANT_LISTING_AT,
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -317,6 +372,11 @@ const curatedDirectEmployerContact: Record<
     email: "external.manoharan.accounts@vacancychennai.in",
     phoneE164: "+916380351319",
     phoneLabel: "+91 63803 51319",
+  },
+  "job-south-indian-restaurant-navalur-urgent": {
+    email: "external.south-indian-restaurant.navalur@vacancychennai.in",
+    phoneE164: "+918124537432",
+    phoneLabel: "+91 81245 37432",
   },
 };
 
@@ -345,6 +405,10 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerDugout.id, curatedEmployerDugout.companyName],
     [curatedEmployerManoharan.id, curatedEmployerManoharan.companyName],
     [curatedEmployerSkbVidhyashram.id, curatedEmployerSkbVidhyashram.companyName],
+    [
+      curatedEmployerSouthIndianRestaurantNavalur.id,
+      curatedEmployerSouthIndianRestaurantNavalur.companyName,
+    ],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);

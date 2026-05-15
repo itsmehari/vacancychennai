@@ -45,7 +45,13 @@ export type ProfileNavLink = {
   description: string;
 };
 
-/** Your Profile menu — resume (candidate) vs job listing (employer). */
+/** Primary nav — employer job posting entry (not under Your Profile). */
+export const listYourJobNavLink = {
+  href: "/post-job",
+  label: "List your job",
+} as const;
+
+/** Your Profile menu — seeker sign-in, profile, and employer billing. */
 export const profileNavLinks: ProfileNavLink[] = [
   {
     href: "/job-seeker-profile",
@@ -61,10 +67,5 @@ export const profileNavLinks: ProfileNavLink[] = [
     href: "/employer/billing",
     label: "Employer billing",
     description: "Buy publish credits or a monthly pass",
-  },
-  {
-    href: "/employer/login",
-    label: "List Your Job",
-    description: "Post a role and reach nearby candidates",
   },
 ];

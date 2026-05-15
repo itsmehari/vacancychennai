@@ -86,6 +86,13 @@ function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
   );
 }
 
+function toIsoTimestamp(value: string | Date | null | undefined): string | undefined {
+  if (value == null) return undefined;
+  if (value instanceof Date) return value.toISOString();
+  const s = String(value).trim();
+  return s || undefined;
+}
+
 function mapDbJobRow(row: DbJobRow): Job {
   return {
     id: row.id,
@@ -102,10 +109,10 @@ function mapDbJobRow(row: DbJobRow): Job {
     status: row.status as JobStatus,
     featured: row.is_featured,
     listingTier: row.listing_tier,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    publishedAt: row.published_at ?? undefined,
-    expiresAt: row.expires_at ?? undefined,
+    createdAt: toIsoTimestamp(row.created_at) ?? new Date().toISOString(),
+    updatedAt: toIsoTimestamp(row.updated_at) ?? new Date().toISOString(),
+    publishedAt: toIsoTimestamp(row.published_at),
+    expiresAt: toIsoTimestamp(row.expires_at),
     billingSource: row.billing_source ?? undefined,
   };
 }
@@ -319,10 +326,14 @@ export async function addAudit(input: {
     });
     return;
   }
+  const actorUserId = isDatabaseUuid(input.actorId) ? input.actorId : null;
+  const metadata = actorUserId
+    ? {}
+    : { actorRole: input.actorRole, actorId: input.actorId };
   await dbExecute(
     `insert into audit_logs (actor_user_id, action, entity_type, entity_id, metadata)
-     values ($1, $2, $3, $4, '{}'::jsonb)`,
-    [input.actorId, input.action, input.entityType, input.entityId],
+     values ($1, $2, $3, $4, $5::jsonb)`,
+    [actorUserId, input.action, input.entityType, input.entityId, JSON.stringify(metadata)],
   );
 }
 

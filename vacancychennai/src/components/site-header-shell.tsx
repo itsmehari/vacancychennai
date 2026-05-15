@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import {
+  listYourJobNavLink,
   profileNavLinks,
   type MegaAreaLink,
   type MegaSegmentLink,
@@ -204,6 +205,14 @@ export default function SiteHeaderShell({
               className={isNavHrefActive(pathname, "/blog") ? navBtnActive : navBtnInactive}
             >
               Blog
+            </Link>
+            <Link
+              href={listYourJobNavLink.href}
+              className={
+                isNavHrefActive(pathname, listYourJobNavLink.href) ? navBtnActive : navBtnInactive
+              }
+            >
+              {listYourJobNavLink.label}
             </Link>
             <div className="relative">
               <button
@@ -494,6 +503,13 @@ export default function SiteHeaderShell({
               onClick={closeMobile}
             >
               Blog
+            </Link>
+            <Link
+              href={listYourJobNavLink.href}
+              className={`block rounded-xl px-3 py-3 text-base font-medium ${isNavHrefActive(pathname, listYourJobNavLink.href) ? "bg-amber-50 text-amber-950 ring-1 ring-amber-200/80" : "text-slate-900 hover:bg-slate-50"}`}
+              onClick={closeMobile}
+            >
+              {listYourJobNavLink.label}
             </Link>
             <button
               type="button"

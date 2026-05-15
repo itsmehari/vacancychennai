@@ -11,9 +11,9 @@ export function isJobsExplorePath(pathname: string): boolean {
   return false;
 }
 
-/** “Your Profile” menu — seeker/employer flows (dashboards, login, landing). */
+/** “Your Profile” menu — seeker sign-in, profile, employer billing (not /post-job; see main nav). */
 export function isProfileHubPath(pathname: string): boolean {
-  if (pathname === "/job-seeker-profile" || pathname === "/post-job") return true;
+  if (pathname === "/job-seeker-profile") return true;
   if (pathname.startsWith("/candidate/") || pathname.startsWith("/employer/")) return true;
   return false;
 }

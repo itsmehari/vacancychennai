@@ -66,8 +66,11 @@ export function jobDetailPageMetadata(opts: {
   const base = baseMetadata(opts.title, opts.description, opts.path);
   let meta: Metadata = base;
   if (opts.keywords?.length) meta = { ...meta, keywords: opts.keywords };
-  const modified = opts.modifiedTime?.trim();
-  const published = (opts.publishedTime ?? opts.modifiedTime)?.trim();
+  const modified =
+    opts.modifiedTime == null ? undefined : String(opts.modifiedTime).trim() || undefined;
+  const publishedRaw = opts.publishedTime ?? opts.modifiedTime;
+  const published =
+    publishedRaw == null ? undefined : String(publishedRaw).trim() || undefined;
   if (modified && published && meta.openGraph) {
     meta = {
       ...meta,
