@@ -52,6 +52,40 @@ export default function PrivacyPage() {
       </div>
 
       <div className="space-y-3 text-slate-700">
+        <h2 className="text-xl font-semibold text-slate-900">Cookies and website analytics</h2>
+        <p>
+          We partner with Microsoft Clarity and Microsoft Advertising to capture how you use and interact
+          with our website through behavioral metrics, heatmaps, and session replay to improve Vacancy
+          Chennai (job search, listings, and employer tools). Website usage data is captured using first-
+          and third-party cookies and other tracking technologies to determine the popularity of pages and
+          online activity. We also use this information for site optimization and fraud/security purposes.
+          For more information about how Microsoft collects and uses your data, visit the{" "}
+          <a
+            href="https://www.microsoft.com/privacy/privacystatement"
+            className={linkInline}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Microsoft Privacy Statement
+          </a>
+          .
+        </p>
+        <p>
+          We also use Google Analytics (GA4) to measure traffic and how visitors navigate the site. Google
+          may use cookies and similar technologies; see{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            className={linkInline}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Google&apos;s Privacy Policy
+          </a>{" "}
+          for details. Essential cookies for sign-in and security are separate from these analytics tools.
+        </p>
+      </div>
+
+      <div className="space-y-3 text-slate-700">
         <h2 className="text-xl font-semibold text-slate-900">Your rights</h2>
         <p>
           To request correction or deletion of your data, contact us via the{" "}

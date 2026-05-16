@@ -139,6 +139,17 @@ export default function SiteFooter() {
                   Privacy
                 </Link>
               </p>
+              <p className="mt-3 max-w-prose text-xs leading-relaxed text-blue-100/90">
+                We improve Vacancy Chennai by using Microsoft Clarity to see how you use our website. By using
+                our site, you agree that we and Microsoft can collect and use this data. Our{" "}
+                <Link
+                  href="/privacy"
+                  className={`text-white underline-offset-2 hover:underline ${focusRingOnAccent} rounded-sm ${transitionFast}`}
+                >
+                  privacy statement
+                </Link>{" "}
+                has more details.
+              </p>
             </div>
 
             <div className="flex min-w-0 flex-col gap-3 sm:max-w-xs">
