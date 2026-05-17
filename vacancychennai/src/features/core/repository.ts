@@ -665,32 +665,48 @@ export async function getApplyPrefillForActor(actorId: string): Promise<{
   };
 }
 
-export async function findJob(jobId: string): Promise<Job | null> {
-  if (!hasDatabase()) return getJobById(jobId) ?? null;
-  if (isDatabaseUuid(jobId)) {
-    const rows = await dbQuery<DbJobRow>(
-      `select * from jobs where id = $1::uuid limit 1`,
-      [jobId],
-    );
-    const row = rows[0];
-    if (row) {
-      const job = mapDbJobRow(row);
-      if (
-        job.status === "published" &&
-        job.expiresAt &&
-        new Date(job.expiresAt).getTime() <= Date.now()
-      ) {
-        return null;
-      }
-      return job;
-    }
+function normalizeJobIdParam(jobId: string): string {
+  try {
+    return decodeURIComponent(jobId).trim();
+  } catch {
+    return jobId.trim();
   }
-  const curated = curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published");
-  if (curated) return curated;
-  const externalCurated = curatedExternalPublishedJobs.find(
-    (j) => j.id === jobId && j.status === "published",
+}
+
+/** Bundled listings (`job-ext-*`, `job-office-*`, …) are not stored in Postgres `jobs`. */
+function findCuratedPublishedJobById(jobId: string): Job | null {
+  return (
+    curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published") ??
+    curatedExternalPublishedJobs.find((j) => j.id === jobId && j.status === "published") ??
+    null
   );
-  return externalCurated ?? null;
+}
+
+export async function findJob(jobId: string): Promise<Job | null> {
+  const id = normalizeJobIdParam(jobId);
+  if (!id) return null;
+
+  const curated = findCuratedPublishedJobById(id);
+  if (!hasDatabase()) {
+    return getJobById(id) ?? curated;
+  }
+
+  // Never query `jobs.id` (uuid) with curated string ids — Postgres raises 22P02.
+  if (!isDatabaseUuid(id)) {
+    return curated;
+  }
+
+  const rows = await dbQuery<DbJobRow>(
+    `select * from jobs
+     where id = $1::uuid
+       and status = 'published'
+       and (expires_at is null or expires_at > now())
+     limit 1`,
+    [id],
+  );
+  const row = rows[0];
+  if (row) return mapDbJobRow(row);
+  return curated;
 }
 
 /** Jobs owned by employer user (`users.id` session actor). */

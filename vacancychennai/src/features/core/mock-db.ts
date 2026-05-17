@@ -299,7 +299,13 @@ export function getPublishedJobsByLocationSlug(slug: string) {
 }
 
 export function getJobById(id: string) {
-  return jobs.find((job) => job.id === id);
+  const trimmed = id.trim();
+  const fromJobs = jobs.find((job) => job.id === trimmed);
+  if (fromJobs) return fromJobs;
+  return (
+    curatedPublishedJobs.find((j) => j.id === trimmed) ??
+    curatedExternalPublishedJobs.find((j) => j.id === trimmed)
+  );
 }
 
 export function addJob(
