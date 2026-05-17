@@ -47,6 +47,14 @@ export const curatedEmployerSouthIndianRestaurantNavalur: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — HL & LAP sales roles; apply via Kamalakannan (see curated direct-contact map). */
+export const curatedEmployerMoneyBoxxFinance: EmployerProfile = {
+  id: "emp-money-boxx-finance",
+  companyName: "Money Boxx Finance Ltd",
+  email: "Kamalakannang@moneyboxxfinance.com",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -198,6 +206,31 @@ const skbTeacherDescription = [
 ].join("\n");
 
 const NAVALUR_RESTAURANT_LISTING_AT = "2026-05-15T00:00:00.000Z";
+const MONEY_BOXX_LISTING_AT = "2026-05-17T00:00:00.000Z";
+
+const moneyBoxxHlLapDescription = [
+  "Urgent requirement — Money Boxx Finance Ltd (HL & LAP).",
+  "",
+  "Open positions:",
+  "• Branch Manager",
+  "• Senior Relationship Manager",
+  "• Relationship Manager",
+  "",
+  "Product: Home Loan (HL) and Loan Against Property (LAP).",
+  "",
+  "Locations:",
+  "Chennai Poonamallee, Kanchipuram, Vellore, Ambur, Coimbatore, Salem, Hosur, Kumbakonam, Trichy, Madurai, Theni.",
+  "",
+  "Qualification: 12th pass and degree.",
+  "Gender: Male candidates only.",
+  "Experience: Minimum 6 months in the same field (HL/LAP/NBFC sales).",
+  "Joining: Immediate joiners preferred.",
+  "",
+  "How to apply:",
+  "Send your résumé to Kamalakannang@moneyboxxfinance.com or call +91 95142 82152.",
+  "",
+  "Salary and CTC were not stated on the original notice; confirm with the employer when you apply.",
+].join("\n");
 
 const southIndianRestaurantNavalurDescription = [
   "Urgent recruitment — South Indian restaurant in Navalur, Chennai. Immediate joining is preferred.",
@@ -348,6 +381,26 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: NAVALUR_RESTAURANT_LISTING_AT,
     updatedAt: NAVALUR_RESTAURANT_LISTING_AT,
   },
+  {
+    id: "job-money-boxx-hl-lap-tamil-nadu-urgent",
+    employerId: curatedEmployerMoneyBoxxFinance.id,
+    title:
+      "Branch Manager / Senior Relationship Manager / Relationship Manager — HL & LAP",
+    category: "Finance",
+    industry: "NBFC",
+    jobType: "full-time",
+    salaryMin: 25000,
+    salaryMax: 120000,
+    locationId: "loc-porur",
+    landmarkText:
+      "Chennai Poonamallee hub plus Kanchipuram, Vellore, Ambur, Coimbatore, Salem, Hosur, Kumbakonam, Trichy, Madurai, Theni.",
+    description: moneyBoxxHlLapDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: MONEY_BOXX_LISTING_AT,
+    updatedAt: MONEY_BOXX_LISTING_AT,
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -377,6 +430,11 @@ const curatedDirectEmployerContact: Record<
     email: "external.south-indian-restaurant.navalur@vacancychennai.in",
     phoneE164: "+918124537432",
     phoneLabel: "+91 81245 37432",
+  },
+  "job-money-boxx-hl-lap-tamil-nadu-urgent": {
+    email: "Kamalakannang@moneyboxxfinance.com",
+    phoneE164: "+919514282152",
+    phoneLabel: "+91 95142 82152",
   },
 };
 
@@ -409,6 +467,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
       curatedEmployerSouthIndianRestaurantNavalur.id,
       curatedEmployerSouthIndianRestaurantNavalur.companyName,
     ],
+    [curatedEmployerMoneyBoxxFinance.id, curatedEmployerMoneyBoxxFinance.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);
