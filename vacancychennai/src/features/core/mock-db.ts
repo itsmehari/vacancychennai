@@ -274,10 +274,14 @@ export function filterPublishedJobs(filters: JobFilter) {
     filtered = filtered.filter((job) => job.jobType === filters.jobType);
   }
   if (typeof filters.salaryMin === "number" && !Number.isNaN(filters.salaryMin)) {
-    filtered = filtered.filter((job) => job.salaryMax >= filters.salaryMin!);
+    filtered = filtered.filter(
+      (job) => job.salaryMax != null && job.salaryMax >= filters.salaryMin!,
+    );
   }
   if (typeof filters.salaryMax === "number" && !Number.isNaN(filters.salaryMax)) {
-    filtered = filtered.filter((job) => job.salaryMin <= filters.salaryMax!);
+    filtered = filtered.filter(
+      (job) => job.salaryMin != null && job.salaryMin <= filters.salaryMax!,
+    );
   }
   return filtered;
 }

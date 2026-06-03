@@ -27,7 +27,10 @@ export async function GET() {
       const pub = new Date(job.updatedAt);
       const pubDate = Number.isNaN(pub.getTime()) ? new Date().toUTCString() : pub.toUTCString();
       const title = `${job.title} — Chennai`;
-      const desc = `${job.category} · ${job.industry}. INR ${job.salaryMin.toLocaleString("en-IN")}–${job.salaryMax.toLocaleString("en-IN")}/month.`;
+      const desc =
+        job.salaryMin != null && job.salaryMax != null
+          ? `${job.category} · ${job.industry}. INR ${job.salaryMin.toLocaleString("en-IN")}–${job.salaryMax.toLocaleString("en-IN")}/month.`
+          : `${job.category} · ${job.industry}. Salary to be discussed.`;
       return `
     <item>
       <title>${escapeXml(title)}</title>

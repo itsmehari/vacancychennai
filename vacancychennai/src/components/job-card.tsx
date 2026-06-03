@@ -63,8 +63,14 @@ export default function JobCard({
           </p>
           <p className="text-sm text-slate-600">{job.landmarkText}</p>
           <p className="mt-2 font-medium tabular-nums text-slate-900">
-            <span className="text-slate-500">INR </span>
-            {job.salaryMin.toLocaleString("en-IN")} – {job.salaryMax.toLocaleString("en-IN")}
+            {job.salaryMin != null && job.salaryMax != null ? (
+              <>
+                <span className="text-slate-500">INR </span>
+                {job.salaryMin.toLocaleString("en-IN")} – {job.salaryMax.toLocaleString("en-IN")}
+              </>
+            ) : (
+              <span className="text-slate-500">Salary to be discussed</span>
+            )}
             <span className="text-slate-500"> · {job.jobType}</span>
           </p>
         </div>

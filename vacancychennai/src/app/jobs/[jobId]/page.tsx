@@ -56,9 +56,10 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
     findLocationById(job.locationId),
     resolveEmployerDisplayNameForJob(job),
   ]);
-  const area = location?.area ?? "Chennai";
-  const typeLabel = job.jobType.replace("-", " ");
-  const salaryBit = `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`;
+  const areaLabel = location?.area ?? "Chennai";
+  const salaryBit = job.salaryMin != null && job.salaryMax != null 
+    ? `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`
+    : "Salary to be discussed";
   const applyHint = isCuratedExternalApplyUrlJob(jobId)
     ? "Apply via the employer careers page linked on Vacancy Chennai."
     : isCuratedDirectEmployerContactJob(jobId)
@@ -67,16 +68,16 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
         ? "Apply through WhatsApp using the details on Vacancy Chennai."
         : "Quick apply on Vacancy Chennai — moderated Chennai listings.";
   const description = truncateMetaDescription(
-    `${job.title}: ${job.category} · ${job.industry}. ${typeLabel} in ${area}, Chennai. ${salaryBit}. ${employerName}. ${applyHint}`,
+    `${job.title}: ${job.category} · ${job.industry}. ${job.jobType.replace("-", " ")} in ${location?.area ?? "Chennai"}, Chennai. ${salaryBit}. ${employerName}. ${applyHint}`,
   );
-  const titleBase = `${job.title} · ${area}`;
+  const titleBase = `${job.title} · ${location?.area ?? "Chennai"}`;
   const metaTitle =
     titleBase.length > 52 ? `${titleBase.slice(0, 49)}… | Vacancy Chennai` : `${titleBase} | Vacancy Chennai`;
   const keywords = Array.from(
     new Set(
       [
         `${job.title} jobs Chennai`,
-        `${area} jobs Chennai`,
+        `${areaLabel} jobs Chennai`,
         `${job.category} jobs Chennai`,
         `${job.industry} jobs Chennai`,
         "Chennai jobs",
@@ -170,7 +171,11 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
       <InnerPageHero
         eyebrow="Chennai · Job listing"
         title={job.title}
-        description={`${metaLine} — INR ${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()} / month`}
+        description={`${metaLine} — ${
+          job.salaryMin != null && job.salaryMax != null
+            ? `INR ${job.salaryMin.toLocaleString("en-IN")} – ${job.salaryMax.toLocaleString("en-IN")} / month`
+            : "Salary to be discussed"
+        }`}
         actions={
           <Link href="/jobs-in-chennai" className="text-sm font-semibold text-amber-200/95 underline-offset-4 hover:text-white hover:underline">
             ← Back to all jobs

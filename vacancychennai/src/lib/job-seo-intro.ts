@@ -14,15 +14,23 @@ export function buildFactualJobIntro(opts: {
   const geo = zone && zone.toLowerCase() !== area.toLowerCase() ? `${area} (${zone})` : area;
   const typeLabel = opts.job.jobType.replace("-", " ");
   const industryBit = opts.job.industry?.trim() ? ` in ${opts.job.industry.trim()}` : "";
-  const salaryOk = opts.job.salaryMin > 0 && opts.job.salaryMax > 0;
+  const salaryOk =
+    opts.job.salaryMin != null &&
+    opts.job.salaryMax != null &&
+    opts.job.salaryMin > 0 &&
+    opts.job.salaryMax > 0;
+  const minPay = opts.job.salaryMin;
+  const maxPay = opts.job.salaryMax;
   const salary =
     salaryOk &&
+    minPay != null &&
+    maxPay != null &&
     !(
-      opts.job.salaryMin === 25_000 &&
-      opts.job.salaryMax === 120_000 &&
+      minPay === 25_000 &&
+      maxPay === 120_000 &&
       opts.job.description.includes("Not stated on the indexed listing")
     )
-      ? `Advertised monthly band on Vacancy Chennai is roughly ₹${opts.job.salaryMin.toLocaleString("en-IN")}–₹${opts.job.salaryMax.toLocaleString("en-IN")} before statutory deductions—confirm what is offered in writing.`
+      ? `Advertised monthly band on Vacancy Chennai is roughly ₹${minPay.toLocaleString("en-IN")}–₹${maxPay.toLocaleString("en-IN")} before statutory deductions—confirm what is offered in writing.`
       : "Compensation may not be stated on this listing; confirm pay, incentives, and probation terms directly with the employer.";
 
   const landmark = opts.job.landmarkText?.trim();

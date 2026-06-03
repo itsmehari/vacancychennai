@@ -55,6 +55,22 @@ export const curatedEmployerMoneyBoxxFinance: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — Viyani Builder Private Limited hiring staff across Tamil Nadu. */
+export const curatedEmployerViyaniBuilder: EmployerProfile = {
+  id: "emp-viyani-builder",
+  companyName: "Viyani Builder Private Limited",
+  email: "external.viyani.builder@vacancychennai.in",
+  password: "nologin",
+};
+
+/** External listing — security staff near DLF Ramapuram, Porur (see curated direct-contact map). */
+export const curatedEmployerEliteExpress: EmployerProfile = {
+  id: "emp-elite-express-enterprises",
+  companyName: "Elite Express Enterprises",
+  email: "external.eliteexpress@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -95,6 +111,38 @@ export const curatedLocations: Location[] = [
     pincode: "603103",
     lat: 12.849,
     lng: 80.227,
+  },
+  {
+    id: "loc-porur",
+    zone: "Porur / Poonamallee",
+    area: "Porur",
+    pincode: "600116",
+    lat: 13.0381,
+    lng: 80.1565,
+  },
+  {
+    id: "loc-tirunelveli",
+    zone: "Tirunelveli / Tenkasi",
+    area: "Tirunelveli",
+    pincode: "627001",
+    lat: 8.714,
+    lng: 77.7567,
+  },
+  {
+    id: "loc-tenkasi",
+    zone: "Tirunelveli / Tenkasi",
+    area: "Tenkasi",
+    pincode: "627401",
+    lat: 8.9613,
+    lng: 77.3149,
+  },
+  {
+    id: "loc-virudhunagar",
+    zone: "Madurai / Virudhunagar",
+    area: "Virudhunagar",
+    pincode: "626001",
+    lat: 9.5372,
+    lng: 77.9574,
   },
 ];
 
@@ -207,6 +255,8 @@ const skbTeacherDescription = [
 
 const NAVALUR_RESTAURANT_LISTING_AT = "2026-05-15T00:00:00.000Z";
 const MONEY_BOXX_LISTING_AT = "2026-05-17T00:00:00.000Z";
+const VIYANI_BUILDER_LISTING_AT = "2026-05-22T00:00:00.000Z";
+const ELITE_EXPRESS_LISTING_AT = "2026-06-03T00:00:00.000Z";
 
 const moneyBoxxHlLapDescription = [
   "Urgent requirement — Money Boxx Finance Ltd (HL & LAP).",
@@ -230,6 +280,50 @@ const moneyBoxxHlLapDescription = [
   "Send your résumé to Kamalakannang@moneyboxxfinance.com or call +91 95142 82152.",
   "",
   "Salary and CTC were not stated on the original notice; confirm with the employer when you apply.",
+].join("\n");
+
+const viyaniBuilderHindiStaffDescription = [
+  "Viyani Builder Private Limited is hiring Hindi Staff for multiple locations.",
+  "",
+  "Position: Hindi Staff (Female Only)",
+  "",
+  "Qualifications:",
+  "• Any Degree (General / Commerce / Science).",
+  "• Must speak Hindi fluently.",
+  "",
+  "Age Limit:",
+  "• 20 - 30 Years.",
+  "",
+  "Who can apply:",
+  "• Freshers and experienced candidates can apply.",
+  "• Good communication skills required.",
+  "",
+  "Locations:",
+  "• Tirunelveli",
+  "• Tenkasi",
+  "• Virudhunagar",
+  "",
+  "How to apply:",
+  "• Phone: 89259 04590 / 91500 83515",
+  "",
+  "\"Build Your Career With Us!\"",
+].join("\n");
+
+const eliteExpressSecurityStaffDescription = [
+  "Elite Express Enterprises is hiring security staff for sites near DLF Ramapuram, Porur, Chennai.",
+  "",
+  "Open positions and monthly salary:",
+  "• ASO (Assistant Security Officer) — ₹28,000",
+  "• SG (Security Guard) — ₹25,000",
+  "• Lady Guard — ₹22,000",
+  "• Bouncers — ₹30,000",
+  "• Ex-servicemen — ₹30,000",
+  "",
+  "Location: Nearby DLF Ramapuram, Porur.",
+  "",
+  "How to apply:",
+  "• Call +91 99402 07385",
+  "• Website: https://eliteexpressenterprises.in",
 ].join("\n");
 
 const southIndianRestaurantNavalurDescription = [
@@ -382,6 +476,24 @@ export const curatedPublishedJobs: Job[] = [
     updatedAt: NAVALUR_RESTAURANT_LISTING_AT,
   },
   {
+    id: "job-elite-express-security-porur-ramapuram",
+    employerId: curatedEmployerEliteExpress.id,
+    title: "Security staff — ASO, SG, Lady Guard, Bouncer, Ex-servicemen",
+    category: "Security",
+    industry: "Security Services",
+    jobType: "full-time",
+    salaryMin: 22000,
+    salaryMax: 30000,
+    locationId: "loc-porur",
+    landmarkText: "Elite Express Enterprises — near DLF Ramapuram, Porur, Chennai.",
+    description: eliteExpressSecurityStaffDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: ELITE_EXPRESS_LISTING_AT,
+    updatedAt: ELITE_EXPRESS_LISTING_AT,
+  },
+  {
     id: "job-money-boxx-hl-lap-tamil-nadu-urgent",
     employerId: curatedEmployerMoneyBoxxFinance.id,
     title:
@@ -400,6 +512,60 @@ export const curatedPublishedJobs: Job[] = [
     listingTier: "urgent",
     createdAt: MONEY_BOXX_LISTING_AT,
     updatedAt: MONEY_BOXX_LISTING_AT,
+  },
+  {
+    id: "job-viyani-builder-hindi-staff-tirunelveli",
+    employerId: curatedEmployerViyaniBuilder.id,
+    title: "Hindi Staff (Female Only)",
+    category: "Admin",
+    industry: "Real Estate",
+    jobType: "full-time",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-tirunelveli",
+    landmarkText: "Tirunelveli — join our growing team.",
+    description: viyaniBuilderHindiStaffDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: VIYANI_BUILDER_LISTING_AT,
+    updatedAt: VIYANI_BUILDER_LISTING_AT,
+  },
+  {
+    id: "job-viyani-builder-hindi-staff-tenkasi",
+    employerId: curatedEmployerViyaniBuilder.id,
+    title: "Hindi Staff (Female Only)",
+    category: "Admin",
+    industry: "Real Estate",
+    jobType: "full-time",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-tenkasi",
+    landmarkText: "Tenkasi — join our growing team.",
+    description: viyaniBuilderHindiStaffDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: VIYANI_BUILDER_LISTING_AT,
+    updatedAt: VIYANI_BUILDER_LISTING_AT,
+  },
+  {
+    id: "job-viyani-builder-hindi-staff-virudhunagar",
+    employerId: curatedEmployerViyaniBuilder.id,
+    title: "Hindi Staff (Female Only)",
+    category: "Admin",
+    industry: "Real Estate",
+    jobType: "full-time",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-virudhunagar",
+    landmarkText: "Virudhunagar — join our growing team.",
+    description: viyaniBuilderHindiStaffDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: VIYANI_BUILDER_LISTING_AT,
+    updatedAt: VIYANI_BUILDER_LISTING_AT,
   },
 ];
 
@@ -431,10 +597,30 @@ const curatedDirectEmployerContact: Record<
     phoneE164: "+918124537432",
     phoneLabel: "+91 81245 37432",
   },
+  "job-elite-express-security-porur-ramapuram": {
+    email: "external.eliteexpress@vacancychennai.in",
+    phoneE164: "+919940207385",
+    phoneLabel: "+91 99402 07385",
+  },
   "job-money-boxx-hl-lap-tamil-nadu-urgent": {
     email: "Kamalakannang@moneyboxxfinance.com",
     phoneE164: "+919514282152",
     phoneLabel: "+91 95142 82152",
+  },
+  "job-viyani-builder-hindi-staff-tirunelveli": {
+    email: "external.viyani.builder@vacancychennai.in",
+    phoneE164: "+918925904590",
+    phoneLabel: "+91 89259 04590",
+  },
+  "job-viyani-builder-hindi-staff-tenkasi": {
+    email: "external.viyani.builder@vacancychennai.in",
+    phoneE164: "+918925904590",
+    phoneLabel: "+91 89259 04590",
+  },
+  "job-viyani-builder-hindi-staff-virudhunagar": {
+    email: "external.viyani.builder@vacancychennai.in",
+    phoneE164: "+918925904590",
+    phoneLabel: "+91 89259 04590",
   },
 };
 
@@ -468,6 +654,8 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
       curatedEmployerSouthIndianRestaurantNavalur.companyName,
     ],
     [curatedEmployerMoneyBoxxFinance.id, curatedEmployerMoneyBoxxFinance.companyName],
+    [curatedEmployerViyaniBuilder.id, curatedEmployerViyaniBuilder.companyName],
+    [curatedEmployerEliteExpress.id, curatedEmployerEliteExpress.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);

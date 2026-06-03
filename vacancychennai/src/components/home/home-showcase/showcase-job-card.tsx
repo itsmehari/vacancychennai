@@ -84,8 +84,14 @@ export default function ShowcaseJobCard({
               {job.category} · {job.industry}
             </li>
             <li className="mt-1">
-              INR {job.salaryMin.toLocaleString("en-IN")} –{" "}
-              {job.salaryMax.toLocaleString("en-IN")} · {job.jobType.replace("-", " ")}
+              {job.salaryMin != null && job.salaryMax != null ? (
+                <>
+                  INR {job.salaryMin.toLocaleString("en-IN")} – {job.salaryMax.toLocaleString("en-IN")}
+                </>
+              ) : (
+                <>Salary to be discussed</>
+              )}{" "}
+              · {job.jobType.replace("-", " ")}
             </li>
             <li className="mt-1">{job.landmarkText}</li>
           </ul>

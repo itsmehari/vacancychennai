@@ -25,8 +25,8 @@ export type Job = {
   category: string;
   industry: string;
   jobType: JobType;
-  salaryMin: number;
-  salaryMax: number;
+  salaryMin: number | null;
+  salaryMax: number | null;
   locationId: string;
   landmarkText: string;
   description: string;

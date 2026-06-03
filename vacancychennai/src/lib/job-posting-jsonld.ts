@@ -112,6 +112,12 @@ export function buildJobPostingJsonLd(opts: {
     name: opts.employerName.trim() || "Employer",
   };
 
+  const salaryDisclosed =
+    opts.job.salaryMin != null &&
+    opts.job.salaryMax != null &&
+    opts.job.salaryMin > 0 &&
+    opts.job.salaryMax > 0;
+
   const ld: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -126,16 +132,20 @@ export function buildJobPostingJsonLd(opts: {
       "@type": "Place",
       address: postalAddress,
     },
-    baseSalary: {
-      "@type": "MonetaryAmount",
-      currency: "INR",
-      value: {
-        "@type": "QuantitativeValue",
-        minValue: opts.job.salaryMin,
-        maxValue: opts.job.salaryMax,
-        unitText: "MONTH",
-      },
-    },
+    ...(salaryDisclosed
+      ? {
+          baseSalary: {
+            "@type": "MonetaryAmount",
+            currency: "INR",
+            value: {
+              "@type": "QuantitativeValue",
+              minValue: opts.job.salaryMin,
+              maxValue: opts.job.salaryMax,
+              unitText: "MONTH",
+            },
+          },
+        }
+      : {}),
     url: pageUrl,
     identifier: {
       "@type": "PropertyValue",

@@ -25,7 +25,7 @@ export default async function FreshersJobsPage() {
     getEmployerCompanyNameMap(),
   ]);
   const locationsById = new Map(locations.map((l) => [l.id, l]));
-  const jobs = published.filter((job) => job.salaryMin <= 25000);
+  const jobs = published.filter((job) => job.salaryMin != null && job.salaryMin <= 25000);
   const listJsonLd =
     jobs.length > 0 ? buildJobsItemListJsonLd(jobs, "Freshers & entry-level jobs in Chennai") : null;
 
