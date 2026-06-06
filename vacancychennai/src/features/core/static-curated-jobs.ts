@@ -71,6 +71,14 @@ export const curatedEmployerEliteExpress: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — software testing training coordination; contact Babu (see curated WhatsApp map). */
+export const curatedEmployerBabuTestingTraining: EmployerProfile = {
+  id: "emp-babu-software-testing-training",
+  companyName: "Software Testing Training Program",
+  email: "external.babu.testing-training@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -257,6 +265,24 @@ const NAVALUR_RESTAURANT_LISTING_AT = "2026-05-15T00:00:00.000Z";
 const MONEY_BOXX_LISTING_AT = "2026-05-17T00:00:00.000Z";
 const VIYANI_BUILDER_LISTING_AT = "2026-05-22T00:00:00.000Z";
 const ELITE_EXPRESS_LISTING_AT = "2026-06-03T00:00:00.000Z";
+const BABU_TESTING_TRAINING_LISTING_AT = "2026-06-06T00:00:00.000Z";
+
+const babuTestingTrainingAssistantDescription = [
+  "We are looking for a male assistant to help with software testing training coordination and seminar activities.",
+  "",
+  "This role can also suit someone looking for a part-time opportunity alongside their current job, as the workload is not very frequent.",
+  "",
+  "After 6 months, there may be an opportunity for referral to the IT sector, and you will also receive software testing training in parallel.",
+  "",
+  "Gender: Male candidates only.",
+  "Work type: Part-time (flexible alongside another job).",
+  "",
+  "How to apply:",
+  "Contact Babu via WhatsApp call on 8220933002.",
+  "The hiring contact is currently in the UK — WhatsApp is the preferred channel.",
+  "",
+  "Salary was not stated on the original notice; discuss with Babu when you connect.",
+].join("\n");
 
 const moneyBoxxHlLapDescription = [
   "Urgent requirement — Money Boxx Finance Ltd (HL & LAP).",
@@ -567,6 +593,25 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: VIYANI_BUILDER_LISTING_AT,
     updatedAt: VIYANI_BUILDER_LISTING_AT,
   },
+  {
+    id: "job-assistant-software-testing-training-babu",
+    employerId: curatedEmployerBabuTestingTraining.id,
+    title: "Assistant — Software Testing Training & Seminars (Male)",
+    category: "Testing / QA",
+    industry: "Education & IT Training",
+    jobType: "part-time",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-nungambakkam",
+    landmarkText:
+      "Chennai — training coordination and seminar support (city-wide; hiring contact based in the UK).",
+    description: babuTestingTrainingAssistantDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: BABU_TESTING_TRAINING_LISTING_AT,
+    updatedAt: BABU_TESTING_TRAINING_LISTING_AT,
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -575,6 +620,7 @@ const curatedWhatsAppApplyDigitsByJobId: Record<string, string> = {
   "job-office-mgr-advocate-kilpauk": "918248622449",
   "job-skb-principal-playschool-madipakkam": "916380383563",
   "job-skb-teacher-parttime-playschool-madipakkam": "916380383563",
+  "job-assistant-software-testing-training-babu": "918220933002",
 };
 
 /** Apply via employer email / phone only — not Vacancy Chennai quick apply. */
@@ -656,6 +702,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerMoneyBoxxFinance.id, curatedEmployerMoneyBoxxFinance.companyName],
     [curatedEmployerViyaniBuilder.id, curatedEmployerViyaniBuilder.companyName],
     [curatedEmployerEliteExpress.id, curatedEmployerEliteExpress.companyName],
+    [curatedEmployerBabuTestingTraining.id, curatedEmployerBabuTestingTraining.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);

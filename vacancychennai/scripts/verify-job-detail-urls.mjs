@@ -34,6 +34,11 @@ const STATIC_CURATED_JOB_IDS = [
   "job-skb-teacher-parttime-playschool-madipakkam",
   "job-south-indian-restaurant-navalur-urgent",
   "job-money-boxx-hl-lap-tamil-nadu-urgent",
+  "job-elite-express-security-porur-ramapuram",
+  "job-viyani-builder-hindi-staff-tirunelveli",
+  "job-viyani-builder-hindi-staff-tenkasi",
+  "job-viyani-builder-hindi-staff-virudhunagar",
+  "job-assistant-software-testing-training-babu",
 ];
 
 function loadCuratedIds() {
