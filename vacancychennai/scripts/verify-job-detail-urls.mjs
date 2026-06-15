@@ -35,6 +35,7 @@ const STATIC_CURATED_JOB_IDS = [
   "job-south-indian-restaurant-navalur-urgent",
   "job-money-boxx-hl-lap-tamil-nadu-urgent",
   "job-elite-express-security-porur-ramapuram",
+  "job-elite-express-operations-manpower-tambaram-omr",
   "job-viyani-builder-hindi-staff-tirunelveli",
   "job-viyani-builder-hindi-staff-tenkasi",
   "job-viyani-builder-hindi-staff-virudhunagar",

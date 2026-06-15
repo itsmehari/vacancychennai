@@ -265,6 +265,7 @@ const NAVALUR_RESTAURANT_LISTING_AT = "2026-05-15T00:00:00.000Z";
 const MONEY_BOXX_LISTING_AT = "2026-05-17T00:00:00.000Z";
 const VIYANI_BUILDER_LISTING_AT = "2026-05-22T00:00:00.000Z";
 const ELITE_EXPRESS_LISTING_AT = "2026-06-03T00:00:00.000Z";
+const ELITE_EXPRESS_OPERATIONS_LISTING_AT = "2026-06-15T00:00:00.000Z";
 const BABU_TESTING_TRAINING_LISTING_AT = "2026-06-06T00:00:00.000Z";
 
 const babuTestingTrainingAssistantDescription = [
@@ -346,6 +347,30 @@ const eliteExpressSecurityStaffDescription = [
   "• Ex-servicemen — ₹30,000",
   "",
   "Location: Nearby DLF Ramapuram, Porur.",
+  "",
+  "How to apply:",
+  "• Call +91 99402 07385",
+  "• Website: https://eliteexpressenterprises.in",
+].join("\n");
+
+const eliteExpressOperationsSupportDescription = [
+  "Elite Express Enterprises is hiring for manpower coordination and operations support.",
+  "",
+  "Salary: ₹20,000 per month + incentives (confirm the incentive structure when you apply).",
+  "",
+  "Locations:",
+  "• Tambaram",
+  "• Perungudi",
+  "• Mambakkam",
+  "• OMR",
+  "• ECR",
+  "",
+  "Requirements:",
+  "• Good communication skills",
+  "• Manpower coordination & operations support",
+  "",
+  "Who can apply:",
+  "• Freshers and experienced candidates can apply.",
   "",
   "How to apply:",
   "• Call +91 99402 07385",
@@ -520,6 +545,25 @@ export const curatedPublishedJobs: Job[] = [
     updatedAt: ELITE_EXPRESS_LISTING_AT,
   },
   {
+    id: "job-elite-express-operations-manpower-tambaram-omr",
+    employerId: curatedEmployerEliteExpress.id,
+    title: "Manpower Coordination & Operations Support",
+    category: "Admin",
+    industry: "Manpower / Staffing",
+    jobType: "full-time",
+    salaryMin: 20000,
+    salaryMax: 20000,
+    locationId: "loc-tambaram",
+    landmarkText:
+      "Elite Express Enterprises — Tambaram, Perungudi, Mambakkam, OMR & ECR corridors.",
+    description: eliteExpressOperationsSupportDescription,
+    status: "published",
+    featured: false,
+    listingTier: "free",
+    createdAt: ELITE_EXPRESS_OPERATIONS_LISTING_AT,
+    updatedAt: ELITE_EXPRESS_OPERATIONS_LISTING_AT,
+  },
+  {
     id: "job-money-boxx-hl-lap-tamil-nadu-urgent",
     employerId: curatedEmployerMoneyBoxxFinance.id,
     title:
@@ -644,6 +688,11 @@ const curatedDirectEmployerContact: Record<
     phoneLabel: "+91 81245 37432",
   },
   "job-elite-express-security-porur-ramapuram": {
+    email: "external.eliteexpress@vacancychennai.in",
+    phoneE164: "+919940207385",
+    phoneLabel: "+91 99402 07385",
+  },
+  "job-elite-express-operations-manpower-tambaram-omr": {
     email: "external.eliteexpress@vacancychennai.in",
     phoneE164: "+919940207385",
     phoneLabel: "+91 99402 07385",
