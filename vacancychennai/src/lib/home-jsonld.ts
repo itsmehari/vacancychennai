@@ -39,12 +39,37 @@ export function buildHomeJsonLdGraph() {
   };
 
   const organization: Record<string, unknown> = {
-    "@type": "Organization",
+    "@type": ["Organization", "EmploymentAgency"],
     "@id": `${siteUrl}/#organization`,
     name: "Vacancy Chennai",
     url: siteUrl,
     description: HOME_SCHEMA_DESCRIPTION,
+    email: "support@vacancychennai.in",
     areaServed: chennaiAreaServed,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Chennai",
+      addressRegion: "Tamil Nadu",
+      addressCountry: "IN",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "support@vacancychennai.in",
+      availableLanguage: ["English", "Tamil"],
+      areaServed: "IN",
+      url: `${siteUrl}/contact`,
+    },
+    knowsAbout: [
+      "Chennai jobs",
+      "hyperlocal hiring",
+      "OMR jobs",
+      "Tambaram jobs",
+      "Velachery jobs",
+      "Porur jobs",
+      "freshers jobs Chennai",
+      "part-time jobs Chennai",
+    ],
     ...(logoUrl ? { logo: logoUrl } : {}),
     ...(() => {
       const same = organizationSameAsUrls();

@@ -31,9 +31,21 @@ export const metadata: Metadata = {
   title: "Vacancy Chennai",
   description: SITE_DEFAULT_DESCRIPTION,
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in"),
+  applicationName: "Vacancy Chennai",
+  authors: [{ name: "Vacancy Chennai", url: "https://vacancychennai.in" }],
+  creator: "Vacancy Chennai",
+  publisher: "Vacancy Chennai",
+  category: "jobs",
+  keywords: [
+    "Chennai jobs",
+    "jobs in Chennai",
+    "hyperlocal jobs Chennai",
+    "Vacancy Chennai",
+  ],
   alternates: {
     types: {
       "application/rss+xml": "/rss.xml",
+      "text/plain": "/llms.txt",
     },
   },
 };
@@ -45,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${poppins.variable} ${notoTamil.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-slate-50 font-sans text-slate-900 antialiased">

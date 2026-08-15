@@ -101,6 +101,7 @@ export function homePageMetadata(): Metadata {
       "Tambaram jobs",
       "Velachery jobs",
       "Porur jobs",
+      "Guindy jobs",
       "hyperlocal jobs Chennai",
       "freshers jobs Chennai",
       "part time jobs Chennai",

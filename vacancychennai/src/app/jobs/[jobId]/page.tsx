@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JobCard from "@/components/job-card";
-import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
+import { JobApplyPanel } from "@/components/jobs/job-apply-panel";
+import { JobAtAGlance } from "@/components/jobs/job-at-a-glance";
+import { JobRotatingAdPanel } from "@/components/jobs/job-rotating-ad-panel";
+import { JobSafetyAside } from "@/components/jobs/job-safety-aside";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
-import { quickApplyAction } from "@/features/applications/actions";
 import {
   findJob,
   findLocationById,
@@ -25,14 +27,15 @@ import {
 } from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
 import { jobsInAreaPath } from "@/lib/area-job-path";
+import { jobSidebarAds } from "@/lib/job-sidebar-ads";
 import {
   buildJobBreadcrumbListJsonLd,
   buildJobPostingJsonLd,
   type JobApplyMode,
 } from "@/lib/job-posting-jsonld";
-import { buildFactualJobIntro } from "@/lib/job-seo-intro";
+import { buildFactualJobSummary } from "@/lib/job-seo-intro";
 import { jobDetailPageMetadata } from "@/lib/seo";
-import { btnPrimary, formInput, linkInline, pillMeta, sectionCard } from "@/lib/ui";
+import { linkInline, pillMeta, sectionCard } from "@/lib/ui";
 import Link from "next/link";
 
 type Props = {
@@ -57,9 +60,10 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
     resolveEmployerDisplayNameForJob(job),
   ]);
   const areaLabel = location?.area ?? "Chennai";
-  const salaryBit = job.salaryMin != null && job.salaryMax != null 
-    ? `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`
-    : "Salary to be discussed";
+  const salaryBit =
+    job.salaryMin != null && job.salaryMax != null
+      ? `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`
+      : "Salary to be discussed";
   const applyHint = isCuratedExternalApplyUrlJob(jobId)
     ? "Apply via the employer careers page linked on Vacancy Chennai."
     : isCuratedDirectEmployerContactJob(jobId)
@@ -144,17 +148,13 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     areaLabel,
   });
 
-  const factualIntro = buildFactualJobIntro({
+  const visibleSummary = buildFactualJobSummary({
     job,
     location: location ?? null,
     employerName,
   });
 
-  const metaLine = [
-    location?.area,
-    location?.zone,
-    job.jobType.replace("-", " "),
-  ]
+  const metaLine = [location?.area, location?.zone, job.jobType.replace("-", " ")]
     .filter(Boolean)
     .join(" · ");
 
@@ -177,13 +177,16 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
             : "Salary to be discussed"
         }`}
         actions={
-          <Link href="/jobs-in-chennai" className="text-sm font-semibold text-amber-200/95 underline-offset-4 hover:text-white hover:underline">
+          <Link
+            href="/jobs-in-chennai"
+            className="text-sm font-semibold text-amber-200/95 underline-offset-4 hover:text-white hover:underline"
+          >
             ← Back to all jobs
           </Link>
         }
       />
 
-      <nav aria-label="Breadcrumb" className={`${sectionCard} mt-6 text-sm text-slate-600`}>
+      <nav aria-label="Breadcrumb" className="mt-5 text-sm text-slate-500">
         <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <li>
             <Link href="/" className={linkInline}>
@@ -209,211 +212,50 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
           <li aria-hidden className="text-slate-300">
             /
           </li>
-          <li className="font-medium text-slate-800">{job.title}</li>
+          <li className="font-medium text-slate-800">{employerName}</li>
         </ol>
       </nav>
 
-      <div className="grid gap-6 pb-6 pt-8 lg:grid-cols-[1fr_min(340px,100%)] lg:items-start lg:gap-8">
+      <div className="grid gap-6 pb-6 pt-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
         <div className="space-y-4">
           <section className={sectionCard}>
-            <h2 className="text-lg font-semibold text-slate-900">Location &amp; details</h2>
-            <p className="mt-2 text-slate-700">{job.landmarkText}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-800">
+              {employerName}
+            </p>
+            <p className="mt-2 text-base leading-relaxed text-slate-700">{visibleSummary}</p>
+            <p className="mt-3 text-sm text-slate-600">{job.landmarkText}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className={pillMeta}>{location?.area}</span>
               <span className={pillMeta}>{location?.zone}</span>
               <span className={pillMeta}>{job.jobType}</span>
+              <span className={pillMeta}>{job.category}</span>
             </div>
-            <div className="mt-6 border-t border-slate-100 pt-6">
-              <h3 className="text-sm font-semibold text-slate-900">About this listing</h3>
-              <p className="mt-2 text-slate-700 leading-relaxed">{factualIntro}</p>
-              <h3 className="mt-8 text-sm font-semibold text-slate-900">Role details (employer)</h3>
-              <div className="mt-2 whitespace-pre-wrap text-slate-800 leading-relaxed">{job.description}</div>
+          </section>
+
+          <section className={sectionCard} aria-labelledby="job-role-heading">
+            <h2 id="job-role-heading" className="text-lg font-semibold tracking-tight text-slate-900">
+              Role details
+            </h2>
+            <div className="mt-4 whitespace-pre-wrap text-[0.95rem] leading-[1.7] text-slate-800">
+              {job.description}
             </div>
           </section>
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-24">
-          <section className={sectionCard}>
-            {whatsappOnly ? (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  The employer asked for applications on WhatsApp first. Send your résumé in chat; avoid phone
-                  calls unless they request a call back.
-                </p>
-                {waDigits ? (
-                  <a
-                    href={`https://wa.me/${waDigits}`}
-                    className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-cta="job-whatsapp-apply"
-                  >
-                    Open WhatsApp
-                  </a>
-                ) : (
-                  <p className="mt-4 text-sm text-amber-900">
-                    WhatsApp apply is not configured for this listing — use the employer contact details in the
-                    description.
-                  </p>
-                )}
-                <p className="mt-3 text-xs text-slate-500">
-                  Check the role details for email or any alternate contact the employer listed.
-                </p>
-              </>
-            ) : externalApplyUrl ? (
-              <>
-                {query.error === "external-apply-url" ? (
-                  <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
-                    Vacancy Chennai quick apply is off for this listing — use the employer careers link below.
-                  </p>
-                ) : null}
-                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  This job is aggregated from an external careers source. Continue on the employer site to submit
-                  your application.
-                </p>
-                <a
-                  href={externalApplyUrl}
-                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cta="job-external-careers-apply"
-                >
-                  Open employer careers page
-                </a>
-                <p className="mt-3 text-xs text-slate-500">
-                  Vacancy Chennai does not receive applications for this role — always verify details on the live
-                  posting.
-                </p>
-              </>
-            ) : directEmployerContact && directContact ? (
-              <>
-                {query.error === "direct-employer-contact" ? (
-                  <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
-                    Quick apply is turned off for this listing — use email or phone below.
-                  </p>
-                ) : null}
-                <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  This role is listed for direct contact with the employer. Use email, phone, or WhatsApp
-                  below (Vacancy Chennai quick apply is not used for this posting).
-                </p>
-                <a
-                  href={`mailto:${directContact.email}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
-                  className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
-                  data-cta="job-direct-email-apply"
-                >
-                  Email {directContact.email}
-                </a>
-                <a
-                  href={`tel:${directContact.phoneE164.replace(/\s/g, "")}`}
-                  className={`${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`}
-                  data-cta="job-direct-phone-apply"
-                >
-                  Call {directContact.phoneLabel}
-                </a>
-                {waDigits ? (
-                  <a
-                    href={`https://wa.me/${waDigits}?text=${encodeURIComponent(
-                      `Hi, I saw the ${job.title} opening on Vacancy Chennai and would like to apply.`,
-                    )}`}
-                    className={`${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-cta="job-direct-whatsapp-apply"
-                  >
-                    WhatsApp {directContact.phoneLabel}
-                  </a>
-                ) : null}
-              </>
-            ) : (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">Quick apply</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  No heavy resume required. Name + phone is enough. Signed-in candidates can pre-fill from their
-                  profile.
-                </p>
-                {prefill && (prefill.profileHeadline || prefill.skillsPreview) ? (
-                  <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700 ring-1 ring-slate-100">
-                    <p className="font-semibold text-slate-800">From your profile</p>
-                    {prefill.profileHeadline ? (
-                      <p className="mt-1">
-                        <span className="text-slate-500">Headline: </span>
-                        {prefill.profileHeadline}
-                      </p>
-                    ) : null}
-                    {prefill.skillsPreview ? (
-                      <p className="mt-1">
-                        <span className="text-slate-500">Skills: </span>
-                        {prefill.skillsPreview}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-                {query.success === "applied" && (
-                  <div className="mt-4 space-y-3">
-                    <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
-                      Application submitted successfully.
-                    </p>
-                    <JobSeekerProfileCta variant="inline" dataCta="job-detail-post-apply" />
-                  </div>
-                )}
-                {query.error === "whatsapp-only" && (
-                  <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-100">
-                    This role is WhatsApp-only — use the button above or the number in the description.
-                  </p>
-                )}
-                {query.error &&
-                  query.error !== "whatsapp-only" &&
-                  query.error !== "direct-employer-contact" &&
-                  query.error !== "external-apply-url" && (
-                    <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
-                      Could not submit application. Please check your details.
-                    </p>
-                  )}
-                <form action={quickApplyAction} className="mt-4 grid gap-3">
-                  <input type="hidden" name="jobId" value={job.id} />
-                  <input
-                    className={formInput}
-                    name="applicantName"
-                    placeholder="Your full name"
-                    required
-                    defaultValue={prefill?.applicantName}
-                    autoComplete="name"
-                  />
-                  <input
-                    className={formInput}
-                    name="applicantPhone"
-                    placeholder="Phone number"
-                    required
-                    defaultValue={prefill?.applicantPhone}
-                    autoComplete="tel"
-                  />
-                  <input
-                    className={formInput}
-                    name="applicantEmail"
-                    type="email"
-                    placeholder="Email (optional)"
-                    defaultValue={prefill?.applicantEmail}
-                    autoComplete="email"
-                  />
-                  <input
-                    className={formInput}
-                    name="resumeLink"
-                    placeholder="Resume link (optional)"
-                    defaultValue={prefill?.resumeLink}
-                  />
-                  <button type="submit" className={btnPrimary}>
-                    Apply now
-                  </button>
-                </form>
-                <div className="mt-6 border-t border-slate-100 pt-4">
-                  <JobSeekerProfileCta variant="inline" dataCta="job-detail-profile-hint" />
-                </div>
-              </>
-            )}
-          </section>
+          <JobApplyPanel
+            jobId={job.id}
+            jobTitle={job.title}
+            whatsappOnly={whatsappOnly}
+            waDigits={waDigits}
+            externalApplyUrl={externalApplyUrl}
+            directContact={directContact ?? null}
+            query={query}
+            prefill={prefill}
+          />
+          <JobSafetyAside />
+          <JobRotatingAdPanel ads={jobSidebarAds()} />
+          <JobAtAGlance job={job} location={location ?? null} employerName={employerName} />
         </aside>
       </div>
 

@@ -133,6 +133,19 @@ export function buildJobPostingJsonLd(opts: {
     jobLocation: {
       "@type": "Place",
       address: postalAddress,
+      ...(typeof loc?.lat === "number" && typeof loc?.lng === "number"
+        ? {
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: loc.lat,
+              longitude: loc.lng,
+            },
+          }
+        : {}),
+    },
+    applicantLocationRequirements: {
+      "@type": "Country",
+      name: "India",
     },
     ...(salaryDisclosed
       ? {

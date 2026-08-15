@@ -9,12 +9,19 @@ declare global {
   }
 }
 
+const PARTNER_HOSTS = ["resumedoctor.in", "bseri.net", "mychennaicity.in"];
+
+function hostnameIsTrackedPartner(hostname: string): boolean {
+  const h = hostname.toLowerCase().replace(/^www\./, "");
+  return PARTNER_HOSTS.some((root) => h === root || h.endsWith(`.${root}`));
+}
+
 const GA_MEASUREMENT_ID =
   typeof process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID === "string"
     ? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID.trim()
     : "";
 
-/** GA4 — custom event when navigating to resumedoctor.in (`data-utm-content` optional dimension). */
+/** GA4 — custom event when navigating to partner sites (`data-utm-content` optional dimension). */
 export function PartnerOutboundAnalytics() {
   useEffect(() => {
     if (!GA_MEASUREMENT_ID) return undefined;
@@ -32,7 +39,9 @@ export function PartnerOutboundAnalytics() {
         return;
       }
       if (!/^https?:$/i.test(url.protocol)) return;
-      if (!hostnameIsResumeDoctor(url.hostname)) return;
+      if (!hostnameIsResumeDoctor(url.hostname) && !hostnameIsTrackedPartner(url.hostname)) {
+        return;
+      }
 
       let utmContent = anchor.dataset.utmContent?.trim();
       if (!utmContent) {

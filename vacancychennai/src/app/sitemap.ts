@@ -33,6 +33,8 @@ const STATIC_SITEMAP_PAGES: StaticEntry[] = [
   { path: "/blog", changeFrequency: "weekly", priority: 0.58 },
   { path: "/jobs.xml", changeFrequency: "hourly", priority: 0.55 },
   { path: "/rss.xml", changeFrequency: "hourly", priority: 0.52 },
+  { path: "/llms.txt", changeFrequency: "daily", priority: 0.45 },
+  { path: "/llms-full.txt", changeFrequency: "daily", priority: 0.4 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.35 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.35 },
 ];

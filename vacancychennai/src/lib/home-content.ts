@@ -37,4 +37,24 @@ export const homeFaqItems: HomeFaqItem[] = [
     answer:
       "We aim to review new listings quickly on business days. Urgent packs may be prioritised where available.",
   },
+  {
+    question: "Is Vacancy Chennai free for job seekers?",
+    answer:
+      "Yes. Browsing Chennai listings and applying is free. You can quick-apply with name and phone, or create a candidate account to track applications.",
+  },
+  {
+    question: "Which Chennai areas can I search?",
+    answer:
+      "Listings are organised by micro-area and corridor — including OMR, Velachery, Tambaram, Porur, Ambattur, Guindy, Nanganallur, and other Greater Chennai neighbourhoods on the area hubs.",
+  },
+  {
+    question: "How do I find part-time or fresher jobs in Chennai?",
+    answer:
+      "Use the Part-time jobs Chennai hub or the Freshers jobs Chennai hub, or filter the main Jobs in Chennai board by job type and category.",
+  },
+  {
+    question: "How do I report a suspicious or fake job?",
+    answer:
+      "Do not pay anyone for job confirmation. Use the Contact page (support@vacancychennai.in) and include the job URL so we can review the listing.",
+  },
 ];
