@@ -1,9 +1,13 @@
-## 2026-08 — Partner ad banners, link fixes, Nanganallur job requests
+## 2026-08-15 — Session ship (listings, LLM/SEO, ads, Nanganallur)
 
-- **Ads:** `src/lib/partner-ads.ts` + `src/components/ads/*` — rotating ResumeDoctor / BSERI / MyChennaiCity creatives. Square on job-detail sidebar; rectangle on hubs, home, blog, and a site-wide band on remaining public pages (skip dashboards, admin, auth recovery, privacy/terms).
-- **Links:** Footer uses live email (`support@vacancychennai.in`), partner logo URLs, Nanganallur jobs + job-request paths; contact drops the placeholder WhatsApp number; terms/about/pricing point at real site pages.
-- **Local job requests:** `/local-job-request-nanganallur` — candidate magic-link or SMS OTP, one public post per account, WhatsApp contact for employers. Migration **`013_local_job_requests.sql`**. Magic-link `next` returns seekers to this page (`sendCandidateMagicLinkEmail` + verify route). OTP send goes through Twilio via `src/lib/otp-send.ts`.
-- **Run `npm run db:migrate`** after pull (and in production) so `local_job_requests` exists before the page queries it.
+Full narrative: [`WORK_LOG.md`](./WORK_LOG.md). Commits: `77b9c58` → `2de873b` → `5e75019` → `60cb04b`.
+
+- **MP Developers walk-in:** urgent featured curated job — `/jobs/job-mp-developers-mega-walk-in-pallavaram-guindy` (Guindy hub, Pallavaram walk-in, direct email/call/WhatsApp).
+- **Job detail layout:** apply panel + safety aside + square partner ads + at-a-glance; factual summary via `job-seo-intro.ts`.
+- **LLM / AEO / GEO:** `/llms.txt`, `/llm.txt`, `/llms-full.txt`; AI bots in `robots.ts`; FAQ + Organization/JobPosting schema; `lang="en-IN"`.
+- **Ads:** `src/lib/partner-ads.ts` + `src/components/ads/*` — square (job sidebar) / rectangle (hubs, home, blog, site-wide band). Skip dashboards, admin, auth recovery, privacy/terms.
+- **Links:** Footer email + partner logos; no fake WhatsApp/phone; terms/about/pricing CTAs fixed.
+- **Local job requests:** `/local-job-request-nanganallur` — magic link or SMS OTP, one post per candidate, WhatsApp for employers. Migration **`013_local_job_requests.sql`** (run `npm run db:migrate`).
 
 ---
 

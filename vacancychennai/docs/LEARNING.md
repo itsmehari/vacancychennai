@@ -6,6 +6,7 @@ Engineering and design notes from implementation work (including the 2026 home/m
 |-----|------|
 | **This file** | Pitfalls, patterns, “why we did X” — living reference while building. |
 | [`PROJECT_UPDATE.md`](./PROJECT_UPDATE.md) | Changelog: what shipped, in roughly reverse chronological order. |
+| [`WORK_LOG.md`](./WORK_LOG.md) | Session work log: commits, decisions, live URLs, follow-ups. |
 | [`AGENTS.md`](../AGENTS.md) | Cursor/agent rules for this app (Next.js warning + project conventions). |
 | [Cursor skill — Vacancy Chennai](../../.cursor/skills/vacancychennai-proj-skill/SKILL.md) | When the agent should load Vacancy Chennai context (triggers + file map). |
 | [Cursor skill — Next 16 proxy](../../.cursor/skills/nextjs-16-proxy-migration/SKILL.md) | `middleware.ts` → `proxy.ts` migration and conventions. |
