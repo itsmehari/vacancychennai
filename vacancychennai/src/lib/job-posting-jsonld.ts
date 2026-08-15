@@ -76,7 +76,9 @@ export function buildJobPostingJsonLd(opts: {
   const root = siteUrlRoot();
   const pageUrl = `${root}${opts.canonicalPath}`;
   const datePosted = isoDatePosted(opts.job.createdAt);
-  const validThrough = validThroughIso(datePosted);
+  const validThrough = opts.job.expiresAt
+    ? isoDatePosted(opts.job.expiresAt)
+    : validThroughIso(datePosted);
 
   const loc = opts.location;
   const addressLocality = loc?.area?.trim() || "Chennai";

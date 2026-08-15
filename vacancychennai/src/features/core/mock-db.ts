@@ -18,6 +18,7 @@ import {
   curatedEmployerSkbVidhyashram,
   curatedEmployerMoneyBoxxFinance,
   curatedEmployerSouthIndianRestaurantNavalur,
+  curatedEmployerMpDevelopers,
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
@@ -81,6 +82,7 @@ export const employers: EmployerProfile[] = [
   curatedEmployerSkbVidhyashram,
   curatedEmployerSouthIndianRestaurantNavalur,
   curatedEmployerMoneyBoxxFinance,
+  curatedEmployerMpDevelopers,
   ...curatedExternalEmployers,
 ];
 
@@ -170,16 +172,8 @@ export const jobs: Job[] = [
     createdAt: now(),
     updatedAt: now(),
   },
-  ...curatedPublishedJobs.map((j) => ({
-    ...j,
-    createdAt: now(),
-    updatedAt: now(),
-  })),
-  ...curatedExternalPublishedJobs.map((j) => ({
-    ...j,
-    createdAt: now(),
-    updatedAt: now(),
-  })),
+  ...curatedPublishedJobs,
+  ...curatedExternalPublishedJobs,
 ];
 
 export const applications: JobApplication[] = [
@@ -211,7 +205,12 @@ export function getEmployerById(id: string) {
 }
 
 export function getPublishedJobs() {
-  return jobs.filter((job) => job.status === "published");
+  return jobs.filter((job) => {
+    if (job.status !== "published") return false;
+    if (!job.expiresAt) return true;
+    const exp = new Date(job.expiresAt).getTime();
+    return Number.isNaN(exp) || exp > Date.now();
+  });
 }
 
 /** When no published jobs exist, category chips still show common Chennai market labels. */
@@ -230,7 +229,13 @@ export function getPublishedJobsCount(): number {
 export function getFeaturedPublishedJobs(limit = 6): Job[] {
   const featured = getPublishedJobs()
     .filter((job) => job.featured)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a, b) => {
+      const tierRank = (tier: Job["listingTier"]) =>
+        tier === "urgent" ? 2 : tier === "featured" ? 1 : 0;
+      const byTier = tierRank(b.listingTier) - tierRank(a.listingTier);
+      if (byTier !== 0) return byTier;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
   return featured.slice(0, limit);
 }
 

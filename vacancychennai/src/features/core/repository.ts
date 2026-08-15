@@ -12,6 +12,7 @@ import {
   getEmployerById as getMockEmployerById,
   getJobById,
   getLocationById as getMockLocationById,
+  getPublishedJobs,
   jobs,
   locations,
   setJobFeatured,
@@ -69,15 +70,22 @@ function mergeLocationsWithCurated(dbLocations: Location[]): Location[] {
 }
 
 /** Published jobs: DB rows plus curated listings (by id, curated fill gaps only). */
+function isCuratedListingLive(job: Job): boolean {
+  if (job.status !== "published") return false;
+  if (!job.expiresAt) return true;
+  const exp = new Date(job.expiresAt).getTime();
+  return Number.isNaN(exp) || exp > Date.now();
+}
+
 function mergePublishedJobsWithCurated(dbJobs: Job[]): Job[] {
   const byId = new Map(dbJobs.map((j) => [j.id, j]));
   for (const job of curatedPublishedJobs) {
-    if (job.status === "published" && !byId.has(job.id)) {
+    if (isCuratedListingLive(job) && !byId.has(job.id)) {
       byId.set(job.id, job);
     }
   }
   for (const job of curatedExternalPublishedJobs) {
-    if (job.status === "published" && !byId.has(job.id)) {
+    if (isCuratedListingLive(job) && !byId.has(job.id)) {
       byId.set(job.id, job);
     }
   }
@@ -140,9 +148,9 @@ export async function listLocations() {
 
 export async function listPublishedJobs(): Promise<Job[]> {
   if (!hasDatabase()) {
-    return jobs
-      .filter((job) => job.status === "published")
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return getPublishedJobs().sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
   }
   const rows = await dbQuery<DbJobRow>(
     `select * from jobs
@@ -169,8 +177,8 @@ export async function listRelatedPublishedJobs(
 export async function listPublishedJobsCreatedSince(sinceIso: string): Promise<Job[]> {
   if (!hasDatabase()) {
     const sinceMs = new Date(sinceIso).getTime();
-    return jobs
-      .filter((job) => job.status === "published" && new Date(job.createdAt).getTime() >= sinceMs)
+    return getPublishedJobs()
+      .filter((job) => new Date(job.createdAt).getTime() >= sinceMs)
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }
   const rows = await dbQuery<DbJobRow>(
@@ -676,8 +684,8 @@ function normalizeJobIdParam(jobId: string): string {
 /** Bundled listings (`job-ext-*`, `job-office-*`, …) are not stored in Postgres `jobs`. */
 function findCuratedPublishedJobById(jobId: string): Job | null {
   return (
-    curatedPublishedJobs.find((j) => j.id === jobId && j.status === "published") ??
-    curatedExternalPublishedJobs.find((j) => j.id === jobId && j.status === "published") ??
+    curatedPublishedJobs.find((j) => j.id === jobId && isCuratedListingLive(j)) ??
+    curatedExternalPublishedJobs.find((j) => j.id === jobId && isCuratedListingLive(j)) ??
     null
   );
 }

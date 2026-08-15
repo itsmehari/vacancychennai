@@ -91,6 +91,11 @@ const RULES: Rule[] = [
     test: (h) => /\blegal\b|\badvocate\b|\bparalegal\b|\blaw firm\b/i.test(h),
   },
   {
+    soc: "17-2051.00",
+    test: (h) =>
+      /\bstructural engineer\b|\bcivil engineer\b|\bland acquisition\b|\b3d modular\b/i.test(h),
+  },
+  {
     soc: "17-3027.00",
     test: (h) =>
       /\bmanufacturing\b|\bproduction engineer\b|\bquality inspector\b|\bmachine operator\b|\bplant engineer\b/i.test(

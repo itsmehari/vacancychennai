@@ -296,8 +296,8 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                 ) : null}
                 <h2 className="text-lg font-semibold text-slate-900">How to apply</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  This role is listed for direct contact with the employer. Use email or phone below (Vacancy
-                  Chennai quick apply is not used for this posting).
+                  This role is listed for direct contact with the employer. Use email, phone, or WhatsApp
+                  below (Vacancy Chennai quick apply is not used for this posting).
                 </p>
                 <a
                   href={`mailto:${directContact.email}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
@@ -313,6 +313,19 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                 >
                   Call {directContact.phoneLabel}
                 </a>
+                {waDigits ? (
+                  <a
+                    href={`https://wa.me/${waDigits}?text=${encodeURIComponent(
+                      `Hi, I saw the ${job.title} opening on Vacancy Chennai and would like to apply.`,
+                    )}`}
+                    className={`${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cta="job-direct-whatsapp-apply"
+                  >
+                    WhatsApp {directContact.phoneLabel}
+                  </a>
+                ) : null}
               </>
             ) : (
               <>

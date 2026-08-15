@@ -53,7 +53,7 @@ export default function JobCard({
           </div>
           {job.featured && (
             <span className="shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-warning-bg)] px-2 py-1 text-xs font-semibold text-[var(--color-warning-text)] ring-1 ring-amber-200/80">
-              Featured
+              {job.listingTier === "urgent" ? "Urgent" : "Featured"}
             </span>
           )}
         </div>

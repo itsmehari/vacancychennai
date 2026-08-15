@@ -48,7 +48,13 @@ export default async function Home() {
 
   const featuredJobs = published
     .filter((j) => j.featured)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a, b) => {
+      const tierRank = (tier: (typeof a)["listingTier"]) =>
+        tier === "urgent" ? 2 : tier === "featured" ? 1 : 0;
+      const byTier = tierRank(b.listingTier) - tierRank(a.listingTier);
+      if (byTier !== 0) return byTier;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
     .slice(0, 6);
   const featuredIds = new Set(featuredJobs.map((j) => j.id));
   const sortedPublished = [...published].sort(

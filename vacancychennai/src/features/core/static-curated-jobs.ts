@@ -79,6 +79,14 @@ export const curatedEmployerBabuTestingTraining: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — MP Developers mega walk-in; apply via careers email / WhatsApp / Pallavaram walk-in. */
+export const curatedEmployerMpDevelopers: EmployerProfile = {
+  id: "emp-mp-developers",
+  companyName: "MP Developers",
+  email: "careers@mpdevelopers.com",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -111,6 +119,14 @@ export const curatedLocations: Location[] = [
     pincode: "600091",
     lat: 12.9821,
     lng: 80.1881,
+  },
+  {
+    id: "loc-guindy",
+    zone: "South Chennai",
+    area: "Guindy",
+    pincode: "600032",
+    lat: 13.0067,
+    lng: 80.2206,
   },
   {
     id: "loc-navalur",
@@ -267,6 +283,7 @@ const VIYANI_BUILDER_LISTING_AT = "2026-05-22T00:00:00.000Z";
 const ELITE_EXPRESS_LISTING_AT = "2026-06-03T00:00:00.000Z";
 const ELITE_EXPRESS_OPERATIONS_LISTING_AT = "2026-06-15T00:00:00.000Z";
 const BABU_TESTING_TRAINING_LISTING_AT = "2026-06-06T00:00:00.000Z";
+const MP_DEVELOPERS_WALK_IN_LISTING_AT = "2026-08-15T16:00:00.000Z";
 
 const babuTestingTrainingAssistantDescription = [
   "We are looking for a male assistant to help with software testing training coordination and seminar activities.",
@@ -375,6 +392,40 @@ const eliteExpressOperationsSupportDescription = [
   "How to apply:",
   "• Call +91 99402 07385",
   "• Website: https://eliteexpressenterprises.in",
+].join("\n");
+
+const mpDevelopersMegaWalkInDescription = [
+  "MP Developers (Trust Forever) is running a mega walk-in drive for experienced residential-project professionals. Interview in Pallavaram; work location Guindy.",
+  "",
+  "This is a community listing from the employer’s public walk-in notice — confirm the Pallavaram interview address, documents, and role fit before you travel. Official careers page: https://mpdevelopers.com/careers",
+  "",
+  "Walk-in details:",
+  "• Days: Monday to Saturday",
+  "• Time: 10:30 AM to 4:30 PM",
+  "• Interview location: Pallavaram",
+  "• Work location: Guindy",
+  "",
+  "Open positions (5):",
+  "• Land Acquisition Manager — 2 openings, 3–10 years",
+  "• ME Structural Engineer — 1 opening, 3–10 years",
+  "• 3D Modular — 1 opening, 3–10 years",
+  "• Call Audit — 1 opening, 10–15 years",
+  "",
+  "Who they want:",
+  "Candidates from reputed developers, with proven expertise in residential projects.",
+  "",
+  "How to apply:",
+  "Walk in Monday–Saturday, 10:30 AM–4:30 PM, at the Pallavaram interview, or send your résumé first:",
+  "• Email: careers@mpdevelopers.com",
+  "• Phone / WhatsApp: +91 78457 58753",
+  "",
+  "Mention that you saw the opening on Vacancy Chennai.",
+  "",
+  "Apply by: 13 Nov 2026.",
+  "",
+  "Salary was not stated on the original notice; confirm pay with MP Developers when you apply.",
+  "",
+  "Safety note: Do not pay any upfront “registration” or “security” fee to third parties — verify that you are dealing with the real MP Developers hiring contact (careers@mpdevelopers.com).",
 ].join("\n");
 
 const southIndianRestaurantNavalurDescription = [
@@ -656,6 +707,26 @@ export const curatedPublishedJobs: Job[] = [
     createdAt: BABU_TESTING_TRAINING_LISTING_AT,
     updatedAt: BABU_TESTING_TRAINING_LISTING_AT,
   },
+  {
+    id: "job-mp-developers-mega-walk-in-pallavaram-guindy",
+    employerId: curatedEmployerMpDevelopers.id,
+    title:
+      "Land Acquisition, Structural Engineer, 3D Modular & Call Audit — mega walk-in (Pallavaram)",
+    category: "Engineering",
+    industry: "Real Estate / Construction",
+    jobType: "full-time",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-guindy",
+    landmarkText: "Walk-in interview at Pallavaram · work location Guindy.",
+    description: mpDevelopersMegaWalkInDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: MP_DEVELOPERS_WALK_IN_LISTING_AT,
+    updatedAt: MP_DEVELOPERS_WALK_IN_LISTING_AT,
+    expiresAt: "2026-11-13T18:29:59.000Z",
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -665,6 +736,7 @@ const curatedWhatsAppApplyDigitsByJobId: Record<string, string> = {
   "job-skb-principal-playschool-madipakkam": "916380383563",
   "job-skb-teacher-parttime-playschool-madipakkam": "916380383563",
   "job-assistant-software-testing-training-babu": "918220933002",
+  "job-mp-developers-mega-walk-in-pallavaram-guindy": "917845758753",
 };
 
 /** Apply via employer email / phone only — not Vacancy Chennai quick apply. */
@@ -717,10 +789,15 @@ const curatedDirectEmployerContact: Record<
     phoneE164: "+918925904590",
     phoneLabel: "+91 89259 04590",
   },
+  "job-mp-developers-mega-walk-in-pallavaram-guindy": {
+    email: "careers@mpdevelopers.com",
+    phoneE164: "+917845758753",
+    phoneLabel: "+91 78457 58753",
+  },
 };
 
 export function isCuratedWhatsAppOnlyJob(jobId: string): boolean {
-  return jobId in curatedWhatsAppApplyDigitsByJobId;
+  return jobId in curatedWhatsAppApplyDigitsByJobId && !(jobId in curatedDirectEmployerContact);
 }
 
 export function getCuratedWhatsAppApplyDigits(jobId: string): string | undefined {
@@ -752,6 +829,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerViyaniBuilder.id, curatedEmployerViyaniBuilder.companyName],
     [curatedEmployerEliteExpress.id, curatedEmployerEliteExpress.companyName],
     [curatedEmployerBabuTestingTraining.id, curatedEmployerBabuTestingTraining.companyName],
+    [curatedEmployerMpDevelopers.id, curatedEmployerMpDevelopers.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);
