@@ -4,6 +4,7 @@ import "./globals.css";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { MicrosoftClarity } from "@/components/microsoft-clarity";
 import { PartnerOutboundAnalytics } from "@/components/partner-outbound-analytics";
+import { SiteWideAdBand } from "@/components/ads/site-wide-ad-band";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import { SITE_DEFAULT_DESCRIPTION } from "@/lib/home-seo-copy";
@@ -66,6 +67,7 @@ export default function RootLayout({
         <PartnerOutboundAnalytics />
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
+        <SiteWideAdBand />
         <SiteFooter />
       </body>
     </html>

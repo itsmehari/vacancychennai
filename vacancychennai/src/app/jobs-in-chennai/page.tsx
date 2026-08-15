@@ -1,3 +1,4 @@
+import { PageAdSlot } from "@/components/ads/page-ad-slot";
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
@@ -70,6 +71,7 @@ export default async function JobsInChennaiPage({ searchParams }: Props) {
         />
       ) : null}
       <InnerPageHero eyebrow="Vacancy Chennai" title={title} description={desc} />
+      <PageAdSlot shape="rectangle" placement="jobs_hub" className="pt-8" />
       <div className="space-y-6 pb-4 pt-8">
         <div className="flex flex-wrap gap-2">
           <Link

@@ -1,3 +1,4 @@
+import { PageAdSlot } from "@/components/ads/page-ad-slot";
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import {
@@ -7,8 +8,9 @@ import {
 } from "@/features/core/repository";
 import { filterPublishedJobList, getLocationByAreaSlug } from "@/lib/job-filters";
 import { buildJobsItemListJsonLd } from "@/lib/jobs-itemlist-jsonld";
+import { NANGANALLUR_AREA_SLUG, NANGANALLUR_PAGE_PATH } from "@/lib/local-job-request-constants";
 import { baseMetadata } from "@/lib/seo";
-import { btnPrimary, sectionCard } from "@/lib/ui";
+import { btnPrimary, linkInline, sectionCard } from "@/lib/ui";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -20,6 +22,19 @@ type Props = {
 function getSlugFromPath(path: string) {
   if (!path.startsWith("jobs-in-")) return null;
   return path.replace("jobs-in-", "");
+}
+
+function AreaSeekerRequestCta({ slug }: { slug: string }) {
+  if (slug !== NANGANALLUR_AREA_SLUG) return null;
+  return (
+    <p className={`${sectionCard} mt-8 text-sm leading-relaxed text-slate-700`}>
+      Looking for work in this area?{" "}
+      <Link href={NANGANALLUR_PAGE_PATH} className={linkInline}>
+        Post your job need
+      </Link>{" "}
+      — local employers can reach you on WhatsApp.
+    </p>
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -78,6 +93,8 @@ export default async function AreaPage({ params }: Props) {
             </Link>
           }
         />
+        <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
+        <AreaSeekerRequestCta slug={slug} />
         <div className="pb-4 pt-8">
           <div className={`${sectionCard} text-center`}>
             <p className="text-sm text-slate-600">Check back soon or expand your search on the main jobs board.</p>
@@ -105,6 +122,8 @@ export default async function AreaPage({ params }: Props) {
           </Link>
         }
       />
+      <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
+      <AreaSeekerRequestCta slug={slug} />
       <section className="grid gap-4 pb-4 pt-8 md:grid-cols-2">
         {jobs.map((job) => {
           const loc = locationsById.get(job.locationId);

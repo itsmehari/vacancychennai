@@ -10,12 +10,15 @@ function getSiteBaseUrl(): string {
   return raw.replace(/\/$/, "");
 }
 
-function buildVerifyUrl(plaintext: string, purpose: EmailVerificationPurpose) {
+function buildVerifyUrl(plaintext: string, purpose: EmailVerificationPurpose, nextPath?: string) {
   const base = getSiteBaseUrl();
   const params = new URLSearchParams({
     token: plaintext,
     purpose,
   });
+  if (nextPath?.startsWith("/") && !nextPath.startsWith("//")) {
+    params.set("next", nextPath);
+  }
   return `${base}/api/auth/email/verify?${params.toString()}`;
 }
 
@@ -73,9 +76,10 @@ export async function sendCandidateMagicLinkEmail(input: {
   to: string;
   fullName: string;
   plaintextToken: string;
+  nextPath?: string;
 }): Promise<void> {
   const { resend, from } = requireResendClient();
-  const url = buildVerifyUrl(input.plaintextToken, "candidate_magic");
+  const url = buildVerifyUrl(input.plaintextToken, "candidate_magic", input.nextPath);
   const subject = "Your Vacancy Chennai sign-in link";
   const text = `Hi ${input.fullName},
 

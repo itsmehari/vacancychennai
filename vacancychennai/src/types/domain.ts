@@ -103,3 +103,18 @@ export type AuditLog = {
 
 export type LanguageCode = "en" | "ta";
 
+export type LocalJobRequest = {
+  id: string;
+  userId: string;
+  areaSlug: string;
+  fullName: string;
+  dateOfBirth: string;
+  education: string;
+  locationText: string;
+  experienceLevel: string;
+  jobNeeds: string;
+  contactPhone: string;
+  createdAt: string;
+  updatedAt: string;
+};
+

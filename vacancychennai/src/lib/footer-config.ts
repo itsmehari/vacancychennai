@@ -5,6 +5,9 @@
  * 3. Utility bar: brand, social, newsletter CTAs, contact
  */
 
+import { jobsInAreaPath } from "@/lib/area-job-path";
+import { footerPartnerLogoHref } from "@/lib/partner-ads";
+
 export type FooterNavLink = {
   href: string;
   label: string;
@@ -38,7 +41,10 @@ export const footerSiteLinkColumns: FooterSiteColumn[] = [
       { href: "/jobs-in-chennai", label: "All jobs in Chennai" },
       { href: "/freshers-jobs-chennai", label: "Freshers jobs" },
       { href: "/part-time-jobs-chennai", label: "Part-time jobs" },
+      { href: jobsInAreaPath("Nanganallur"), label: "Jobs in Nanganallur" },
+      { href: "/local-job-request-nanganallur", label: "Post job need — Nanganallur" },
       { href: "/job-seeker-profile", label: "Job seeker profile" },
+      { href: "/subscribe", label: "Job alerts" },
       { href: "/candidate/login", label: "Candidate login" },
       { href: "/candidate/register", label: "Create candidate account" },
     ],
@@ -64,10 +70,12 @@ export const footerSiteLinkColumns: FooterSiteColumn[] = [
   },
 ];
 
-/** Tier 2: add `{ name, imgSrc?, href? }` to show the hiring partners strip */
-export const footerLogos: FooterLogo[] = [];
-
-
+/** Tier 2: partner sites with live URLs */
+export const footerLogos: FooterLogo[] = [
+  { name: "ResumeDoctor", href: footerPartnerLogoHref("resume-doctor") },
+  { name: "BSERI", href: footerPartnerLogoHref("bseri") },
+  { name: "MyChennaiCity", href: footerPartnerLogoHref("mychennaicity") },
+];
 
 export const footerNewsletter = {
   headline: "Receive the latest jobs and offers by:",
@@ -79,9 +87,8 @@ export const footerNewsletter = {
 
 export const footerContact = {
   lines: ["Chennai, Tamil Nadu, India"],
-  phoneDisplay: "+91 — — — — —",
-  /** Set when you publish a support number, e.g. tel:+914412345678 */
-  phoneHref: "" as string,
+  emailDisplay: "support@vacancychennai.in",
+  emailHref: "mailto:support@vacancychennai.in",
 };
 
 export const footerBrand = {

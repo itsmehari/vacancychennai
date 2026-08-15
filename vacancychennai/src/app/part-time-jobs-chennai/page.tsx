@@ -1,3 +1,4 @@
+import { PageAdSlot } from "@/components/ads/page-ad-slot";
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
@@ -47,6 +48,7 @@ export default async function PartTimeJobsPage() {
           </Link>
         }
       />
+      <PageAdSlot shape="rectangle" placement="part_time_hub" className="pt-8" />
       <div className="pb-4 pt-8">
         {jobs.length === 0 ? (
           <div className={`${sectionCard} text-center`}>

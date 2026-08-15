@@ -1,3 +1,12 @@
+## 2026-08 — Partner ad banners, link fixes, Nanganallur job requests
+
+- **Ads:** `src/lib/partner-ads.ts` + `src/components/ads/*` — rotating ResumeDoctor / BSERI / MyChennaiCity creatives. Square on job-detail sidebar; rectangle on hubs, home, blog, and a site-wide band on remaining public pages (skip dashboards, admin, auth recovery, privacy/terms).
+- **Links:** Footer uses live email (`support@vacancychennai.in`), partner logo URLs, Nanganallur jobs + job-request paths; contact drops the placeholder WhatsApp number; terms/about/pricing point at real site pages.
+- **Local job requests:** `/local-job-request-nanganallur` — candidate magic-link or SMS OTP, one public post per account, WhatsApp contact for employers. Migration **`013_local_job_requests.sql`**. Magic-link `next` returns seekers to this page (`sendCandidateMagicLinkEmail` + verify route). OTP send goes through Twilio via `src/lib/otp-send.ts`.
+- **Run `npm run db:migrate`** after pull (and in production) so `local_job_requests` exists before the page queries it.
+
+---
+
 ## 2026-05 — Employer billing (SuperProfile links), publish gate, pricing
 
 - **`010_billing_listing_usage.sql`:** `jobs.published_at`, `expires_at`, `billing_source`; `entitlement_usages`; `payment_orders.provider_payment_id` unique for idempotency.

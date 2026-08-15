@@ -1,6 +1,7 @@
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import { baseMetadata } from "@/lib/seo";
-import { sectionCard } from "@/lib/ui";
+import { btnPrimary, btnSecondary, sectionCard } from "@/lib/ui";
+import Link from "next/link";
 
 export const metadata = baseMetadata(
   "About Vacancy Chennai",
@@ -33,6 +34,17 @@ export default function AboutPage() {
             <li>Employers hiring in Chennai — from retail and logistics to IT corridors</li>
             <li>Teams who want simpler workflows than national boards tuned for metros only</li>
           </ul>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/jobs-in-chennai" className={btnPrimary}>
+              Browse jobs
+            </Link>
+            <Link href="/post-job" className={btnSecondary}>
+              Post a job
+            </Link>
+            <Link href="/contact" className={btnSecondary}>
+              Contact
+            </Link>
+          </div>
         </section>
       </div>
     </>

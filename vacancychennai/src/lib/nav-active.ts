@@ -7,6 +7,7 @@ export function isNavHrefActive(pathname: string, href: string): boolean {
 export function isJobsExplorePath(pathname: string): boolean {
   if (pathname.startsWith("/jobs-in-")) return true;
   if (pathname === "/freshers-jobs-chennai" || pathname === "/part-time-jobs-chennai") return true;
+  if (pathname.startsWith("/local-job-request-")) return true;
   if (/^\/jobs\/[^/]+$/.test(pathname)) return true;
   return false;
 }

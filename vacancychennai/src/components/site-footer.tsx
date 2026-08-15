@@ -94,14 +94,26 @@ export default function SiteFooter() {
                     <span className="text-sm font-medium text-slate-400">{logo.name}</span>
                   );
                   return logo.href ? (
-                    <Link
-                      key={logo.name}
-                      href={logo.href}
-                      className={`${focusRingOnDark} rounded-md`}
-                      rel="noopener noreferrer"
-                    >
-                      {inner}
-                    </Link>
+                    logo.href.startsWith("http") ? (
+                      <a
+                        key={logo.name}
+                        href={logo.href}
+                        className={`${focusRingOnDark} rounded-md`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-utm-content="footer_logo"
+                      >
+                        {inner}
+                      </a>
+                    ) : (
+                      <Link
+                        key={logo.name}
+                        href={logo.href}
+                        className={`${focusRingOnDark} rounded-md`}
+                      >
+                        {inner}
+                      </Link>
+                    )
                   ) : (
                     <div key={logo.name}>{inner}</div>
                   );
@@ -170,8 +182,23 @@ export default function SiteFooter() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-blue-100/80">
-                  Social profile links coming soon — see Contact for updates.
+                <p className="text-sm leading-relaxed text-blue-100/90">
+                  <Link
+                    href="/contact"
+                    className={`font-medium text-white underline-offset-2 hover:underline ${focusRingOnAccent} rounded-sm ${transitionFast}`}
+                  >
+                    Contact the team
+                  </Link>
+                  <span className="text-blue-200/80" aria-hidden>
+                    {" "}
+                    ·{" "}
+                  </span>
+                  <a
+                    href="mailto:support@vacancychennai.in"
+                    className={`font-medium text-white underline-offset-2 hover:underline ${focusRingOnAccent} rounded-sm ${transitionFast}`}
+                  >
+                    support@vacancychennai.in
+                  </a>
                 </p>
               )}
             </div>
@@ -207,16 +234,12 @@ export default function SiteFooter() {
                   {line}
                 </p>
               ))}
-              {footerContact.phoneHref ? (
-                <a
-                  href={footerContact.phoneHref}
-                  className={`mt-2 inline-block font-medium text-white hover:underline ${focusRingOnAccent} rounded-sm ${transitionFast}`}
-                >
-                  {footerContact.phoneDisplay}
-                </a>
-              ) : (
-                <p className="mt-2 font-medium tabular-nums text-white">{footerContact.phoneDisplay}</p>
-              )}
+              <a
+                href={footerContact.emailHref}
+                className={`mt-2 inline-block font-medium text-white hover:underline ${focusRingOnAccent} rounded-sm ${transitionFast}`}
+              >
+                {footerContact.emailDisplay}
+              </a>
               <p className="mt-2">
                 <Link
                   href="/contact"

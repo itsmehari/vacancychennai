@@ -1,3 +1,4 @@
+import { PageAdSlot } from "@/components/ads/page-ad-slot";
 import { BlogArticleBody } from "@/components/blog/blog-article-body";
 import { BlogArticleShareStrip } from "@/components/blog/first-resume-playbook-widgets";
 import { BlogReadingProgress } from "@/components/blog/blog-reading-progress";
@@ -125,6 +126,7 @@ export default async function BlogArticlePage({ params }: Props) {
         </div>
         <BlogArticleBody post={post} />
         {post.interactive === "first-resume-playbook" ? <BlogArticleShareStrip title={post.title} /> : null}
+        <PageAdSlot shape="rectangle" placement="blog_article" className="mt-10" />
         {rd ? (
           <div className="mt-10 max-w-2xl">
             <PartnerResumeDoctorAside

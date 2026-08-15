@@ -29,6 +29,11 @@ export const megaSegmentLinks: MegaSegmentLink[] = [
     label: "Part-time & flexible",
     description: "Shifts and flexible hours",
   },
+  {
+    href: "/local-job-request-nanganallur",
+    label: "Post a job need — Nanganallur",
+    description: "Tell local employers what you are looking for",
+  },
 ];
 
 export function locationsToMegaAreas(locations: Location[]): MegaAreaLink[] {

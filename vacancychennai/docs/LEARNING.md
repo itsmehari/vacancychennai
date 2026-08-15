@@ -151,6 +151,8 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | Repository (DB + mock) | `src/features/core/repository.ts` — jobs, locations, audits, AI match suggestions |
 | Area filter + slug resolve | `src/lib/job-filters.ts` — `filterPublishedJobList`, `getLocationByAreaSlug` |
 | Dynamic area page | `src/app/[locationPage]/page.tsx` |
+| Partner ads | `src/lib/partner-ads.ts`, `src/components/ads/*` — square vs rectangle; `shouldShowSiteWideAd` skips pages with inline slots |
+| Local job requests | `/local-job-request-nanganallur`, `src/features/local-job-request/*`, migration `013_local_job_requests.sql` — run `npm run db:migrate` or the page 500s when listing rows |
 | Agent rules | `AGENTS.md` (repo: `vacancychennai/AGENTS.md`) |
 | Cursor skills | `vacancychennai-proj-skill`, `nextjs-16-proxy-migration` under repo `.cursor/skills/` |
 | Job seeker profile PRD (Vacancy Chennai stack) | [`docs/job-seeker-profile-plan.md`](./job-seeker-profile-plan.md) |

@@ -23,6 +23,7 @@ const STATIC_SITEMAP_PAGES: StaticEntry[] = [
   { path: "/post-job", changeFrequency: "weekly", priority: 0.85 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.82 },
   { path: "/job-seeker-profile", changeFrequency: "weekly", priority: 0.78 },
+  { path: "/local-job-request-nanganallur", changeFrequency: "daily", priority: 0.74 },
   { path: "/subscribe", changeFrequency: "weekly", priority: 0.72 },
   { path: "/employer/login", changeFrequency: "monthly", priority: 0.7 },
   { path: "/employer/register", changeFrequency: "monthly", priority: 0.7 },

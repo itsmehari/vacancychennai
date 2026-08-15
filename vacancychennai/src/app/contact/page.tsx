@@ -29,10 +29,17 @@ export default function ContactPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">WhatsApp</dt>
-              <dd className="mt-1 text-slate-800">+91-90000-00000</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Job alerts</dt>
+              <dd className="mt-1">
+                <Link href="/subscribe" className={linkInline}>
+                  Subscribe by email or SMS
+                </Link>
+              </dd>
             </div>
           </dl>
+          <p className="mt-6 text-sm leading-relaxed text-slate-600">
+            Email is the fastest way to reach us. Include the job URL if you are reporting a listing.
+          </p>
           <div className="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
             <Link href="/jobs-in-chennai" className={btnPrimary}>
               Browse jobs

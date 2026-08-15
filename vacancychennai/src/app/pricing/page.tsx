@@ -146,8 +146,18 @@ export default function PricingPage() {
         </section>
 
         <p className="mt-10 text-center text-sm text-slate-600">
-          Full policy: see <code className="rounded bg-slate-100 px-1">docs/EMPLOYER_BILLING_POLICY.md</code> in the
-          repo.
+          Billing questions?{" "}
+          <Link href="/contact" className="font-semibold text-blue-700 hover:text-blue-900 hover:underline">
+            Contact us
+          </Link>{" "}
+          or email{" "}
+          <a
+            href="mailto:support@vacancychennai.in"
+            className="font-semibold text-blue-700 hover:text-blue-900 hover:underline"
+          >
+            support@vacancychennai.in
+          </a>
+          .
         </p>
       </div>
     </>

@@ -1,3 +1,4 @@
+import { HomeAdBand } from "@/components/ads/home-ad-band";
 import HomeBlogCta from "@/components/home/home-blog-cta";
 import HomeCandidatesJoin from "@/components/home/home-candidates-join";
 import HomeCategoryChips from "@/components/home/home-category-chips";
@@ -105,6 +106,7 @@ export default async function Home() {
         <HomeSegmentCards />
         <HomeCategoryChips categories={categories} />
         <HomeLocationGrid locations={locations} />
+        <HomeAdBand placement="home_after_areas" />
         <HomeJobSection
           sectionId="featured"
           variant="featured"
@@ -130,6 +132,7 @@ export default async function Home() {
           />
         ) : null}
         <HomeHowItWorks />
+        <HomeAdBand placement="home_after_how" />
         <HomeEmployerPricingStrip />
         <HomeEmployersMarketing />
         <HomeCandidatesJoin />

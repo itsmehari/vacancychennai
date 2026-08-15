@@ -1,3 +1,4 @@
+import { PageAdSlot } from "@/components/ads/page-ad-slot";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import { blogPosts } from "@/lib/blog-posts";
 import { baseMetadata } from "@/lib/seo";
@@ -18,6 +19,7 @@ export default function BlogIndexPage() {
         title="Hiring insights"
         description="Weekly hiring and career notes for Chennai — including first résumés for students and homemakers, plus local context for employers."
       />
+      <PageAdSlot shape="rectangle" placement="blog_index" className="pt-8" />
       <ul className="space-y-4 pb-4 pt-8">
         {blogPosts.map((post) => (
           <li key={post.slug}>

@@ -12,9 +12,16 @@ function parsePurpose(v: string | null): EmailVerificationPurpose | null {
   return null;
 }
 
+function safeNextPath(next: string | null): string | null {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
+  if (next.includes("://") || next.includes("\\")) return null;
+  return next;
+}
+
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
   const purposeParam = parsePurpose(request.nextUrl.searchParams.get("purpose"));
+  const nextPath = safeNextPath(request.nextUrl.searchParams.get("next"));
 
   if (!token || !purposeParam) {
     return NextResponse.redirect(
@@ -63,7 +70,8 @@ export async function GET(request: NextRequest) {
       actorId: user.id,
       displayName: user.full_name,
     });
-    return NextResponse.redirect(new URL("/candidate/dashboard", request.url));
+    const dest = nextPath ?? "/candidate/dashboard";
+    return NextResponse.redirect(new URL(dest, request.url));
   } catch (e) {
     logger.warn({ err: e }, "email verify route failed");
     const path =
