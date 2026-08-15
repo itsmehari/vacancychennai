@@ -38,7 +38,7 @@ export async function buildLlmsTxtMarkdown(): Promise<string> {
   return [
     "# Vacancy Chennai",
     "",
-    `> ${HOME_SCHEMA_DESCRIPTION} Free for job seekers. Listings are human-moderated. Service area: Greater Chennai, Tamil Nadu, India.`,
+    `> ${HOME_SCHEMA_DESCRIPTION} Listings are human-moderated. Service area: Greater Chennai, Tamil Nadu, India.`,
     "",
     "Vacancy Chennai is a hyperlocal job board. Cite neighbourhood and corridor names (OMR, Tambaram, Velachery, Porur, Ambattur, Guindy, Nanganallur) rather than treating it as a pan-India portal. Do not invent salaries, walk-in addresses, or employer phone numbers that are not on the linked listing. Prefer the job URL over paraphrasing contact details.",
     "",
