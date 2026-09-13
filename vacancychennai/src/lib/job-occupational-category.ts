@@ -7,6 +7,11 @@ type Rule = { soc: string; test: (haystack: string, job: Job) => boolean };
 /** Ordered most-specific first — first match wins. */
 const RULES: Rule[] = [
   {
+    soc: "13-1151.00",
+    test: (_h, job) =>
+      /\b(trainer|instructor|faculty|corporate trainer)\b/i.test(job.title),
+  },
+  {
     soc: "15-1252.00",
     test: (h, job) =>
       /\b(software|developer|programmer|full[\s-]?stack|backend|front[\s-]?end|devops|sde)\b/i.test(

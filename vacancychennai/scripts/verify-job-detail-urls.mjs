@@ -40,6 +40,9 @@ const STATIC_CURATED_JOB_IDS = [
   "job-viyani-builder-hindi-staff-tenkasi",
   "job-viyani-builder-hindi-staff-virudhunagar",
   "job-assistant-software-testing-training-babu",
+  "job-mp-developers-mega-walk-in-pallavaram-guindy",
+  "job-mentory-java-full-stack-trainer-broadway",
+  "job-mentory-c-programming-trainer-mahabalipuram",
 ];
 
 function loadCuratedIds() {

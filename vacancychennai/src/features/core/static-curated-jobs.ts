@@ -87,6 +87,14 @@ export const curatedEmployerMpDevelopers: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — Mentory / Mentry trainer network; apply via WhatsApp on the hiring flyer. */
+export const curatedEmployerMentorySolutions: EmployerProfile = {
+  id: "emp-mentory-solutions",
+  companyName: "Mentory Solutions",
+  email: "external.mentory.solutions@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -167,6 +175,22 @@ export const curatedLocations: Location[] = [
     pincode: "626001",
     lat: 9.5372,
     lng: 77.9574,
+  },
+  {
+    id: "loc-broadway",
+    zone: "Chennai Central",
+    area: "Broadway",
+    pincode: "600001",
+    lat: 13.0876,
+    lng: 80.284,
+  },
+  {
+    id: "loc-mahabalipuram",
+    zone: "OMR / ECR",
+    area: "Mahabalipuram",
+    pincode: "603104",
+    lat: 12.6269,
+    lng: 80.1927,
   },
 ];
 
@@ -284,6 +308,7 @@ const ELITE_EXPRESS_LISTING_AT = "2026-06-03T00:00:00.000Z";
 const ELITE_EXPRESS_OPERATIONS_LISTING_AT = "2026-06-15T00:00:00.000Z";
 const BABU_TESTING_TRAINING_LISTING_AT = "2026-06-06T00:00:00.000Z";
 const MP_DEVELOPERS_WALK_IN_LISTING_AT = "2026-08-15T16:00:00.000Z";
+const MENTORY_TRAINERS_LISTING_AT = "2026-09-13T17:30:00.000Z";
 
 const babuTestingTrainingAssistantDescription = [
   "We are looking for a male assistant to help with software testing training coordination and seminar activities.",
@@ -426,6 +451,76 @@ const mpDevelopersMegaWalkInDescription = [
   "Salary was not stated on the original notice; confirm pay with MP Developers when you apply.",
   "",
   "Safety note: Do not pay any upfront “registration” or “security” fee to third parties — verify that you are dealing with the real MP Developers hiring contact (careers@mpdevelopers.com).",
+].join("\n");
+
+const mentoryJavaFullStackTrainerDescription = [
+  "Urgent trainer requirement — Mentory Solutions (trainer network & professional training services).",
+  "",
+  "Public job boards list the same WhatsApp desk as Mentry, a freelance technical-trainer network that staffs colleges, universities, institutes, and corporate programmes. This listing follows the September 2026 hiring flyer.",
+  "",
+  "Role: Java Full Stack Trainer (onsite classroom).",
+  "Openings: 1 — the flyer asks for 1 female trainer for this Broadway batch (as printed).",
+  "Location: Broadway, Chennai (George Town / North Chennai). Confirm the exact campus or hall with the recruiter — the flyer names the locality only.",
+  "Start date: 15 September 2026.",
+  "Class duration: 3–4 hours per day.",
+  "Assignment length: 3–4 months.",
+  "",
+  "What you will do:",
+  "• Deliver Java full-stack software / developer training to the assigned student batch.",
+  "• Cover typical classroom topics (core Java plus web stack) and keep the batch on the printed calendar.",
+  "",
+  "Who can apply:",
+  "• Freshers are welcome on this flyer (unlike some older Mentry network ads that asked for 2–4 years).",
+  "• Local Chennai candidates are preferred.",
+  "• Comfort teaching Java full-stack topics in a classroom.",
+  "",
+  "Pay: This flyer does not print a salary. Separate public Mentry trainer ads that share WhatsApp +91 93615 33079 have quoted about ₹1,000–₹2,500 per day depending on technology, duration, and experience. Treat that as a network range from other ads, not a guarantee for this Broadway batch. Confirm pay on WhatsApp before you travel.",
+  "",
+  "Sister opening from the same flyer: C Programming Trainer — Mahabalipuram (3 seats, start 16 September 2026).",
+  "",
+  "How to apply:",
+  "WhatsApp or call. Send your updated profile / résumé, current location, and availability. Name the Java Full Stack Trainer role.",
+  "• WhatsApp / call: +91 93459 99620",
+  "• Call: +91 93615 33079",
+  "",
+  "Mention that you saw the opening on Vacancy Chennai.",
+  "",
+  "Safety note: Do not pay any upfront “registration” or “security” fee to third parties — verify that you are dealing with the hiring contacts on the numbers above.",
+].join("\n");
+
+const mentoryCProgrammingTrainerDescription = [
+  "Urgent trainer requirement — Mentory Solutions (trainer network & professional training services).",
+  "",
+  "Public job boards list the same WhatsApp desk as Mentry, a freelance technical-trainer network that staffs colleges, universities, institutes, and corporate programmes. This listing follows the September 2026 hiring flyer.",
+  "",
+  "Role: C Programming Trainer (onsite classroom).",
+  "Openings: 3 trainers.",
+  "Location: Mahabalipuram (Mamallapuram), Chennai / ECR. Confirm the exact campus or hall with the recruiter — the flyer names the locality only.",
+  "Start date: 16 September 2026.",
+  "Class duration: 3–4 hours per day.",
+  "Assignment length: 3 months.",
+  "",
+  "What you will do:",
+  "• Deliver classroom C programming training (syntax, logic, and basic development practice).",
+  "• Build strong foundations for the assigned student batch and keep sessions in the printed 3–4 hour window.",
+  "",
+  "Who can apply:",
+  "• Freshers are welcome on this flyer (unlike some older Mentry network ads that asked for 2–4 years).",
+  "• Local Chennai / nearby candidates are preferred.",
+  "• Ready to travel to or stay near Mahabalipuram for the batch.",
+  "",
+  "Pay: This flyer does not print a salary. Separate public Mentry trainer ads that share WhatsApp +91 93615 33079 have quoted about ₹1,000–₹2,500 per day depending on technology, duration, and experience. Treat that as a network range from other ads, not a guarantee for this Mahabalipuram batch. Confirm pay on WhatsApp before you travel.",
+  "",
+  "Sister opening from the same flyer: Java Full Stack Trainer — Broadway (1 female trainer, start 15 September 2026).",
+  "",
+  "How to apply:",
+  "WhatsApp or call. Send your updated profile / résumé, current location, and availability. Name the C Programming Trainer role.",
+  "• WhatsApp / call: +91 93459 99620",
+  "• Call: +91 93615 33079",
+  "",
+  "Mention that you saw the opening on Vacancy Chennai.",
+  "",
+  "Safety note: Do not pay any upfront “registration” or “security” fee to third parties — verify that you are dealing with the hiring contacts on the numbers above.",
 ].join("\n");
 
 const southIndianRestaurantNavalurDescription = [
@@ -727,6 +822,46 @@ export const curatedPublishedJobs: Job[] = [
     updatedAt: MP_DEVELOPERS_WALK_IN_LISTING_AT,
     expiresAt: "2026-11-13T18:29:59.000Z",
   },
+  {
+    id: "job-mentory-java-full-stack-trainer-broadway",
+    employerId: curatedEmployerMentorySolutions.id,
+    title: "Java Full Stack Trainer (Female) — Broadway",
+    category: "Education / Training",
+    industry: "IT Training",
+    jobType: "contract",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-broadway",
+    landmarkText:
+      "Broadway, Chennai (George Town / North Chennai). Confirm the exact campus or hall — the flyer names the locality only.",
+    description: mentoryJavaFullStackTrainerDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: MENTORY_TRAINERS_LISTING_AT,
+    updatedAt: MENTORY_TRAINERS_LISTING_AT,
+    expiresAt: "2026-10-17T18:29:59.000Z",
+  },
+  {
+    id: "job-mentory-c-programming-trainer-mahabalipuram",
+    employerId: curatedEmployerMentorySolutions.id,
+    title: "C Programming Trainer — Mahabalipuram",
+    category: "Education / Training",
+    industry: "IT Training",
+    jobType: "contract",
+    salaryMin: null,
+    salaryMax: null,
+    locationId: "loc-mahabalipuram",
+    landmarkText:
+      "Mahabalipuram (Mamallapuram), Chennai / ECR. Confirm the exact campus or hall — the flyer names the locality only.",
+    description: mentoryCProgrammingTrainerDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: MENTORY_TRAINERS_LISTING_AT,
+    updatedAt: MENTORY_TRAINERS_LISTING_AT,
+    expiresAt: "2026-10-17T18:29:59.000Z",
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -737,6 +872,8 @@ const curatedWhatsAppApplyDigitsByJobId: Record<string, string> = {
   "job-skb-teacher-parttime-playschool-madipakkam": "916380383563",
   "job-assistant-software-testing-training-babu": "918220933002",
   "job-mp-developers-mega-walk-in-pallavaram-guindy": "917845758753",
+  "job-mentory-java-full-stack-trainer-broadway": "919345999620",
+  "job-mentory-c-programming-trainer-mahabalipuram": "919345999620",
 };
 
 /** Apply via employer email / phone only — not Vacancy Chennai quick apply. */
@@ -830,6 +967,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerEliteExpress.id, curatedEmployerEliteExpress.companyName],
     [curatedEmployerBabuTestingTraining.id, curatedEmployerBabuTestingTraining.companyName],
     [curatedEmployerMpDevelopers.id, curatedEmployerMpDevelopers.companyName],
+    [curatedEmployerMentorySolutions.id, curatedEmployerMentorySolutions.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);
