@@ -20,6 +20,7 @@ import {
   curatedEmployerSouthIndianRestaurantNavalur,
   curatedEmployerMpDevelopers,
   curatedEmployerMentorySolutions,
+  curatedEmployerBalbhas,
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
@@ -85,6 +86,7 @@ export const employers: EmployerProfile[] = [
   curatedEmployerMoneyBoxxFinance,
   curatedEmployerMpDevelopers,
   curatedEmployerMentorySolutions,
+  curatedEmployerBalbhas,
   ...curatedExternalEmployers,
 ];
 

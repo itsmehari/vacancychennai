@@ -95,6 +95,14 @@ export const curatedEmployerMentorySolutions: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — Balbhas Business Sysnomics; apply via Google Form. */
+export const curatedEmployerBalbhas: EmployerProfile = {
+  id: "emp-balbhas",
+  companyName: "BALBHAS",
+  email: "hr@balbhas.com",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -143,6 +151,14 @@ export const curatedLocations: Location[] = [
     pincode: "603103",
     lat: 12.849,
     lng: 80.227,
+  },
+  {
+    id: "loc-perungudi",
+    zone: "OMR / ECR",
+    area: "Perungudi",
+    pincode: "600096",
+    lat: 12.9694,
+    lng: 80.2435,
   },
   {
     id: "loc-porur",
@@ -309,6 +325,39 @@ const ELITE_EXPRESS_OPERATIONS_LISTING_AT = "2026-06-15T00:00:00.000Z";
 const BABU_TESTING_TRAINING_LISTING_AT = "2026-06-06T00:00:00.000Z";
 const MP_DEVELOPERS_WALK_IN_LISTING_AT = "2026-08-15T16:00:00.000Z";
 const MENTORY_TRAINERS_LISTING_AT = "2026-09-13T17:30:00.000Z";
+const BALBHAS_SERVICE_DESK_LISTING_AT = "2026-10-19T09:15:00.000Z";
+
+const balbhasServiceDeskEngineerDescription = [
+  "Hiring alert — Service Desk Engineer (fresher) at BALBHAS (Balbhas Business Sysnomics Pvt. Ltd.).",
+  "",
+  "Workplace: TVH Agnitio IT Park, #141, 7th Floor, Rajiv Gandhi Salai (OMR), Perungudi, Chennai 600096 (company address on balbhas.com).",
+  "",
+  "Experience: Freshers (0–1 year).",
+  "Salary: ₹12,000 CTC / month · about ₹10,000 take-home (as stated on the hiring notice).",
+  "Shift: Rotational shifts.",
+  "Interview: 3 rounds — virtual.",
+  "",
+  "Eligibility:",
+  "• Bachelor’s degree in Computer Science, IT, or a related field.",
+  "• Basic knowledge of Windows OS, MS Office / Microsoft 365, Active Directory, and networking.",
+  "• Good communication and troubleshooting skills.",
+  "• Willingness to work rotational shifts.",
+  "",
+  "Job responsibilities:",
+  "• Provide basic IT support for desktops, laptops, printers, and network issues.",
+  "• Troubleshoot Windows and Microsoft Office-related issues.",
+  "• Log and track service requests and resolve user queries.",
+  "• Support IT installations and configurations.",
+  "",
+  "How to apply:",
+  "Fill the registration form: https://forms.gle/XvgeS58vgeT2JaX6A",
+  "",
+  "Employer site: https://www.balbhas.com/careers",
+  "",
+  "Mention that you saw the opening on Vacancy Chennai.",
+  "",
+  "Safety note: Do not pay any upfront “registration” or “security” fee to third parties — apply only through the Google Form above and confirm that you are dealing with BALBHAS.",
+].join("\n");
 
 const babuTestingTrainingAssistantDescription = [
   "We are looking for a male assistant to help with software testing training coordination and seminar activities.",
@@ -862,6 +911,25 @@ export const curatedPublishedJobs: Job[] = [
     updatedAt: MENTORY_TRAINERS_LISTING_AT,
     expiresAt: "2026-10-17T18:29:59.000Z",
   },
+  {
+    id: "job-balbhas-service-desk-engineer-perungudi",
+    employerId: curatedEmployerBalbhas.id,
+    title: "Service Desk Engineer (Fresher)",
+    category: "IT Support",
+    industry: "IT Services",
+    jobType: "full-time",
+    salaryMin: 10000,
+    salaryMax: 12000,
+    locationId: "loc-perungudi",
+    landmarkText: "TVH Agnitio IT Park, #141, 7th Floor, Rajiv Gandhi Salai (OMR), Perungudi.",
+    description: balbhasServiceDeskEngineerDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: BALBHAS_SERVICE_DESK_LISTING_AT,
+    updatedAt: BALBHAS_SERVICE_DESK_LISTING_AT,
+    expiresAt: "2026-12-31T18:29:59.000Z",
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -968,6 +1036,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerBabuTestingTraining.id, curatedEmployerBabuTestingTraining.companyName],
     [curatedEmployerMpDevelopers.id, curatedEmployerMpDevelopers.companyName],
     [curatedEmployerMentorySolutions.id, curatedEmployerMentorySolutions.companyName],
+    [curatedEmployerBalbhas.id, curatedEmployerBalbhas.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);

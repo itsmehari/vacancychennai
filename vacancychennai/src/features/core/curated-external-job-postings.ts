@@ -96,9 +96,10 @@ export const curatedExternalPublishedJobs: Job[] = rows.map((row) => {
   };
 });
 
-export const curatedExternalApplyUrlByJobId: Record<string, string> = Object.fromEntries(
-  rows.map((row) => [stableExternalJobId(row.sourceUrl), row.sourceUrl]),
-);
+export const curatedExternalApplyUrlByJobId: Record<string, string> = {
+  ...Object.fromEntries(rows.map((row) => [stableExternalJobId(row.sourceUrl), row.sourceUrl])),
+  "job-balbhas-service-desk-engineer-perungudi": "https://forms.gle/XvgeS58vgeT2JaX6A",
+};
 
 export function curatedExternalEmployerCompanyNameMap(): Map<string, string> {
   return new Map(curatedExternalEmployers.map((e) => [e.id, e.companyName]));

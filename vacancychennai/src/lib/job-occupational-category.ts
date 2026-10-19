@@ -12,18 +12,18 @@ const RULES: Rule[] = [
       /\b(trainer|instructor|faculty|corporate trainer)\b/i.test(job.title),
   },
   {
+    soc: "15-1232.00",
+    test: (h) =>
+      /\bservice desk\b|\bit support\b|\bhelp\s*desk\b|\bdesktop\s*support\b|\btechnical\s*support\b|\bsystem\s*admin/i.test(
+        h,
+      ),
+  },
+  {
     soc: "15-1252.00",
     test: (h, job) =>
       /\b(software|developer|programmer|full[\s-]?stack|backend|front[\s-]?end|devops|sde)\b/i.test(
         job.title,
       ) || /\bsoftware\b|\bdeveloper\b/i.test(h),
-  },
-  {
-    soc: "15-1232.00",
-    test: (h) =>
-      /\bit support\b|\bhelp\s*desk\b|\bdesktop\s*support\b|\btechnical\s*support\b|\bsystem\s*admin/i.test(
-        h,
-      ),
   },
   {
     soc: "15-1212.00",

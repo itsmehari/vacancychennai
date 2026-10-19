@@ -78,7 +78,9 @@ export function JobApplyPanel({
             How to apply
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Continue on the employer site to submit your application.
+            {externalApplyUrl.includes("forms.gle") || externalApplyUrl.includes("docs.google.com")
+              ? "Continue on the employer registration form to submit your application."
+              : "Continue on the employer site to submit your application."}
           </p>
           <a
             href={externalApplyUrl}
@@ -87,7 +89,9 @@ export function JobApplyPanel({
             rel="noopener noreferrer"
             data-cta="job-external-careers-apply"
           >
-            Open employer careers page
+            {externalApplyUrl.includes("forms.gle") || externalApplyUrl.includes("docs.google.com")
+              ? "Open application form"
+              : "Open employer careers page"}
           </a>
         </>
       ) : directContact ? (

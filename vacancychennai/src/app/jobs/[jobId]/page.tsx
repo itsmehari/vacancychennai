@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
       ? `₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")}/month`
       : "Salary to be discussed";
   const applyHint = isCuratedExternalApplyUrlJob(jobId)
-    ? "Apply via the employer careers page linked on Vacancy Chennai."
+    ? "Apply via the employer form or careers page linked on Vacancy Chennai."
     : isCuratedDirectEmployerContactJob(jobId)
       ? "Contact the employer using email or phone on Vacancy Chennai."
       : isCuratedWhatsAppOnlyJob(job.id)
