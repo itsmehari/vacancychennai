@@ -44,6 +44,7 @@ const STATIC_CURATED_JOB_IDS = [
   "job-mentory-java-full-stack-trainer-broadway",
   "job-mentory-c-programming-trainer-mahabalipuram",
   "job-balbhas-service-desk-engineer-perungudi",
+  "job-amazon-picker-packer-porur-mugalivakkam",
 ];
 
 function loadCuratedIds() {

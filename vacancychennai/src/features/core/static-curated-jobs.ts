@@ -103,6 +103,14 @@ export const curatedEmployerBalbhas: EmployerProfile = {
   password: "nologin",
 };
 
+/** External listing — Amazon picker & packer WhatsApp notice from HR Diya (not Amazon careers). */
+export const curatedEmployerHrDiyaAmazon: EmployerProfile = {
+  id: "emp-hr-diya-amazon-warehouse",
+  companyName: "HR Diya (Amazon picker & packer hiring)",
+  email: "external.hr.diya.amazon@vacancychennai.in",
+  password: "nologin",
+};
+
 export const curatedLocations: Location[] = [
   {
     id: "loc-parrys",
@@ -591,6 +599,42 @@ const southIndianRestaurantNavalurDescription = [
   "Salary was not stated on the original notice; confirm with the restaurant when you call.",
 ].join("\n");
 
+const AMAZON_PICKER_PACKER_LISTING_AT = "2026-10-21T07:15:00.000Z";
+
+const amazonPickerPackerPorurMugalivakkamDescription = [
+  "Immediate joining — picker and packer roles for Amazon warehouse work in Porur and Mugalivakkam, Chennai.",
+  "",
+  "This notice was shared by HR Diya on WhatsApp. It is a third-party hiring contact, not Amazon’s official careers page. Confirm the exact site, shift, and pay with Diya before you travel.",
+  "",
+  "Role: Picker and packer.",
+  "Who can apply: Male and female candidates.",
+  "Age: 18 to 35 years.",
+  "Qualification: 10th standard up to any degree.",
+  "Joining: Immediate joiners.",
+  "",
+  "Work locations:",
+  "• Porur",
+  "• Mugalivakkam",
+  "",
+  "Shifts (as printed on the notice):",
+  "• 6:00 AM – 3:00 PM",
+  "• 7:00 AM – 4:00 PM",
+  "• 9:00 AM – 6:00 PM",
+  "• 3:00 PM – 10:00 PM",
+  "• 10:00 PM – 6:00 AM",
+  "",
+  "Salary: ₹16,000 – ₹20,000 per month.",
+  "Part-time is also available. Ask which shift and whether the part-time rate differs.",
+  "",
+  "How to apply:",
+  "WhatsApp HR Diya and say you are interested in the Amazon picker and packer opening.",
+  "• HR Diya: +91 90438 55191",
+  "",
+  "Mention that you saw the opening on Vacancy Chennai.",
+  "",
+  "Safety note: Do not pay any upfront registration or security fee. Confirm you are messaging the number above, and confirm the worksite before you join.",
+].join("\n");
+
 export const curatedPublishedJobs: Job[] = [
   {
     id: "job-office-mgr-advocate-parrys",
@@ -930,6 +974,26 @@ export const curatedPublishedJobs: Job[] = [
     updatedAt: BALBHAS_SERVICE_DESK_LISTING_AT,
     expiresAt: "2026-12-31T18:29:59.000Z",
   },
+  {
+    id: "job-amazon-picker-packer-porur-mugalivakkam",
+    employerId: curatedEmployerHrDiyaAmazon.id,
+    title: "Amazon Picker & Packer — Porur & Mugalivakkam (immediate joining)",
+    category: "Warehouse",
+    industry: "E-commerce / Logistics",
+    jobType: "full-time",
+    salaryMin: 16000,
+    salaryMax: 20000,
+    locationId: "loc-porur",
+    landmarkText:
+      "Porur and Mugalivakkam, Chennai. Part-time also available. Apply on WhatsApp to HR Diya.",
+    description: amazonPickerPackerPorurMugalivakkamDescription,
+    status: "published",
+    featured: true,
+    listingTier: "urgent",
+    createdAt: AMAZON_PICKER_PACKER_LISTING_AT,
+    updatedAt: AMAZON_PICKER_PACKER_LISTING_AT,
+    expiresAt: "2026-12-05T18:29:59.000Z",
+  },
 ];
 
 /** E.164 country code + national number, no + prefix — for `https://wa.me/`. */
@@ -942,6 +1006,7 @@ const curatedWhatsAppApplyDigitsByJobId: Record<string, string> = {
   "job-mp-developers-mega-walk-in-pallavaram-guindy": "917845758753",
   "job-mentory-java-full-stack-trainer-broadway": "919345999620",
   "job-mentory-c-programming-trainer-mahabalipuram": "919345999620",
+  "job-amazon-picker-packer-porur-mugalivakkam": "919043855191",
 };
 
 /** Apply via employer email / phone only — not Vacancy Chennai quick apply. */
@@ -1037,6 +1102,7 @@ export function curatedEmployerCompanyNameMap(): Map<string, string> {
     [curatedEmployerMpDevelopers.id, curatedEmployerMpDevelopers.companyName],
     [curatedEmployerMentorySolutions.id, curatedEmployerMentorySolutions.companyName],
     [curatedEmployerBalbhas.id, curatedEmployerBalbhas.companyName],
+    [curatedEmployerHrDiyaAmazon.id, curatedEmployerHrDiyaAmazon.companyName],
   ]);
   for (const [id, name] of curatedExternalEmployerCompanyNameMap()) {
     m.set(id, name);
