@@ -69,6 +69,9 @@ export function buildHomeJsonLdGraph() {
       "Porur jobs",
       "freshers jobs Chennai",
       "part-time jobs Chennai",
+      "internships in Chennai",
+      "Chennai jobs by role",
+      "Chennai neighbourhood hiring",
     ],
     ...(logoUrl ? { logo: logoUrl } : {}),
     ...(() => {

@@ -273,6 +273,13 @@ export async function setJobStatus(
     );
     return { id: jobId, status };
   }
+  if (status === "closed") {
+    await dbExecute(
+      `update jobs set status = 'closed'::job_status, updated_at = now(), expires_at = now() where id = $1::uuid`,
+      [jobId],
+    );
+    return { id: jobId, status };
+  }
   await dbExecute(`update jobs set status = $2::job_status, updated_at = now() where id = $1::uuid`, [
     jobId,
     status,
@@ -287,6 +294,7 @@ export async function createApplication(input: {
   applicantPhone: string;
   applicantEmail?: string;
   resumeLink?: string;
+  sourceChannel?: string;
 }) {
   if (!hasDatabase()) return addApplication(input);
   if (!isDatabaseUuid(input.jobId)) {
@@ -300,10 +308,11 @@ export async function createApplication(input: {
     );
     candidateProfileId = cp[0]?.id ?? null;
   }
+  const sourceChannel = input.sourceChannel?.trim() || "platform";
   const rows = await dbQuery<{ id: string }>(
     `insert into applications (
-      job_id, candidate_id, applicant_name, applicant_phone, applicant_email, resume_url
-    ) values ($1,$2,$3,$4,$5,$6)
+      job_id, candidate_id, applicant_name, applicant_phone, applicant_email, resume_url, source_channel
+    ) values ($1,$2,$3,$4,$5,$6,$7)
     returning id`,
     [
       input.jobId,
@@ -312,6 +321,7 @@ export async function createApplication(input: {
       input.applicantPhone,
       input.applicantEmail ?? null,
       input.resumeLink ?? null,
+      sourceChannel,
     ],
   );
   return { id: rows[0].id };
@@ -358,9 +368,10 @@ export async function listEmployerApplications(employerId: string) {
     applicant_name: string;
     applicant_phone: string;
     stage: "applied" | "screening" | "interview" | "offer" | "rejected";
+    source_channel: string | null;
     created_at: string;
   }>(
-    `select a.id, a.job_id, a.applicant_name, a.applicant_phone, a.stage, a.created_at
+    `select a.id, a.job_id, a.applicant_name, a.applicant_phone, a.stage, a.source_channel, a.created_at
      from applications a
      join jobs j on j.id = a.job_id
      where j.employer_id = (select id from employer_profiles where user_id = $1 limit 1)
@@ -373,6 +384,7 @@ export async function listEmployerApplications(employerId: string) {
     applicantName: row.applicant_name,
     applicantPhone: row.applicant_phone,
     stage: row.stage,
+    sourceChannel: row.source_channel ?? undefined,
     createdAt: row.created_at,
   }));
 }

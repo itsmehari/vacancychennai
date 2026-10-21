@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AuthPageShell from "@/components/layout/auth-page-shell";
-import { loginQueryErrorMessage, loginQueryInfoMessage } from "@/lib/auth-login-errors";
-import { hasDatabase } from "@/lib/db";
 import { subscribeAlertsAction, type SubscriptionChannel } from "@/features/auth/account-actions";
+import { listLocations } from "@/features/core/repository";
+import { loginQueryErrorMessage, loginQueryInfoMessage } from "@/lib/auth-login-errors";
+import { roleHubs } from "@/lib/discover/roles";
+import { hasDatabase } from "@/lib/db";
 import { btnPrimary, focusRing, linkInline, transitionFast } from "@/lib/ui";
 
 export const metadata: Metadata = {
@@ -34,7 +36,7 @@ const labels: Record<SubscriptionChannel, { title: string; hint: string; input: 
   },
   job_alerts: {
     title: "Job alerts",
-    hint: "Email when we publish roles that match your interests (MVP: all new listings in your areas).",
+    hint: "Email when new listings match the area and role you pick. Leave both blank for every new Chennai listing.",
     input: "Email address",
     type: "email",
   },
@@ -51,6 +53,8 @@ export default async function SubscribePage({ searchParams }: Props) {
   const errorMessage = loginQueryErrorMessage(q.error);
   const infoMessage = loginQueryInfoMessage({ subscribed: q.subscribed });
   const db = hasDatabase();
+  const locations = db ? await listLocations() : [];
+  const areas = [...new Set(locations.map((location) => location.area))].sort((a, b) => a.localeCompare(b));
 
   return (
     <AuthPageShell>
@@ -116,6 +120,42 @@ export default async function SubscribePage({ searchParams }: Props) {
                 className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder={channel === "sms_reminder" ? "+919876543210" : "you@example.com"}
               />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="sub-area" className="text-sm font-medium text-slate-700">
+                Area (optional)
+              </label>
+              <select
+                id="sub-area"
+                name="interestArea"
+                defaultValue=""
+                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">All Chennai areas</option>
+                {areas.map((area) => (
+                  <option key={area} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="sub-role" className="text-sm font-medium text-slate-700">
+                Role (optional)
+              </label>
+              <select
+                id="sub-role"
+                name="interestRole"
+                defaultValue=""
+                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">All roles</option>
+                {roleHubs.map((role) => (
+                  <option key={role.slug} value={role.slug}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <button type="submit" className={`${btnPrimary} w-full`}>
               Subscribe

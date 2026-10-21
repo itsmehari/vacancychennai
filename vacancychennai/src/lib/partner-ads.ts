@@ -73,6 +73,7 @@ export function footerPartnerLogoHref(partner: "resume-doctor" | "bseri" | "mych
 export function shouldShowSiteWideAd(pathname: string): boolean {
   if (!pathname) return false;
   if (pathname.startsWith("/admin")) return false;
+  if (pathname.startsWith("/super-admin")) return false;
   if (pathname.startsWith("/employer/dashboard")) return false;
   if (pathname.startsWith("/employer/billing")) return false;
   if (pathname.startsWith("/employer/resume-database")) return false;

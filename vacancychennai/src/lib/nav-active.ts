@@ -7,8 +7,20 @@ export function isNavHrefActive(pathname: string, href: string): boolean {
 export function isJobsExplorePath(pathname: string): boolean {
   if (pathname.startsWith("/jobs-in-")) return true;
   if (pathname === "/freshers-jobs-chennai" || pathname === "/part-time-jobs-chennai") return true;
+  if (pathname === "/internships-chennai" || pathname === "/contract-jobs-chennai") return true;
+  if (pathname === "/temporary-jobs-chennai" || pathname === "/areas") return true;
+  if (pathname === "/salary-guide-chennai" || pathname === "/jobs-this-week" || pathname === "/share-areas") return true;
+  if (pathname === "/roles" || pathname.startsWith("/roles/")) return true;
   if (pathname.startsWith("/local-job-request-")) return true;
   if (/^\/jobs\/[^/]+$/.test(pathname)) return true;
+  return false;
+}
+
+/** Guides, glossary, FAQ, safety, and the salary snapshot. */
+export function isGuidesNavPath(pathname: string): boolean {
+  if (pathname === "/guides" || pathname.startsWith("/guides/")) return true;
+  if (pathname === "/faq" || pathname === "/glossary") return true;
+  if (pathname === "/how-to-apply" || pathname === "/job-safety") return true;
   return false;
 }
 

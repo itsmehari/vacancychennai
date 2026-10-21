@@ -395,17 +395,38 @@ export async function subscribeAlertsAction(formData: FormData) {
     storeAddress = e164;
   }
 
+  const interestAreaRaw = String(formData.get("interestArea") ?? "").trim();
+  const interestRoleRaw = String(formData.get("interestRole") ?? "").trim();
+  const { listLocations } = await import("@/features/core/repository");
+  const { getRoleHub } = await import("@/lib/discover/roles");
+  const locations = await listLocations();
+  const interestArea = locations.some((location) => location.area === interestAreaRaw)
+    ? interestAreaRaw
+    : "";
+  const interestRole = getRoleHub(interestRoleRaw) ? interestRoleRaw : "";
+
   try {
     await dbExecute(
-      `insert into email_subscriptions (channel, address, active)
-       values ($1, $2, true)
+      `insert into email_subscriptions (channel, address, active, interest_area, interest_role)
+       values ($1, $2, true, $3, $4)
        on conflict (address, channel)
-       do update set active = true, updated_at = now()`,
-      [channel, storeAddress],
+       do update set active = true, interest_area = $3, interest_role = $4, updated_at = now()`,
+      [channel, storeAddress, interestArea || null, interestRole || null],
     );
   } catch (e) {
-    logger.warn({ err: e, channel }, "email_subscriptions insert failed");
-    redirect(`/subscribe?error=invalid&ch=${channel}`);
+    logger.warn({ err: e, channel }, "email_subscriptions insert with interests failed; retrying without");
+    try {
+      await dbExecute(
+        `insert into email_subscriptions (channel, address, active)
+         values ($1, $2, true)
+         on conflict (address, channel)
+         do update set active = true, updated_at = now()`,
+        [channel, storeAddress],
+      );
+    } catch (retryError) {
+      logger.warn({ err: retryError, channel }, "email_subscriptions insert failed");
+      redirect(`/subscribe?error=invalid&ch=${channel}`);
+    }
   }
 
   redirect(`/subscribe?subscribed=1&ch=${channel}`);

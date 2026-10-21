@@ -12,6 +12,8 @@ const PRIVATE_PATHS = [
   "/employer/reset-password",
   "/admin/forgot-password",
   "/admin/reset-password",
+  "/super-admin",
+  "/post-job/classic",
 ];
 
 /** Answer / generative engines — same public allow list as Googlebot; private paths stay closed. */

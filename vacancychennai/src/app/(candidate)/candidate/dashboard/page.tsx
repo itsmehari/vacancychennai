@@ -6,6 +6,7 @@ import {
   listApplicationsForCandidateUser,
   listLocations,
 } from "@/features/core/repository";
+import { jobsInAreaPath } from "@/lib/area-job-path";
 import { requireRole } from "@/lib/auth";
 import { EXPERIENCE_LEVEL_OPTIONS } from "@/lib/candidate-profile-constants";
 import { btnPrimary, btnSecondary, focusRing, formInput, linkInline, sectionCard } from "@/lib/ui";
@@ -38,12 +39,21 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
     );
   }
 
+  const savedArea = locs.find((location) => location.id === profile.locationId);
+
   return (
     <div className="space-y-6">
       <DashboardWelcome title="Candidate dashboard" subtitle={`Welcome, ${session.displayName}`}>
         <p className="mt-2 text-sm text-slate-600">
           Profile completion: {profile.profileCompleted ? "Completed" : "In progress"}
         </p>
+        {savedArea ? (
+          <p className="mt-3">
+            <Link href={jobsInAreaPath(savedArea.area)} className={btnSecondary}>
+              Jobs in {savedArea.area}
+            </Link>
+          </p>
+        ) : null}
         {query.success && (
           <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
             Profile updated.

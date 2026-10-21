@@ -17,12 +17,19 @@ import {
 } from "@/features/core/static-curated-jobs";
 import { incrementMetric } from "@/lib/metrics";
 
+function cleanApplySource(raw: string): string | undefined {
+  const value = raw.trim().toLowerCase();
+  if (!/^[a-z0-9:_-]{1,40}$/.test(value)) return undefined;
+  return value;
+}
+
 export async function quickApplyAction(formData: FormData) {
   const jobId = String(formData.get("jobId") ?? "").trim();
   const applicantName = String(formData.get("applicantName") ?? "").trim();
   const applicantPhone = String(formData.get("applicantPhone") ?? "").trim();
   const applicantEmail = String(formData.get("applicantEmail") ?? "").trim();
   const resumeLink = String(formData.get("resumeLink") ?? "").trim();
+  const sourceChannel = cleanApplySource(String(formData.get("sourceChannel") ?? ""));
 
   const job = await findJob(jobId);
   if (!job || job.status !== "published" || !applicantName || !applicantPhone) {
@@ -53,6 +60,7 @@ export async function quickApplyAction(formData: FormData) {
     applicantPhone,
     applicantEmail: applicantEmail || undefined,
     resumeLink: resumeLink || undefined,
+    sourceChannel,
   });
 
   await addAudit({

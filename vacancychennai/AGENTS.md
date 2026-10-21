@@ -29,6 +29,7 @@ Conventions learned from shipping the marketing shell, auth/dashboard polish, bl
 - **Article page SEO:** `src/app/blog/[slug]/page.tsx` uses `buildBlogPostingJsonLd` plus `buildBlogBreadcrumbListJsonLd` (`src/lib/blog-jsonld.ts`). Open Graph `type: "article"`.
 - **Home + hubs:** Homepage strings live in `src/lib/home-seo-copy.ts`; graph in `src/lib/home-jsonld.ts`. Listing pages use `buildJobsItemListJsonLd` from `src/lib/jobs-itemlist-jsonld.ts`. Jobs hub metadata + `hreflang`: `jobsInChennaiListingMetadata()` in `src/lib/seo.ts`.
 - **Hyperlocal paths:** Use `jobsInAreaPath` from `src/lib/area-job-path.ts` for any `/jobs-in-*` link or sitemap line — never duplicate slug logic.
+- **Discover / answer pages:** Role hubs live in `src/lib/discover/roles.ts` and `src/app/roles/[slug]/page.tsx` (match via `jobMatchesRole`). Guides live in `src/lib/discover/guides.ts`. Job-type hubs, glossary, extra FAQ, and sitemap rows live in `src/lib/discover/hubs.ts`. Salary figures on `/salary-guide-chennai` come only from `buildSalarySnapshot` — do not hard-code city wages. Add a new public path to `discoverSitemapEntries()` and `llm-site-index.ts` when it should be cited.
 - **Dynamic area page (`app/[locationPage]/page.tsx`):** After parsing the `jobs-in-*` segment into a slug, require a real location with `getLocationByAreaSlug(slug, locations)` from `src/lib/job-filters.ts` (using `listLocations()` from the repository). Call `notFound()` and align `generateMetadata` when the slug is unknown. Do not rely on `filterPublishedJobList`’s zone substring fallback alone for public area URLs — short slugs can falsely match zone text.
 - **Sitemap / robots:** `src/app/sitemap.ts` merges static routes + area URLs (`listLocations`) + **`/blog/{slug}`** + **`/jobs.xml`** + **`/jobs/{id}`** for published roles (`listPublishedJobs`, up to 50k URLs per Google’s single-file limit). `robots.ts` exposes sitemap.
 - **RSS:** Blog feed: `GET /rss.xml` (`src/app/rss.xml/route.ts`). Job listings feed: `GET /jobs.xml` (`src/app/jobs.xml/route.ts`) — newest postings for crawlers/aggregators. Root `layout.tsx` blog alternate via metadata `alternates.types`.
@@ -47,6 +48,7 @@ Conventions learned from shipping the marketing shell, auth/dashboard polish, bl
 
 ## Employer flow
 
+- **Public post:** `/post-job` is the short paste flow (phone, email, vacancy text) saved to `quick_job_posts` and reviewed at `/super-admin`. The previous draft form stays at `/post-job/classic` and is not linked.
 - `createJobAction` redirects to `?success=job-created`. Dashboard copy for that query param should stay aligned with the real moderation lifecycle (see `docs/PROJECT_UPDATE.md`).
 
 ## Auth email (Resend) — employer + candidate + admin reset

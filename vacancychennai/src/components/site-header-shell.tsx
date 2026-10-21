@@ -10,7 +10,7 @@ import {
   type MegaAreaLink,
   type MegaSegmentLink,
 } from "@/lib/nav-config";
-import { isJobsExplorePath, isNavHrefActive, isProfileHubPath } from "@/lib/nav-active";
+import { isGuidesNavPath, isJobsExplorePath, isNavHrefActive, isProfileHubPath } from "@/lib/nav-active";
 import { focusRing, transitionFast } from "@/lib/ui";
 import type { UserRole } from "@/types/domain";
 
@@ -205,6 +205,9 @@ export default function SiteHeaderShell({
               className={isNavHrefActive(pathname, "/blog") ? navBtnActive : navBtnInactive}
             >
               Blog
+            </Link>
+            <Link href="/guides" className={isGuidesNavPath(pathname) ? navBtnActive : navBtnInactive}>
+              Guides
             </Link>
             <Link
               href={listYourJobNavLink.href}
@@ -503,6 +506,13 @@ export default function SiteHeaderShell({
               onClick={closeMobile}
             >
               Blog
+            </Link>
+            <Link
+              href="/guides"
+              className={`block rounded-xl px-3 py-3 text-base font-medium ${isGuidesNavPath(pathname) ? "bg-amber-50 text-amber-950 ring-1 ring-amber-200/80" : "text-slate-900 hover:bg-slate-50"}`}
+              onClick={closeMobile}
+            >
+              Guides
             </Link>
             <Link
               href={listYourJobNavLink.href}

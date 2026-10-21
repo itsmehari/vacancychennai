@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JobCard from "@/components/job-card";
+import { CopyJobLink } from "@/components/jobs/copy-job-link";
 import { JobApplyPanel } from "@/components/jobs/job-apply-panel";
 import { JobAtAGlance } from "@/components/jobs/job-at-a-glance";
 import { JobRotatingAdPanel } from "@/components/jobs/job-rotating-ad-panel";
@@ -36,11 +37,12 @@ import {
 import { buildFactualJobSummary } from "@/lib/job-seo-intro";
 import { jobDetailPageMetadata } from "@/lib/seo";
 import { linkInline, pillMeta, sectionCard } from "@/lib/ui";
+import { absoluteUrl } from "@/lib/site-base-url";
 import Link from "next/link";
 
 type Props = {
   params: Promise<{ jobId: string }>;
-  searchParams: Promise<{ success?: string; error?: string }>;
+  searchParams: Promise<{ success?: string; error?: string; src?: string }>;
 };
 
 function truncateMetaDescription(raw: string, max = 158): string {
@@ -102,6 +104,8 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
 export default async function JobDetailPage({ params, searchParams }: Props) {
   const { jobId } = await params;
   const query = await searchParams;
+  const rawSrc = query.src ?? "";
+  const sourceChannel = /^[a-z0-9:_-]{1,40}$/i.test(rawSrc) ? rawSrc.trim().toLowerCase() : undefined;
   const job = await findJob(jobId);
   if (!job || job.status !== "published") notFound();
 
@@ -224,6 +228,9 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
             </p>
             <p className="mt-2 text-base leading-relaxed text-slate-700">{visibleSummary}</p>
             <p className="mt-3 text-sm text-slate-600">{job.landmarkText}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <CopyJobLink url={absoluteUrl(`/jobs/${job.id}`)} />
+            </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className={pillMeta}>{location?.area}</span>
               <span className={pillMeta}>{location?.zone}</span>
@@ -252,6 +259,8 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
             directContact={directContact ?? null}
             query={query}
             prefill={prefill}
+            jobUrl={absoluteUrl(`/jobs/${job.id}`)}
+            sourceChannel={sourceChannel}
           />
           <JobSafetyAside />
           <JobRotatingAdPanel ads={jobSidebarAds()} />

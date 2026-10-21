@@ -1,4 +1,5 @@
 import DashboardWelcome from "@/components/layout/dashboard-welcome";
+import { CopyJobLink } from "@/components/jobs/copy-job-link";
 import Link from "next/link";
 import { updateApplicationStageAction } from "@/features/applications/actions";
 import {
@@ -8,10 +9,12 @@ import {
   suggestCandidatesForJobMatches,
 } from "@/features/core/repository";
 import { getEmployerBillingSummary } from "@/features/billing/employer-summary";
-import { promoteJobAction, createJobAction } from "@/features/jobs/actions";
+import { promoteJobAction, createJobAction, closeOwnedJobAction } from "@/features/jobs/actions";
 import { requireRole } from "@/lib/auth";
+import { absoluteUrl } from "@/lib/site-base-url";
 import {
   btnDenseDanger,
+  btnDenseNeutral,
   btnDenseSuccess,
   btnDenseWarning,
   btnPrimary,
@@ -58,6 +61,10 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
     ) : query.success === "promoted" ? (
       <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
         Listing upgraded — your job now uses the selected tier.
+      </p>
+    ) : query.success === "job-closed" ? (
+      <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
+        Listing closed. It leaves the public board and the job feed the same day.
       </p>
     ) : query.success ? (
       <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
@@ -111,6 +118,12 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
 
       <section className={sectionCard}>
         <h2 className="text-xl font-semibold text-slate-900">Post a job</h2>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+          <li>Area where the person will report</li>
+          <li>Job type: full-time, part-time, internship, contract, or temporary</li>
+          <li>Shift and weekly off in the description</li>
+          <li>A monthly salary range, or say clearly that pay is discussed later</li>
+        </ul>
         <form action={createJobAction} className="mt-4 grid gap-3 md:grid-cols-2">
           <input className={formInput} name="title" placeholder="Job title" required />
           <input className={formInput} name="category" placeholder="Category" required />
@@ -162,6 +175,17 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
               <p className="mt-1 text-slate-600">
                 Status: {job.status} · Tier: {job.listingTier}
               </p>
+              {job.status === "published" ? (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <CopyJobLink url={absoluteUrl(`/jobs/${job.id}`)} />
+                  <form action={closeOwnedJobAction}>
+                    <input type="hidden" name="jobId" value={job.id} />
+                    <button className={btnDenseNeutral} type="submit">
+                      Mark filled and close
+                    </button>
+                  </form>
+                </div>
+              ) : null}
               <form action={promoteJobAction} className="mt-3 flex flex-wrap gap-2">
                 <input type="hidden" name="jobId" value={job.id} />
                 <button className={btnDenseWarning} name="tier" value="featured" type="submit">
@@ -190,6 +214,9 @@ export default async function EmployerDashboardPage({ searchParams }: Props) {
               <p className="font-semibold text-slate-900">{application.applicantName}</p>
               <p className="text-slate-700">{application.applicantPhone}</p>
               <p className="text-slate-600">Stage: {application.stage}</p>
+              {application.sourceChannel && application.sourceChannel !== "platform" ? (
+                <p className="text-slate-500">Came from: {application.sourceChannel}</p>
+              ) : null}
               <form action={updateApplicationStageAction} className="mt-3 flex flex-wrap gap-2">
                 <input type="hidden" name="applicationId" value={application.id} />
                 <button className={btnDenseSuccess} type="submit" name="stage" value="screening">

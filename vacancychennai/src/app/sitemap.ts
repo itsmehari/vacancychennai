@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { listLocations, listPublishedJobs } from "@/features/core/repository";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { blogPosts } from "@/lib/blog-posts";
+import { discoverSitemapEntries } from "@/lib/discover/hubs";
 import { absoluteUrl } from "@/lib/site-base-url";
 
 /** Google allows up to 50,000 URLs per sitemap file. */
@@ -20,6 +21,7 @@ const STATIC_SITEMAP_PAGES: StaticEntry[] = [
   { path: "/jobs-in-chennai", changeFrequency: "daily", priority: 0.95 },
   { path: "/freshers-jobs-chennai", changeFrequency: "daily", priority: 0.88 },
   { path: "/part-time-jobs-chennai", changeFrequency: "daily", priority: 0.88 },
+  ...discoverSitemapEntries(),
   { path: "/post-job", changeFrequency: "weekly", priority: 0.85 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.82 },
   { path: "/job-seeker-profile", changeFrequency: "weekly", priority: 0.78 },

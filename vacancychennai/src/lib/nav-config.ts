@@ -30,6 +30,31 @@ export const megaSegmentLinks: MegaSegmentLink[] = [
     description: "Shifts and flexible hours",
   },
   {
+    href: "/internships-chennai",
+    label: "Internships",
+    description: "Listings marked as internship",
+  },
+  {
+    href: "/roles",
+    label: "Jobs by role",
+    description: "Telecaller, delivery, accounts, retail, and more",
+  },
+  {
+    href: "/areas",
+    label: "All neighbourhoods",
+    description: "Every area hub, grouped by zone",
+  },
+  {
+    href: "/salary-guide-chennai",
+    label: "Salary snapshot",
+    description: "Ranges on live listings, not a city survey",
+  },
+  {
+    href: "/guides",
+    label: "Hiring guides",
+    description: "How to apply, commute, and write a local post",
+  },
+  {
     href: "/local-job-request-nanganallur",
     label: "Post a job need — Nanganallur",
     description: "Tell local employers what you are looking for",

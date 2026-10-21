@@ -13,6 +13,7 @@ import {
   listLocations,
   addAudit,
   createJob,
+  listJobsForEmployerUser,
   promoteOwnedJob,
   setJobStatus,
 } from "@/features/core/repository";
@@ -148,5 +149,33 @@ export async function promoteJobAction(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/employer/dashboard");
   redirect("/employer/dashboard?success=promoted");
+}
+
+export async function closeOwnedJobAction(formData: FormData) {
+  const employer = await requireRole("employer", "/employer/login");
+  const jobId = String(formData.get("jobId") ?? "").trim();
+  const mine = await listJobsForEmployerUser(employer.actorId);
+  const job = mine.find((item) => item.id === jobId);
+  if (!job || job.status !== "published") {
+    redirect("/employer/dashboard?error=invalid-job");
+  }
+
+  const updated = await setJobStatus(jobId, "closed");
+  if (!updated) {
+    redirect("/employer/dashboard?error=invalid-job");
+  }
+
+  await addAudit({
+    actorRole: "employer",
+    actorId: employer.actorId,
+    action: "status_change",
+    entityType: "job",
+    entityId: jobId,
+  });
+
+  revalidatePath("/");
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/employer/dashboard");
+  redirect("/employer/dashboard?success=job-closed");
 }
 

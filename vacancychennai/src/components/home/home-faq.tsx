@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { homeFaqItems } from "@/lib/home-content";
 import HomeSectionShell from "@/components/home/home-section-shell";
 import SectionHeader from "@/components/home/section-header";
-import { cardSurface, focusRing } from "@/lib/ui";
+import { cardSurface, focusRing, linkInline } from "@/lib/ui";
 
 export default function HomeFaq() {
   return (
@@ -12,6 +13,11 @@ export default function HomeFaq() {
           eyebrow="Help"
           title="Frequently asked questions"
           description="Straight answers about applying, privacy, and posting jobs in Chennai."
+          action={
+            <Link href="/faq" className={linkInline}>
+              All answers
+            </Link>
+          }
         />
         <div className={`${cardSurface} overflow-hidden p-0`}>
           {homeFaqItems.map((item, index) => (

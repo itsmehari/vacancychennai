@@ -1,4 +1,5 @@
 import { PageAdSlot } from "@/components/ads/page-ad-slot";
+import { AreaShareActions } from "@/components/discover/area-share-actions";
 import JobCard from "@/components/job-card";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import {
@@ -8,8 +9,10 @@ import {
 } from "@/features/core/repository";
 import { filterPublishedJobList, getLocationByAreaSlug } from "@/lib/job-filters";
 import { buildJobsItemListJsonLd } from "@/lib/jobs-itemlist-jsonld";
+import { jobsInAreaPath } from "@/lib/area-job-path";
 import { NANGANALLUR_AREA_SLUG, NANGANALLUR_PAGE_PATH } from "@/lib/local-job-request-constants";
 import { baseMetadata } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site-base-url";
 import { btnPrimary, linkInline, sectionCard } from "@/lib/ui";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -22,6 +25,20 @@ type Props = {
 function getSlugFromPath(path: string) {
   if (!path.startsWith("jobs-in-")) return null;
   return path.replace("jobs-in-", "");
+}
+
+function AreaHubShare({ area }: { area: string }) {
+  return (
+    <div className={`${sectionCard} mt-8`}>
+      <h2 className="text-base font-semibold text-slate-900">Share this hub</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Opens WhatsApp or Telegram with a ready post, or your mail app with a note for a college or association.
+      </p>
+      <div className="mt-3">
+        <AreaShareActions area={area} pageUrl={absoluteUrl(jobsInAreaPath(area))} />
+      </div>
+    </div>
+  );
 }
 
 function AreaSeekerRequestCta({ slug }: { slug: string }) {
@@ -94,6 +111,7 @@ export default async function AreaPage({ params }: Props) {
           }
         />
         <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
+        <AreaHubShare area={getLocationByAreaSlug(slug, locations)?.area ?? readable} />
         <AreaSeekerRequestCta slug={slug} />
         <div className="pb-4 pt-8">
           <div className={`${sectionCard} text-center`}>
@@ -123,6 +141,7 @@ export default async function AreaPage({ params }: Props) {
         }
       />
       <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
+      <AreaHubShare area={getLocationByAreaSlug(slug, locations)?.area ?? readable} />
       <AreaSeekerRequestCta slug={slug} />
       <section className="grid gap-4 pb-4 pt-8 md:grid-cols-2">
         {jobs.map((job) => {

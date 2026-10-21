@@ -1,3 +1,31 @@
+## 2026-10-21 — Checklist items that needed product work
+
+- **This week:** `/jobs-this-week` counts published listings from the last seven days and links each area. Listed in the footer, home strip, sitemap, and `/llms.txt`.
+- **Guides:** each of the ten guides has a Tamil short answer on the same URL.
+- **Apply and close:** job pages have Copy job link. Role hubs add `?src=role-…`, stored on the application as `source_channel`. After apply, the confirmation shows the job URL and the no-fee line. Employers can mark a published job filled; that sets status closed and `expires_at` to now.
+- **Alerts:** `/subscribe` can name an area and a role. Migration **`015_subscription_interests.sql`** (run `npm run db:migrate`). Until that migration is applied, signup still works and digests stay city-wide.
+- **Employer paste:** step 3 asks the poster to confirm area, shift or job type, and pay before send. The employer dashboard shows the same four points above the post form.
+- **Share desk:** `/share-areas` and each area hub open WhatsApp, Telegram, or a college email with the hub link filled in. The person in the group or the placement inbox still sends it.
+- **Checklist:** [`SEO_50_CHECKLIST.md`](./SEO_50_CHECKLIST.md). Search Console indexing, Indexing API, Google Business Profile, and impression tracking stay open.
+
+---
+
+## 2026-10-21 — Simple vacancy paste + inbox
+
+- **`/post-job`:** three steps (phone, email, pasted vacancy). Honeypot, minimum fill time, per-phone and per-IP limits, duplicate suppression. Link-heavy pastes are stored as spam.
+- **Old employer draft:** still at `/post-job/classic` (noindex, not linked, disallowed in robots).
+- **Inbox:** `/super-admin/login` then `/super-admin`. Credentials from `SUPER_ADMIN_USERNAME` / `SUPER_ADMIN_PASSWORD` (defaults `adminchennai` / `chennaiadmin`). Optional `SUPER_ADMIN_SESSION_SECRET`. Migration **`014_quick_job_posts.sql`**.
+
+---
+
+## 2026-10-21 — Answer pages for Google and AI search
+
+- **Discover hubs:** `/roles` and `/roles/[slug]` (live title/category/industry matches), `/areas`, `/internships-chennai`, `/contract-jobs-chennai`, `/temporary-jobs-chennai`, `/salary-guide-chennai` (ranges from published listings only).
+- **Guides and trust:** `/guides` plus articles, `/how-to-apply` (HowTo), `/hire-in-chennai`, `/faq`, `/glossary`, `/job-safety`.
+- **Wiring:** home strip, Find jobs menu, Guides nav, footer, sitemap, `/llms.txt` and `/llms-full.txt`. Copy stays factual: no invented walk-ins or city-wide salaries.
+
+---
+
 ## 2026-08-15 — Session ship (listings, LLM/SEO, ads, Nanganallur)
 
 Full narrative: [`WORK_LOG.md`](./WORK_LOG.md). Commits: `77b9c58` → `2de873b` → `5e75019` → `60cb04b`.

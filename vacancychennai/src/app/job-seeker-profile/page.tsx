@@ -1,6 +1,9 @@
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import InnerPageHero from "@/components/marketing/inner-page-hero";
 import { PartnerResumeDoctorAside } from "@/components/partner/partner-resume-doctor-aside";
+import { getCandidateDashboardProfile, listLocations } from "@/features/core/repository";
+import { jobsInAreaPath } from "@/lib/area-job-path";
+import { getSession } from "@/lib/auth";
 import { baseMetadata } from "@/lib/seo";
 import { btnPrimary, btnSecondary, focusRingOnDark, linkInline, sectionCard, transitionFast } from "@/lib/ui";
 import Link from "next/link";
@@ -11,7 +14,13 @@ export const metadata = baseMetadata(
   "/job-seeker-profile",
 );
 
-export default function JobSeekerProfilePage() {
+export default async function JobSeekerProfilePage() {
+  const session = await getSession();
+  const profile =
+    session?.role === "candidate" ? await getCandidateDashboardProfile(session.actorId) : null;
+  const locations = profile ? await listLocations() : [];
+  const savedArea = profile ? locations.find((location) => location.id === profile.locationId) : undefined;
+
   return (
     <>
       <InnerPageHero
@@ -42,8 +51,15 @@ export default function JobSeekerProfilePage() {
             <li>Résumé file: PDF, DOC, or DOCX, up to 2MB (demo storage on this MVP).</li>
             <li>Or paste a link to your résumé (Drive, portfolio, etc.).</li>
             <li>Short headline and optional experience band — we do not auto-parse CVs.</li>
-            <li>Your Chennai / suburb area and skills tags.</li>
+            <li>Your Chennai / suburb area and skills tags. After you save an area, this page and your dashboard link to that neighbourhood hub.</li>
           </ul>
+          {savedArea ? (
+            <p className="mt-4">
+              <Link href={jobsInAreaPath(savedArea.area)} className={btnPrimary}>
+                Jobs in {savedArea.area}
+              </Link>
+            </p>
+          ) : null}
           <p className="mt-4 text-sm text-slate-600">
             <strong className="text-slate-800">Transparency:</strong> employer visibility of contacts and résumés
             follows the rules on the resume database and pricing pages — we do not promise recruiter browsing

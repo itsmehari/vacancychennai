@@ -37,6 +37,22 @@ export function clearFailedAttempts(key: string) {
   attempts.delete(key);
 }
 
+const windows = new Map<string, number[]>();
+
+/** Returns true when this hit is still inside the window limit. */
+export function consumeRateLimit(key: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const start = now - windowMs;
+  const stamps = (windows.get(key) ?? []).filter((stamp) => stamp > start);
+  if (stamps.length >= max) {
+    windows.set(key, stamps);
+    return false;
+  }
+  stamps.push(now);
+  windows.set(key, stamps);
+  return true;
+}
+
 const verificationEmailSends = new Map<string, number[]>();
 
 export function canSendVerificationEmail(

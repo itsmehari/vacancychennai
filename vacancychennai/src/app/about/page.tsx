@@ -28,6 +28,25 @@ export default function AboutPage() {
           </p>
         </section>
         <section className={sectionCard}>
+          <h2 className="text-lg font-semibold text-slate-900">Who reviews a listing</h2>
+          <p className="mt-2 leading-relaxed text-slate-700">
+            The Vacancy Chennai editorial desk reviews a new employer post before it is public. The review checks
+            that the area, contact path, and description are fit to publish. It does not employ you, guarantee the
+            salary, or confirm a walk-in that is not written on the job. Questions and reports go to{" "}
+            <a className="font-semibold text-blue-700 hover:underline" href="mailto:support@vacancychennai.in">
+              support@vacancychennai.in
+            </a>
+            .
+          </p>
+          <p className="mt-3 text-sm text-slate-600">
+            Partner feeds can use the jobs RSS at{" "}
+            <Link href="/jobs.xml" className="font-semibold text-blue-700 hover:underline">
+              /jobs.xml
+            </Link>
+            . Each item should link back to the job URL.
+          </p>
+        </section>
+        <section className={sectionCard}>
           <h2 className="text-lg font-semibold text-slate-900">Who it is for</h2>
           <ul className="mt-3 list-inside list-disc space-y-2 text-slate-700">
             <li>Job seekers browsing by neighbourhood or micro-area, category, or role type</li>

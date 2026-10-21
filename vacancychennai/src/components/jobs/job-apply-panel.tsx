@@ -26,6 +26,8 @@ type Props = {
   directContact: DirectContact | null;
   query: { success?: string; error?: string };
   prefill: Prefill;
+  jobUrl: string;
+  sourceChannel?: string;
 };
 
 export function JobApplyPanel({
@@ -37,6 +39,8 @@ export function JobApplyPanel({
   directContact,
   query,
   prefill,
+  jobUrl,
+  sourceChannel,
 }: Props) {
   return (
     <section className={sectionCard} aria-labelledby="job-apply-heading">
@@ -164,7 +168,8 @@ export function JobApplyPanel({
           {query.success === "applied" && (
             <div className="mt-4 space-y-3">
               <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
-                Application submitted successfully.
+                Application submitted. Keep this job link: {jobUrl}. Never pay a third party to confirm
+                the role. If someone asks for a fee, send this URL to support@vacancychennai.in.
               </p>
               <JobSeekerProfileCta variant="inline" dataCta="job-detail-post-apply" />
             </div>
@@ -184,6 +189,7 @@ export function JobApplyPanel({
             )}
           <form action={quickApplyAction} className="mt-4 grid gap-3">
             <input type="hidden" name="jobId" value={jobId} />
+            {sourceChannel ? <input type="hidden" name="sourceChannel" value={sourceChannel} /> : null}
             <input
               className={formInput}
               name="applicantName"

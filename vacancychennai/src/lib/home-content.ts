@@ -50,7 +50,7 @@ export const homeFaqItems: HomeFaqItem[] = [
   {
     question: "How do I find part-time or fresher jobs in Chennai?",
     answer:
-      "Use the Part-time jobs Chennai hub or the Freshers jobs Chennai hub, or filter the main Jobs in Chennai board by job type and category.",
+      "Use the Part-time jobs hub, the Freshers jobs hub, Internships in Chennai, or a role page such as delivery or telecaller. You can also filter Jobs in Chennai by job type and category. Hiring guides explain how to apply and how to read an area hub.",
   },
   {
     question: "How do I report a suspicious or fake job?",

@@ -10,6 +10,8 @@ type Props = {
   employerCompanyName?: string;
   locationArea?: string;
   locationZone?: string;
+  /** Short source tag stored on apply, e.g. role-telecaller. */
+  listingSource?: string;
 };
 
 export default function JobCard({
@@ -18,6 +20,7 @@ export default function JobCard({
   employerCompanyName,
   locationArea,
   locationZone,
+  listingSource,
 }: Props) {
   const location =
     locationArea != null
@@ -25,6 +28,9 @@ export default function JobCard({
       : getLocationById(job.locationId);
   const employerName =
     employerCompanyName ?? getEmployerById(job.employerId)?.companyName ?? "Local employer";
+  const jobHref = listingSource
+    ? `/jobs/${job.id}?src=${encodeURIComponent(listingSource)}`
+    : `/jobs/${job.id}`;
   const spotlight = variant === "spotlight";
 
   const surface = spotlight
@@ -39,7 +45,7 @@ export default function JobCard({
             <p className="text-xs font-medium text-slate-500">{employerName}</p>
             <h3 className="mt-0.5 text-lg font-semibold text-slate-900">
               <Link
-                href={`/jobs/${job.id}`}
+                href={jobHref}
                 className={`text-inherit hover:underline ${focusRing} rounded-sm`}
                 data-cta={`job-title-${job.id}`}
               >
@@ -76,7 +82,7 @@ export default function JobCard({
         </div>
         <div className="mt-4">
           <Link
-            href={`/jobs/${job.id}`}
+            href={jobHref}
             className={`${btnPrimary} text-sm ${transitionFast}`}
             data-cta={`job-view-${job.id}`}
           >

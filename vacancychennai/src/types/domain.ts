@@ -61,6 +61,8 @@ export type JobApplication = {
   resumeLink?: string;
   stage: ApplicationStage;
   createdAt: string;
+  /** Where the apply started, e.g. role-telecaller. */
+  sourceChannel?: string;
 };
 
 export type EmployerProfile = {

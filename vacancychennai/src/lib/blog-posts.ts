@@ -629,6 +629,19 @@ export const blogPosts: BlogPost[] = [
           href: "https://myomr.in",
           linkLabel: "Visit myomr.in",
         },
+        crossLinks: [
+          {
+            href: "https://mychennaicity.in/chennai-local-news/chennai-local-job-ads-guide-business-owners-hr",
+            label: "Chennai local job ads guide for owners and HR",
+          },
+        ],
+      },
+      {
+        id: "neighbourhood-job-ads",
+        heading: "Writing the neighbourhood job ad",
+        paragraphs: [
+          "Practical guide for Chennai business owners and HR on writing neighbourhood job ads: https://mychennaicity.in/chennai-local-news/chennai-local-job-ads-guide-business-owners-hr — area, shift, and walk-in/apply language first, national boards last.",
+        ],
       },
       {
         id: "job-post-blueprint",

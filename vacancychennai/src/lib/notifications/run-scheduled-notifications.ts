@@ -1,11 +1,19 @@
-import { listPublishedJobsCreatedSince } from "@/features/core/repository";
+import { listLocations, listPublishedJobsCreatedSince } from "@/features/core/repository";
 import { sendJobDigestEmail, sendSmsFallbackDigestEmail } from "@/lib/email/send-digest-email";
 import { getResendClient } from "@/lib/email/resend-client";
 import { logger } from "@/lib/logger";
 import { dbQuery, hasDatabase } from "@/lib/db";
+import { jobMatchesRole } from "@/lib/discover/match";
+import { getRoleHub } from "@/lib/discover/roles";
 import { isTwilioConfigured, sendTwilioSms } from "@/lib/sms/twilio-sms";
+import type { Job, Location } from "@/types/domain";
 
-type SubRow = { channel: string; address: string };
+type SubRow = {
+  channel: string;
+  address: string;
+  interest_area: string | null;
+  interest_role: string | null;
+};
 
 function digestWindowHours(): number {
   const raw = process.env.NOTIFICATION_DIGEST_WINDOW_HOURS?.trim();
@@ -21,9 +29,41 @@ function getSiteBaseUrl(): string {
 
 async function loadActiveSubscriptions(): Promise<SubRow[]> {
   if (!hasDatabase()) return [];
-  return dbQuery<SubRow>(
-    `select channel, address from email_subscriptions where active = true`,
-  );
+  try {
+    return await dbQuery<SubRow>(
+      `select channel, address, interest_area, interest_role from email_subscriptions where active = true`,
+    );
+  } catch (error) {
+    logger.warn({ err: error }, "subscription interest columns unavailable; sending unfiltered digests");
+    const rows = await dbQuery<{ channel: string; address: string }>(
+      `select channel, address from email_subscriptions where active = true`,
+    );
+    return rows.map((row) => ({ ...row, interest_area: null, interest_role: null }));
+  }
+}
+
+function jobsForInterest(
+  jobs: Job[],
+  locationsById: Map<string, Location>,
+  area: string | null,
+  role: string | null,
+): Job[] {
+  return jobs.filter((job) => {
+    if (area) {
+      const loc = locationsById.get(job.locationId);
+      const want = area.trim().toLowerCase();
+      const areaName = loc?.area.toLowerCase() ?? "";
+      const zone = loc?.zone.toLowerCase() ?? "";
+      if (areaName !== want && !zone.includes(want)) return false;
+    }
+    if (role) {
+      const hub = getRoleHub(role);
+      if (hub) return jobMatchesRole(job, hub);
+      const hay = `${job.title} ${job.category}`.toLowerCase();
+      if (!hay.includes(role.toLowerCase())) return false;
+    }
+    return true;
+  });
 }
 
 export type ScheduledNotificationResult = {
@@ -69,31 +109,28 @@ export async function runScheduledNotifications(): Promise<ScheduledNotification
   }
 
   const rows = await loadActiveSubscriptions();
-  const emailSet = new Set<string>();
-  for (const r of rows) {
-    if (r.channel === "email_digest" || r.channel === "job_alerts") {
-      emailSet.add(r.address.trim().toLowerCase());
-    }
-  }
-  const smsNumbers = rows.filter((r) => r.channel === "sms_reminder").map((r) => r.address.trim());
+  const locations = await listLocations();
+  const locationsById = new Map(locations.map((location) => [location.id, location]));
+  const emailRows = rows.filter((row) => row.channel === "email_digest" || row.channel === "job_alerts");
+  const smsNumbers = rows.filter((row) => row.channel === "sms_reminder");
 
   const base = getSiteBaseUrl();
-  const jobWord = published.length === 1 ? "job" : "jobs";
-  const smsBody = `Vacancy Chennai: ${published.length} new ${jobWord}. Browse: ${base || "(set NEXT_PUBLIC_SITE_URL)"}/jobs-in-chennai`;
 
   let emailsSent = 0;
   let emailsFailed = 0;
   const resendReady = getResendClient();
-  if (emailSet.size > 0 && !resendReady) {
+  if (emailRows.length > 0 && !resendReady) {
     logger.warn("scheduled notifications: Resend not configured; skipping digest emails");
-    emailsFailed = emailSet.size;
-  } else if (emailSet.size > 0 && resendReady) {
-    for (const to of emailSet) {
+    emailsFailed = emailRows.length;
+  } else if (emailRows.length > 0 && resendReady) {
+    for (const row of emailRows) {
+      const matched = jobsForInterest(published, locationsById, row.interest_area, row.interest_role);
+      if (matched.length === 0) continue;
       try {
-        await sendJobDigestEmail({ to, jobs: published });
+        await sendJobDigestEmail({ to: row.address.trim().toLowerCase(), jobs: matched });
         emailsSent += 1;
       } catch (e) {
-        logger.warn({ err: e, to }, "digest email send failed");
+        logger.warn({ err: e, to: row.address }, "digest email send failed");
         emailsFailed += 1;
       }
     }
@@ -106,12 +143,16 @@ export async function runScheduledNotifications(): Promise<ScheduledNotification
 
   if (smsNumbers.length > 0) {
     if (isTwilioConfigured()) {
-      for (const to of smsNumbers) {
+      for (const row of smsNumbers) {
+        const matched = jobsForInterest(published, locationsById, row.interest_area, row.interest_role);
+        if (matched.length === 0) continue;
+        const word = matched.length === 1 ? "job" : "jobs";
+        const body = `Vacancy Chennai: ${matched.length} new ${word}. Browse: ${base || "(set NEXT_PUBLIC_SITE_URL)"}/jobs-in-chennai`;
         try {
-          await sendTwilioSms(to, smsBody);
+          await sendTwilioSms(row.address.trim(), body);
           smsSent += 1;
         } catch (e) {
-          logger.warn({ err: e, to }, "Twilio SMS failed");
+          logger.warn({ err: e, to: row.address }, "Twilio SMS failed");
           smsFailed += 1;
         }
       }
@@ -123,7 +164,7 @@ export async function runScheduledNotifications(): Promise<ScheduledNotification
           await sendSmsFallbackDigestEmail({
             to: fallbackTo,
             jobCount: published.length,
-            smsRecipients: smsNumbers,
+            smsRecipients: smsNumbers.map((row) => row.address.trim()),
           });
           smsFallbackEmailSent = true;
         } catch (e) {

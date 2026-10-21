@@ -8,6 +8,19 @@
 - `/jobs-in-ambattur`
 - `/part-time-jobs-chennai`
 - `/freshers-jobs-chennai`
+- `/internships-chennai`
+- `/contract-jobs-chennai`
+- `/temporary-jobs-chennai`
+- `/roles` and `/roles/[slug]`
+- `/areas`
+- `/salary-guide-chennai`
+- `/jobs-this-week`
+- `/guides` and `/guides/[slug]`
+- `/how-to-apply`
+- `/hire-in-chennai`
+- `/faq`
+- `/glossary`
+- `/job-safety`
 
 ## Content Blocks Per Page
 - Intro paragraph (local hiring context)
