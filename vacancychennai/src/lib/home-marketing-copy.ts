@@ -4,30 +4,29 @@
 
 export type HomeStepIcon = "search" | "doc" | "user" | "building" | "clipboard" | "users";
 
-export const homeHeroEyebrow = "Chennai · Jobs by locality";
+/** Hero-level brand line (Playfair display). */
+export const homeHeroBrand = "Vacancy Chennai";
 
-export const homeHeroTitleBefore = "Jobs along ";
-export const homeHeroTitleHighlight = "OMR, Tambaram radial, Porur & Velachery";
-export const homeHeroTitleAfter =
-  " — browse Chennai micro-areas employers actually spell out in postings.";
+export const homeHeroEyebrow = "Hyperlocal hiring · Greater Chennai";
+
+/** Single short H1 — no mid-sentence highlight pill. */
+export const homeHeroTitle = "Jobs near the corridors you already commute";
+
+/** Amber-underline locality line under the H1 (SEO corridors, not a wrapping blob). */
+export const homeHeroCorridors = "OMR · Tambaram · Porur · Velachery";
 
 export const homeHeroSubcopy =
-  "Filter by corridor, suburb, salary, and shift. Quick apply with name and mobile — listings are moderated so you spend less time on junk ads and ghost venues.";
+  "Browse micro-areas employers actually name in postings. Filter by suburb, salary, and shift — moderated listings, quick apply with name and mobile.";
 
 export const homeHeroCtaBrowseJobs = "See all Chennai listings";
 export const homeHeroCtaLearnMore = "How applying works";
 export const homeHeroCtaCreateAccount = "Create free account";
 
-export const homeHeroFootnoteTracked =
-  "Track applications with the same email you use to quick apply.";
+/** One muted line under CTAs. */
+export const homeHeroFootnote =
+  "Free for candidates · save a job seeker profile for faster local applies.";
 
-export const homeHeroProfileTeaserLead = "Job seeker profile";
-export const homeHeroProfileTeaserRest =
-  " — save headline, skills, and a résumé for faster applies locally.";
-
-export const homeHeroSocialProofLine =
-  "Seekers and teams hiring across Chennai — retail, GCC & tech services, logistics, hospitality & clinics";
-
+/** @deprecated Kept for any residual imports; hero no longer renders industry pills. */
 export const homeHeroIndustryPills = [
   "Retail & services",
   "IT & GCC",

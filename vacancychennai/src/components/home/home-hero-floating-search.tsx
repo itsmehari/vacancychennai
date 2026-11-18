@@ -14,7 +14,7 @@ function areaSlug(area: string) {
   return area.toLowerCase().replaceAll(" ", "-");
 }
 
-const selectClass = `min-h-[48px] w-full cursor-pointer appearance-none rounded-2xl border border-slate-200/80 bg-slate-100/90 px-4 py-2.5 pr-10 text-sm font-medium text-slate-800 outline-none hover:border-slate-300 hover:bg-slate-100 ${focusRing} ${transitionFast}`;
+const selectClass = `min-h-[48px] w-full cursor-pointer appearance-none rounded-[var(--radius-md)] border border-slate-200 bg-slate-50 px-4 py-2.5 pr-10 text-sm font-medium text-slate-800 outline-none hover:border-slate-300 hover:bg-white ${focusRing} ${transitionFast}`;
 
 const chevronWrap = "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500";
 
@@ -36,15 +36,15 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
 
   return (
     <div
-      className="rounded-[2rem] border border-slate-200/60 bg-white p-4 shadow-[0_24px_60px_-12px_rgb(15_23_42/0.12)] sm:p-5 md:rounded-[2.25rem] md:p-6"
+      className="rounded-[var(--radius-lg)] border border-slate-200/80 bg-white p-4 shadow-[0_20px_50px_-18px_rgb(15_23_42/0.28)] sm:p-5 md:p-5"
       data-hero-floating-search
     >
-      <p className="mb-3 text-center text-xs font-medium text-slate-500 md:text-left">
-        Jump to the full catalog — same filters as the jobs page.
+      <p className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 md:text-left">
+        Find jobs in Chennai
       </p>
       <form
         onSubmit={onSubmit}
-        className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-stretch lg:flex-nowrap lg:gap-4"
+        className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-stretch lg:flex-nowrap lg:gap-3"
       >
         <div className="relative min-w-0 flex-1 md:min-w-[140px]">
           <label htmlFor="hero-find-job-type" className="sr-only">
@@ -123,15 +123,15 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
 
         <button
           type="submit"
-          className={`inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-full bg-slate-900 px-8 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 ${focusRing} ${transitionFast} md:px-10`}
+          className={`inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-slate-900 px-7 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 ${focusRing} ${transitionFast} md:px-8`}
           data-cta="hero-float-search-submit"
         >
           See matching jobs
           <span
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-900"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-cta-amber)] text-slate-950"
             aria-hidden
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
           </span>
