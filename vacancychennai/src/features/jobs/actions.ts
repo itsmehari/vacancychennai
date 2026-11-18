@@ -80,14 +80,22 @@ export async function createJobAction(formData: FormData) {
   redirect("/employer/dashboard?success=job-created");
 }
 
+const ADMIN_RETURN_PATHS = new Set(["/admin/dashboard", "/admin/jobs"]);
+
+function adminReturnPath(formData: FormData) {
+  const raw = String(formData.get("returnTo") ?? "").trim();
+  return ADMIN_RETURN_PATHS.has(raw) ? raw : "/admin/dashboard";
+}
+
 export async function updateJobStatusAction(formData: FormData) {
   const admin = await requireRole("admin", "/admin/login");
   const jobId = String(formData.get("jobId") ?? "");
   const status = String(formData.get("status") ?? "") as JobStatus;
+  const returnTo = adminReturnPath(formData);
   const allowed: JobStatus[] = ["draft", "review", "published", "paused", "closed"];
 
   if (!jobId || !allowed.includes(status)) {
-    redirect("/admin/dashboard?error=invalid-status");
+    redirect(`${returnTo}?error=invalid-status`);
   }
 
   let updated: { id: string; status: JobStatus } | undefined;
@@ -95,7 +103,7 @@ export async function updateJobStatusAction(formData: FormData) {
     const billing = await resolvePublishBilling(jobId);
     if (!billing.ok) {
       incrementMetric("publishBlockedNoPay");
-      redirect("/admin/dashboard?error=no-entitlement");
+      redirect(`${returnTo}?error=no-entitlement`);
     }
     updated = await setJobStatus(jobId, status, {
       billingSource: billing.billingSource === "republish" ? null : billing.billingSource,
@@ -106,7 +114,7 @@ export async function updateJobStatusAction(formData: FormData) {
   }
   if (!updated) {
     incrementMetric("moderationUpdates", 0);
-    redirect("/admin/dashboard?error=job-not-found");
+    redirect(`${returnTo}?error=job-not-found`);
   }
 
   await addAudit({
@@ -119,8 +127,9 @@ export async function updateJobStatusAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/jobs");
   incrementMetric("moderationUpdates");
-  redirect("/admin/dashboard?success=updated");
+  redirect(`${returnTo}?success=updated`);
 }
 
 export async function promoteJobAction(formData: FormData) {

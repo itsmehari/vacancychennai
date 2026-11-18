@@ -238,16 +238,12 @@ async function main() {
       pass("candidate login invalid email");
 
       await page.goto("/employer/forgot-password");
-      await page.fill('input[name="email"]', "employer@vacancychennai.in");
-      await page.getByRole("button", { name: /send reset link/i }).click();
-      await waitForUrl(page, /forgot=1|error=/, 20000);
-      const fp = page.url();
-      if (fp.includes("forgot=1")) pass("employer forgot-password request", fp);
-      else if (fp.includes("email-config")) skip("employer forgot-password request", "RESEND not configured");
-      else fail("employer forgot-password request", fp);
+      const forgotCopy = await page.locator("body").innerText();
+      if (forgotCopy.includes("Password reset by email is off")) pass("employer forgot-password page");
+      else fail("employer forgot-password page", "missing offline copy");
 
-      await page.goto("/subscribe");
-      await page.fill('input[name="address"]', `e2e-digest-${Date.now()}@vacancychennai.test`);
+      await page.goto("/subscribe?ch=sms");
+      await page.fill('input[name="address"]', "+919000009901");
       await page.getByRole("button", { name: /subscribe/i }).click();
       await waitForUrl(page, /subscribed=1|error=/);
       if (page.url().includes("subscribed=1")) pass("subscribe email_digest happy path");
@@ -271,8 +267,7 @@ async function main() {
       else fail("quick apply", u);
     }
 
-    // --- DB registration (needs Resend) ---
-    if (hasDb && hasResend) {
+    if (hasDb) {
       const ts = Date.now();
       await page.goto("/employer/register");
       await page.fill("#companyName", "E2E Browser Co");
@@ -282,9 +277,9 @@ async function main() {
       await page.fill("#password", "testpass123");
       await page.fill("#passwordConfirm", "testpass123");
       await page.getByRole("button", { name: /create account/i }).click();
-      await waitForUrl(page, /registered=1|error=/, 20000);
+      await waitForUrl(page, /\/employer\/dashboard|error=/, 20000);
       const eu = page.url();
-      if (eu.includes("registered=1")) pass("DB employer register", eu);
+      if (eu.includes("/employer/dashboard")) pass("DB employer register", eu);
       else fail("DB employer register", eu);
 
       await page.goto("/candidate/register");
@@ -295,8 +290,6 @@ async function main() {
       const cu = page.url();
       if (cu.includes("sent=1")) pass("DB candidate register", cu);
       else fail("DB candidate register", cu);
-    } else if (hasDb) {
-      skip("DB employer/candidate register happy path", "RESEND_API_KEY not set");
     }
 
     // --- OTP API (fetch from node) ---

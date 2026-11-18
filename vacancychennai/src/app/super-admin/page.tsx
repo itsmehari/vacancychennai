@@ -1,155 +1,78 @@
-import { superAdminLogoutAction } from "@/features/super-admin/actions";
-import { updateQuickJobPostStatusAction } from "@/features/quick-job-post/actions";
+import {
+  listApplicationsForAdmin,
+  listEmployersForAdmin,
+  listLocalRequestsForAdmin,
+  listSeekersForAdmin,
+} from "@/features/super-admin/directory";
+import { listAllJobs } from "@/features/core/repository";
 import { listQuickJobPosts } from "@/features/quick-job-post/repository";
-import { formatPhoneLabel } from "@/lib/phone";
-import type { QuickJobStatus } from "@/lib/quick-job-post";
-import { isQuickJobStatus } from "@/lib/quick-job-post";
+import { curatedPublishedJobs } from "@/features/core/static-curated-jobs";
 import { isSuperAdmin } from "@/lib/super-admin-session";
-import { btnDenseNeutral, btnDenseSuccess, btnDenseWarning, btnSecondary, sectionCard } from "@/lib/ui";
+import { sectionCard } from "@/lib/ui";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Pasted vacancies | Vacancy Chennai",
+  title: "Super admin | Vacancy Chennai",
   robots: { index: false, follow: false },
 };
 
-type Filter = QuickJobStatus | "all";
-
 type Props = {
-  searchParams: Promise<{ status?: string; updated?: string; error?: string }>;
+  searchParams: Promise<{ status?: string }>;
 };
 
-const FILTERS: { id: Filter; label: string }[] = [
-  { id: "new", label: "New" },
-  { id: "reviewed", label: "Reviewed" },
-  { id: "spam", label: "Spam" },
-  { id: "all", label: "All" },
-];
-
-function formatWhen(iso: string) {
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Kolkata",
-  }).format(new Date(iso));
-}
-
-export default async function SuperAdminInboxPage({ searchParams }: Props) {
+export default async function SuperAdminOverviewPage({ searchParams }: Props) {
   if (!(await isSuperAdmin())) redirect("/super-admin/login");
   const query = await searchParams;
-  const filter: Filter =
-    query.status === "all" || (query.status && isQuickJobStatus(query.status))
-      ? (query.status as Filter)
-      : "new";
-  const posts = await listQuickJobPosts(filter);
+  if (query.status) {
+    redirect(`/super-admin/inbox?status=${encodeURIComponent(query.status)}`);
+  }
+
+  const [seekers, employers, applications, requests, pastedNew, dbJobs] = await Promise.all([
+    listSeekersForAdmin(),
+    listEmployersForAdmin(),
+    listApplicationsForAdmin(),
+    listLocalRequestsForAdmin(),
+    listQuickJobPosts("new"),
+    listAllJobs(),
+  ]);
+  const pendingPhones = seekers.filter((row) => row.phoneVerificationStatus === "pending" && row.phone).length;
+  const contactReady = seekers.filter((row) => row.contactReady).length;
+  const jobIds = new Set(dbJobs.map((job) => job.id));
+  const catalogOnly = curatedPublishedJobs.filter((job) => !jobIds.has(job.id)).length;
+
+  const cards = [
+    { href: "/super-admin/candidates", label: "Job seekers", value: seekers.length, note: `${contactReady} can view contact` },
+    { href: "/super-admin/candidates", label: "Mobiles awaiting review", value: pendingPhones, note: "Number on file, not yet checked" },
+    { href: "/super-admin/jobs", label: "Jobs", value: dbJobs.length + catalogOnly, note: `${dbJobs.length} records · ${catalogOnly} catalog` },
+    { href: "/super-admin/applications", label: "Applications", value: applications.length, note: "Latest 300 when the database is on" },
+    { href: "/super-admin/employers", label: "Employers", value: employers.length, note: "Accounts on file" },
+    { href: "/super-admin/requests", label: "Local requests", value: requests.length, note: "Neighbourhood posts" },
+    { href: "/super-admin/inbox", label: "New pasted vacancies", value: pastedNew.length, note: "Not published yet" },
+  ];
 
   return (
-    <div className="space-y-6 pb-16">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Pasted vacancies</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            {posts.length} in this list. These are not published on the site until you decide to use them.
-          </p>
-        </div>
-        <form action={superAdminLogoutAction}>
-          <button type="submit" className={btnSecondary}>
-            Sign out
-          </button>
-        </form>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Super admin</h1>
+        <p className="mt-1 text-sm text-slate-600">
+          Job seekers, listings, applications, employers, local requests, and pasted vacancies.
+        </p>
       </div>
-
-      {query.updated === "1" ? (
-        <p role="status" className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-100">
-          Status updated.
-        </p>
-      ) : null}
-      {query.error === "invalid" ? (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-100">
-          That update could not be applied.
-        </p>
-      ) : null}
-
-      <nav className="flex flex-wrap gap-2" aria-label="Filter posts">
-        {FILTERS.map((item) => {
-          const active = item.id === filter;
-          return (
-            <a
-              key={item.id}
-              href={item.id === "new" ? "/super-admin" : `/super-admin?status=${item.id}`}
-              className={`inline-flex min-h-[36px] items-center rounded-full px-3 text-sm font-medium ${
-                active ? "bg-slate-900 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-              }`}
-              aria-current={active ? "page" : undefined}
-            >
-              {item.label}
-            </a>
-          );
-        })}
-      </nav>
-
-      {posts.length === 0 ? (
-        <p className={`${sectionCard} text-sm text-slate-600`}>Nothing in this list.</p>
-      ) : (
-        <ul className="space-y-4">
-          {posts.map((post) => (
-            <li key={post.id} className={sectionCard}>
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="text-sm text-slate-500">{formatWhen(post.createdAt)}</p>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{post.status}</p>
-              </div>
-              <p className="mt-3 text-base font-semibold text-slate-900">
-                <a href={`tel:${post.phone}`} className="hover:text-blue-800">
-                  {formatPhoneLabel(post.phone)}
-                </a>
-              </p>
-              <p className="mt-1 text-sm">
-                <a href={`mailto:${post.email}`} className="font-medium text-blue-700 hover:text-blue-900">
-                  {post.email}
-                </a>
-              </p>
-              <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-50 p-3 font-sans text-sm text-slate-800 ring-1 ring-slate-100">
-                {post.description}
-              </pre>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {post.status !== "reviewed" ? (
-                  <form action={updateQuickJobPostStatusAction}>
-                    <input type="hidden" name="id" value={post.id} />
-                    <input type="hidden" name="status" value="reviewed" />
-                    <input type="hidden" name="filter" value={filter} />
-                    <button type="submit" className={btnDenseSuccess}>
-                      Mark reviewed
-                    </button>
-                  </form>
-                ) : null}
-                {post.status !== "spam" ? (
-                  <form action={updateQuickJobPostStatusAction}>
-                    <input type="hidden" name="id" value={post.id} />
-                    <input type="hidden" name="status" value="spam" />
-                    <input type="hidden" name="filter" value={filter} />
-                    <button type="submit" className={btnDenseWarning}>
-                      Mark spam
-                    </button>
-                  </form>
-                ) : null}
-                {post.status !== "new" ? (
-                  <form action={updateQuickJobPostStatusAction}>
-                    <input type="hidden" name="id" value={post.id} />
-                    <input type="hidden" name="status" value="new" />
-                    <input type="hidden" name="filter" value={filter} />
-                    <button type="submit" className={btnDenseNeutral}>
-                      Move back to new
-                    </button>
-                  </form>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <li key={card.label}>
+            <Link href={card.href} className={`${sectionCard} block hover:border-blue-200`}>
+              <p className="text-sm font-medium text-slate-600">{card.label}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-slate-900">{card.value}</p>
+              <p className="mt-1 text-xs text-slate-500">{card.note}</p>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

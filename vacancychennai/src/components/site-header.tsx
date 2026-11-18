@@ -18,6 +18,10 @@ export default async function SiteHeader() {
   } else if (session?.role === "admin") {
     sessionNavItems.push(
       { href: "/admin/dashboard", label: "Dashboard" },
+      { href: "/admin/candidates", label: "Candidates" },
+      { href: "/admin/employers", label: "Employers" },
+      { href: "/admin/jobs", label: "Jobs" },
+      { href: "/admin/applications", label: "Applications" },
       { href: "/admin/distribution", label: "Distribution" },
     );
   }

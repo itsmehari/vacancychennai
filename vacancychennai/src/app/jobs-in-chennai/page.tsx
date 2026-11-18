@@ -110,6 +110,8 @@ export default async function JobsInChennaiPage({ searchParams }: Props) {
                 <option value="full-time">Full-time</option>
                 <option value="part-time">Part-time</option>
                 <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+                <option value="temporary">Temporary</option>
               </select>
             </label>
             <label className="grid gap-1.5 text-sm font-medium text-slate-700">

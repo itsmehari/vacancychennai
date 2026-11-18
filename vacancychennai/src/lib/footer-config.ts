@@ -46,6 +46,7 @@ export const footerSiteLinkColumns: FooterSiteColumn[] = [
       { href: "/areas", label: "Neighbourhood hubs" },
       { href: "/salary-guide-chennai", label: "Salary snapshot" },
       { href: "/jobs-this-week", label: "Jobs posted this week" },
+      { href: "/for-job-seekers", label: "For job seekers" },
       { href: "/how-to-apply", label: "How to apply" },
       { href: "/guides", label: "Hiring guides" },
       { href: "/job-safety", label: "Job safety" },
@@ -65,6 +66,7 @@ export const footerSiteLinkColumns: FooterSiteColumn[] = [
       { href: "/pricing", label: "Pricing" },
       { href: "/post-job", label: "Post a job" },
       { href: "/hire-in-chennai", label: "Hire in Chennai" },
+      { href: "/for-local-businesses", label: "For local businesses" },
     ],
   },
   {

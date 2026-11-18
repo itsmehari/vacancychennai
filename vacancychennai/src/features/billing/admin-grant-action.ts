@@ -8,18 +8,26 @@ import { getJobOwnerUserId } from "@/features/billing/publish-and-fulfill";
 import { dbExecute, hasDatabase } from "@/lib/db";
 import { isDatabaseUuid } from "@/lib/is-database-uuid";
 
+const ADMIN_RETURN_PATHS = new Set(["/admin/dashboard", "/admin/jobs"]);
+
+function adminReturnPath(formData: FormData) {
+  const raw = String(formData.get("returnTo") ?? "").trim();
+  return ADMIN_RETURN_PATHS.has(raw) ? raw : "/admin/dashboard";
+}
+
 export async function grantEmployerPostCreditFromJobAction(formData: FormData) {
   const admin = await requireRole("admin", "/admin/login");
+  const returnTo = adminReturnPath(formData);
   if (!hasDatabase()) {
-    redirect("/admin/dashboard?error=no-db");
+    redirect(`${returnTo}?error=no-db`);
   }
   const jobId = String(formData.get("jobId") ?? "").trim();
   if (!jobId || !isDatabaseUuid(jobId)) {
-    redirect("/admin/dashboard?error=invalid-grant");
+    redirect(`${returnTo}?error=invalid-grant`);
   }
   const userId = await getJobOwnerUserId(jobId);
   if (!userId) {
-    redirect("/admin/dashboard?error=no-owner");
+    redirect(`${returnTo}?error=no-owner`);
   }
 
   await dbExecute(
@@ -37,6 +45,7 @@ export async function grantEmployerPostCreditFromJobAction(formData: FormData) {
   });
 
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/jobs");
   revalidatePath("/employer/billing");
-  redirect("/admin/dashboard?success=grant-credit");
+  redirect(`${returnTo}?success=grant-credit`);
 }

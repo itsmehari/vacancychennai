@@ -7,6 +7,7 @@ import {
   addAudit,
   getCandidateResumeFileKey,
   listLocations,
+  PhoneTakenError,
   unlockCandidateResumeInDb,
   upsertCandidateProfileAfterEdit,
 } from "@/features/core/repository";
@@ -15,9 +16,12 @@ import {
   HEADLINE_MAX_LENGTH,
   MAX_RESUME_BYTES,
   RESUME_ALLOWED_MIME,
+  isAllowedEducation,
   isAllowedExperienceLevel,
+  isAllowedJobPreference,
 } from "@/lib/candidate-profile-constants";
 import { hasDatabase } from "@/lib/db";
+import { normalizePhone } from "@/lib/phone";
 import { incrementMetric } from "@/lib/metrics";
 import { allowProfileSubmit } from "@/lib/profile-submit-rate";
 import {
@@ -35,6 +39,12 @@ export async function updateCandidateProfileAction(formData: FormData) {
   }
 
   const name = String(formData.get("name") ?? "").trim();
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  const education = String(formData.get("education") ?? "").trim();
+  const jobPreferences = formData
+    .getAll("jobPreferences")
+    .map((value) => String(value).trim())
+    .filter(isAllowedJobPreference);
   const skills = String(formData.get("skills") ?? "")
     .split(",")
     .map((item) => item.trim())
@@ -46,10 +56,10 @@ export async function updateCandidateProfileAction(formData: FormData) {
   const resumeFile = formData.get("resumeFile");
 
   const locs = await listLocations();
-  if (!name || !locationId || !locs.some((location) => location.id === locationId)) {
+  if (!name || !phone || !locationId || !locs.some((location) => location.id === locationId)) {
     redirect("/candidate/dashboard?error=invalid-profile");
   }
-  if (!isAllowedExperienceLevel(experienceLevel)) {
+  if (!isAllowedExperienceLevel(experienceLevel) || !isAllowedEducation(education) || jobPreferences.length === 0) {
     redirect("/candidate/dashboard?error=invalid-profile");
   }
 
@@ -101,17 +111,27 @@ export async function updateCandidateProfileAction(formData: FormData) {
     }
   }
 
-  await upsertCandidateProfileAfterEdit({
-    userId: candidate.actorId,
-    name,
-    skills,
-    locationId,
-    headline,
-    experienceLevel,
-    resumeUrl,
-    newResumeUploaded,
-    resumeFileStorageKey: hasDatabase() ? resumeFileStorageKey : undefined,
-  });
+  try {
+    await upsertCandidateProfileAfterEdit({
+      userId: candidate.actorId,
+      name,
+      phone,
+      skills,
+      locationId,
+      headline,
+      experienceLevel,
+      resumeUrl,
+      education,
+      jobPreferences,
+      newResumeUploaded,
+      resumeFileStorageKey: hasDatabase() ? resumeFileStorageKey : undefined,
+    });
+  } catch (error) {
+    if (error instanceof PhoneTakenError) {
+      redirect("/candidate/dashboard?error=phone-taken");
+    }
+    throw error;
+  }
 
   await addAudit({
     actorRole: "candidate",

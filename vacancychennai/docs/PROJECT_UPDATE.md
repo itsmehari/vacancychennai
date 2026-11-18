@@ -1,3 +1,44 @@
+## 2026-10-27 — Electrical Project Manager (Tamil Nadu)
+
+- Urgent curated listing `/jobs/job-electrical-project-manager-tamil-nadu-sadhana`. Site and project role across Tamil Nadu. The flyer names HR Sadhana and does not print a company or a salary figure. Pay is travel allowance plus an amount to confirm. Phone and WhatsApp stay behind a free job seeker profile.
+
+## 2026-10-26 — No Resend mail
+
+- Employer registration stores the password, marks the email verified, and opens the dashboard. Login no longer waits for a verification email, including older accounts that were never verified.
+- Password-reset email, job digests, and pass-expiry emails are off. Forgot-password pages point to support@vacancychennai.in. Text alerts still use Twilio when it is configured.
+
+## 2026-10-26 — Eureka Forbes field recruiter
+
+- Urgent curated listing `/jobs/job-eureka-forbes-field-recruiter-anna-nagar`. Work areas are Anna Nagar (hub), Adyar, and Pammal. Pay is market rate plus fuel and incentive. Email and phone stay behind a free job seeker profile.
+
+## 2026-10-26 — Home hero is the navy banner again
+
+- The paper-board homepage hero was reverted. `/` uses the deep navy banner, amber outline button, coast illustration, overlapping search card, and dark stats strip.
+
+## 2026-10-25 — Candidate accounts do not use Resend
+
+- Candidate registration and login no longer send email. A new profile stores a password and opens a session immediately, then returns to `?next=` or the dashboard.
+- Login is email plus that password. An older account with no password can set one on the login page. If a mobile is already stored it must match; if none is stored, the number entered is saved.
+- The Nanganallur job-request form signs the seeker in with Continue. SMS stays optional. Employer verification and password reset still use Resend.
+
+---
+
+## 2026-10-24 — Seeker profile gate and super admin
+
+- **Contact:** employer phone, email, and WhatsApp on a job (including numbers inside the notice) stay hidden until the candidate profile has name, email, mobile, area, qualification, and at least one job preference. Quick apply is unchanged. Phone review is a separate admin flag and does not block contact.
+- **Register:** `/candidate/register` collects those fields, writes `users` + `candidate_profiles` with a password, and signs the candidate in. Return path `?next=/jobs/…` is used immediately. Migration **`016_candidate_registration_profile.sql`** (`npm run db:migrate`).
+- **Super admin:** `/super-admin/login` then overview, job seekers (verify / pending / needs correction), jobs, applications, employers, local requests, and pasted vacancies at `/super-admin/inbox`. Sign-in is email + password from `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` (optional legacy `SUPER_ADMIN_USERNAME` if that env var is set).
+
+---
+
+## 2026-10-21 — First audience and prices
+
+- **Who first:** shops, clinics, and startups with a street address (`/for-local-businesses`). Next: verified mid-size IT teams. Then a larger office.
+- **Prices:** job seeker pass **₹99 / 30 days** (alerts; browse and apply stay public). Local business **₹199** for **5** publishes. Verified is the 10-post pack (₹490). Corporate desk is the 20-post pack (₹980).
+- **Checkout:** candidate accounts can buy `seeker_pass`. Employer accounts buy the job plans, including new `local_5`.
+
+---
+
 ## 2026-10-21 — Checklist items that needed product work
 
 - **This week:** `/jobs-this-week` counts published listings from the last seven days and links each area. Listed in the footer, home strip, sitemap, and `/llms.txt`.
@@ -35,7 +76,7 @@ Full narrative: [`WORK_LOG.md`](./WORK_LOG.md). Commits: `77b9c58` → `2de873b`
 - **LLM / AEO / GEO:** `/llms.txt`, `/llm.txt`, `/llms-full.txt`; AI bots in `robots.ts`; FAQ + Organization/JobPosting schema; `lang="en-IN"`.
 - **Ads:** `src/lib/partner-ads.ts` + `src/components/ads/*` — square (job sidebar) / rectangle (hubs, home, blog, site-wide band). Skip dashboards, admin, auth recovery, privacy/terms.
 - **Links:** Footer email + partner logos; no fake WhatsApp/phone; terms/about/pricing CTAs fixed.
-- **Local job requests:** `/local-job-request-nanganallur` — magic link or SMS OTP, one post per candidate, WhatsApp for employers. Migration **`013_local_job_requests.sql`** (run `npm run db:migrate`).
+- **Local job requests:** `/local-job-request-nanganallur` — Continue signs the seeker in (optional SMS OTP), one post per candidate, WhatsApp for employers. Migration **`013_local_job_requests.sql`** (run `npm run db:migrate`).
 
 ---
 

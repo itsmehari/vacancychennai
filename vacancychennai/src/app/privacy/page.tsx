@@ -19,9 +19,11 @@ export default function PrivacyPage() {
       <div className="space-y-3 text-slate-700">
         <h2 className="text-xl font-semibold text-slate-900">Job seeker profiles</h2>
         <p>
-          If you sign in as a candidate and save a profile, we may store your name, phone, email, preferred
-          area, skills, a short headline, experience band, an optional résumé link, and (if you upload) a
-          résumé file. Uploaded files are stored as{" "}
+          If you register as a candidate, we store your name, email, mobile number, area, educational
+          qualification, and job preferences, plus any headline, skills, experience band, résumé link, or
+          résumé file you add later. Your mobile stays marked pending until an administrator marks it
+          verified or asks for a correction. Employer phone, email, and WhatsApp on a listing are shown
+          only after that profile is complete. Uploaded files are stored as{" "}
           <strong>private objects</strong> in Vercel Blob when the site operator configures object storage;
           otherwise, in <strong>server memory</strong> (typical for local development only — files do not
           survive restarts). A résumé URL you paste yourself is not uploaded to our storage unless you also

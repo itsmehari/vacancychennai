@@ -40,7 +40,7 @@ export const homeFaqItems: HomeFaqItem[] = [
   {
     question: "Is Vacancy Chennai free for job seekers?",
     answer:
-      "Yes. Browsing Chennai listings and applying is free. You can quick-apply with name and phone, or create a candidate account to track applications.",
+      "Reading listings and applying with your name and phone is free. A ₹99 monthly pass adds area and role alerts and keeps your profile ready. It is not a fee to an employer.",
   },
   {
     question: "Which Chennai areas can I search?",

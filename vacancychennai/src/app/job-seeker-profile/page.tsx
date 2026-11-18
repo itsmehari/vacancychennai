@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export const metadata = baseMetadata(
   "Job seeker profile — upload résumé & skills | Vacancy Chennai",
-  "Optional profile for Chennai job seekers: headline, area, experience, skills, résumé (PDF/DOC/DOCX). Sign in to create or update. Browse and apply stay free.",
+  "Free job seeker profile: name, email, mobile, area, qualification, and job preferences. Required before employer contact is shown on a listing.",
   "/job-seeker-profile",
 );
 
@@ -26,7 +26,7 @@ export default async function JobSeekerProfilePage() {
       <InnerPageHero
         eyebrow="For job seekers"
         title="Your job seeker profile"
-        description="Sign in as a candidate to add headline, area, experience, skills, and résumé — same fields as your dashboard. Browsing and quick apply stay free."
+        description="Register once with your name, email, mobile, area, qualification, and the work you want. That profile unlocks employer contact on a job. Quick apply stays free."
         actions={
           <>
             <Link href="/candidate/login" className={btnPrimary}>

@@ -1,43 +1,29 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createCandidateRegistration, listLocations } from "@/features/core/repository";
+import { createSession } from "@/lib/auth";
 import { dbExecute, dbQuery, hasDatabase } from "@/lib/db";
 import {
-  sendAdminPasswordResetEmail,
-  sendCandidateMagicLinkEmail,
-  sendEmployerPasswordResetEmail,
-  sendEmployerVerificationEmail,
-} from "@/lib/email/send-auth-email";
-import {
-  createEmailVerificationToken,
   finalizeAdminPasswordReset,
   finalizeEmployerPasswordReset,
 } from "@/lib/email/verification-tokens";
-import { getResendClient } from "@/lib/email/resend-client";
 import { logger } from "@/lib/logger";
+import { isAllowedEducation, isAllowedJobPreference } from "@/lib/candidate-profile-constants";
+import { normalizePhone } from "@/lib/phone";
 import {
-  canSendVerificationEmail,
+  consumeRateLimit,
   getRateLimitState,
-  recordVerificationEmailSent,
   registerFailedAttempt,
 } from "@/lib/rate-limit";
+import { safeCandidateNextPath } from "@/lib/safe-next-path";
 
 const MIN_PASSWORD = 8;
 
 function normalizeEmail(v: string) {
   return v.trim().toLowerCase();
-}
-
-function normalizePhone(raw: string): string | null {
-  const digits = raw.replace(/[\s().-]/g, "");
-  if (!digits) return null;
-  if (digits.startsWith("+")) {
-    return /^\+\d{10,15}$/.test(digits) ? digits : null;
-  }
-  if (/^\d{10}$/.test(digits)) return `+91${digits}`;
-  if (/^\d{11,15}$/.test(digits)) return `+${digits}`;
-  return null;
 }
 
 async function findUserByEmail(email: string) {
@@ -53,30 +39,6 @@ async function findUserByEmail(email: string) {
      from users where lower(email) = $1 limit 1`,
     [email],
   ).then((r) => r[0]);
-}
-
-async function sendEmployerVerifyAfterRegister(user: {
-  id: string;
-  email: string;
-  full_name: string;
-}): Promise<"sent" | "rate-limited" | "config" | "failed"> {
-  if (!getResendClient()) return "config";
-  const rateKey = `employer-verify-send:${user.email.toLowerCase()}`;
-  if (!canSendVerificationEmail(rateKey)) return "rate-limited";
-  const plaintext = await createEmailVerificationToken(user.id, "employer_verify");
-  if (!plaintext) return "failed";
-  try {
-    await sendEmployerVerificationEmail({
-      to: user.email,
-      fullName: user.full_name,
-      plaintextToken: plaintext,
-    });
-    recordVerificationEmailSent(rateKey);
-    return "sent";
-  } catch (e) {
-    logger.warn({ err: e, email: user.email }, "employer verification after register failed");
-    return "failed";
-  }
 }
 
 export async function registerEmployerAction(formData: FormData) {
@@ -113,8 +75,8 @@ export async function registerEmployerAction(formData: FormData) {
   const passwordHash = bcrypt.hashSync(password, 10);
 
   const inserted = await dbQuery<{ id: string }>(
-    `insert into users (role, full_name, email, phone, password_hash, status)
-     values ('employer'::user_role, $1, $2, $3, $4, 'active'::account_status)
+    `insert into users (role, full_name, email, phone, password_hash, status, email_verified_at)
+     values ('employer'::user_role, $1, $2, $3, $4, 'active'::account_status, now())
      returning id`,
     [fullName, email, phone, passwordHash],
   );
@@ -134,133 +96,167 @@ export async function registerEmployerAction(formData: FormData) {
     redirect("/employer/register?error=invalid");
   }
 
-  const sendResult = await sendEmployerVerifyAfterRegister({
-    id: userId,
-    email,
-    full_name: fullName,
+  await createSession({
+    role: "employer",
+    actorId: userId,
+    displayName: fullName,
   });
-  if (sendResult === "config") {
-    redirect("/employer/register?error=email-config");
-  }
-  if (sendResult === "rate-limited") {
-    redirect("/employer/register?error=email-rate-limited");
-  }
-  if (sendResult === "failed") {
-    redirect("/employer/register?error=email-failed");
-  }
 
-  redirect("/employer/login?registered=1");
+  redirect("/employer/dashboard");
+}
+
+function registerRedirect(error: string, next: string | null): never {
+  const params = new URLSearchParams({ error });
+  if (next) params.set("next", next);
+  redirect(`/candidate/register?${params.toString()}`);
+}
+
+async function requestIp() {
+  const h = await headers();
+  const forwarded = h.get("x-forwarded-for");
+  const first = forwarded?.split(",")[0]?.trim();
+  return (first || h.get("x-real-ip") || "unknown").slice(0, 80);
 }
 
 export async function registerCandidateAction(formData: FormData) {
+  const next = safeCandidateNextPath(String(formData.get("next") ?? ""));
   if (!hasDatabase()) {
-    redirect("/candidate/register?error=db-required");
+    registerRedirect("db-required", next);
+  }
+
+  const honeypot = String(formData.get("companyWebsite") ?? "").trim();
+  if (honeypot) {
+    redirect(next ? `/candidate/login?sent=1&next=${encodeURIComponent(next)}` : "/candidate/login?sent=1");
+  }
+
+  const ip = await requestIp();
+  if (!consumeRateLimit(`candidate-register:${ip}`, 8, 60 * 60 * 1000)) {
+    registerRedirect("rate-limited", next);
   }
 
   const fullName = String(formData.get("fullName") ?? "").trim();
   const email = normalizeEmail(String(formData.get("email") ?? ""));
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  const password = String(formData.get("password") ?? "");
+  const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
+  const locationId = String(formData.get("locationId") ?? "").trim();
+  const education = String(formData.get("education") ?? "").trim();
+  const jobPreferences = [
+    ...new Set(
+      formData
+        .getAll("jobPreferences")
+        .map((value) => String(value).trim())
+        .filter(isAllowedJobPreference),
+    ),
+  ];
 
-  if (!fullName || !email) {
-    redirect("/candidate/register?error=invalid");
+  if (fullName.length < 2 || fullName.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    registerRedirect("invalid", next);
+  }
+  if (password.length < MIN_PASSWORD || passwordConfirm.length < MIN_PASSWORD) {
+    registerRedirect("weak-password", next);
+  }
+  if (password !== passwordConfirm) {
+    registerRedirect("password-mismatch", next);
+  }
+  if (!phone) registerRedirect("invalid-phone", next);
+  if (!isAllowedEducation(education)) registerRedirect("invalid-education", next);
+  if (jobPreferences.length === 0) registerRedirect("invalid-preferences", next);
+
+  const locations = await listLocations();
+  if (!locations.some((location) => location.id === locationId)) {
+    registerRedirect("invalid-location", next);
   }
 
-  const existing = await findUserByEmail(email);
-  if (existing) {
-    redirect("/candidate/register?error=email-taken");
+  const created = await createCandidateRegistration({
+    fullName,
+    email,
+    phone,
+    locationId,
+    education,
+    jobPreferences,
+    passwordHash: bcrypt.hashSync(password, 10),
+  });
+  if (!created.ok) {
+    registerRedirect(created.error === "failed" ? "invalid" : created.error, next);
   }
 
-  if (!getResendClient()) {
-    redirect("/candidate/register?error=email-config");
-  }
+  await createSession({
+    role: "candidate",
+    actorId: created.userId,
+    displayName: fullName,
+  });
 
-  const inserted = await dbQuery<{ id: string }>(
-    `insert into users (role, full_name, email, phone, password_hash, status)
-     values ('candidate'::user_role, $1, $2, null, null, 'active'::account_status)
-     returning id`,
-    [fullName, email],
-  );
-  const userId = inserted[0]?.id;
-  if (!userId) {
-    redirect("/candidate/register?error=invalid");
-  }
-
-  try {
-    await dbExecute(`insert into candidate_profiles (user_id) values ($1)`, [userId]);
-  } catch (e) {
-    logger.warn({ err: e, userId }, "candidate_profiles insert failed");
-    await dbExecute(`delete from users where id = $1`, [userId]);
-    redirect("/candidate/register?error=invalid");
-  }
-
-  const rateKey = `candidate-magic:${email}`;
-  if (!canSendVerificationEmail(rateKey)) {
-    redirect("/candidate/register?error=email-rate-limited");
-  }
-
-  const plaintext = await createEmailVerificationToken(userId, "candidate_magic");
-  if (!plaintext) {
-    redirect("/candidate/register?error=email-failed");
-  }
-
-  try {
-    await sendCandidateMagicLinkEmail({
-      to: email,
-      fullName: fullName,
-      plaintextToken: plaintext,
-    });
-    recordVerificationEmailSent(rateKey);
-  } catch (e) {
-    logger.warn({ err: e, email }, "candidate welcome magic link failed");
-    redirect("/candidate/register?error=email-failed");
-  }
-
-  redirect("/candidate/login?sent=1");
+  redirect(next ?? "/candidate/dashboard");
 }
 
-export async function requestEmployerPasswordResetAction(formData: FormData) {
+export async function setCandidatePasswordAction(formData: FormData) {
   if (!hasDatabase()) {
-    redirect("/employer/forgot-password?error=db-required");
+    redirect("/candidate/login?error=db-required");
   }
 
+  const next = safeCandidateNextPath(String(formData.get("next") ?? ""));
   const email = normalizeEmail(String(formData.get("email") ?? ""));
-  if (!email) {
-    redirect("/employer/forgot-password?error=invalid");
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  const password = String(formData.get("password") ?? "");
+  const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
+
+  function back(error: string): never {
+    const params = new URLSearchParams({ error });
+    if (next) params.set("next", next);
+    redirect(`/candidate/login?${params.toString()}`);
   }
 
-  const limiterKey = `pwd-reset-req:${email}`;
-  const rate = getRateLimitState(limiterKey);
-  if (rate.blocked) {
-    redirect("/employer/forgot-password?error=rate-limited");
+  if (!email || !phone) back("invalid");
+  if (password.length < MIN_PASSWORD || passwordConfirm.length < MIN_PASSWORD) back("weak-password");
+  if (password !== passwordConfirm) back("password-mismatch");
+
+  const limiterKey = `candidate-set-password:${email}`;
+  if (getRateLimitState(limiterKey).blocked) back("rate-limited");
+
+  const rows = await dbQuery<{
+    id: string;
+    role: string;
+    full_name: string;
+    phone: string | null;
+  }>(
+    `select id, role::text as role, full_name, phone
+     from users where lower(email) = $1 limit 1`,
+    [email],
+  );
+  const user = rows[0];
+  if (!user || user.role !== "candidate") {
+    registerFailedAttempt(limiterKey);
+    back("invalid-candidate");
+  }
+  if (user.phone && user.phone !== phone) {
+    registerFailedAttempt(limiterKey);
+    back("phone-mismatch");
   }
 
-  if (!getResendClient()) {
-    redirect("/employer/forgot-password?error=email-config");
+  try {
+    await dbExecute(
+      `update users set password_hash = $2, phone = $3, updated_at = now() where id = $1`,
+      [user.id, bcrypt.hashSync(password, 10), phone],
+    );
+  } catch (error) {
+    const code =
+      typeof error === "object" && error !== null && "code" in error
+        ? (error as { code?: string }).code
+        : undefined;
+    if (code === "23505") back("phone-taken");
+    throw error;
   }
+  await createSession({
+    role: "candidate",
+    actorId: user.id,
+    displayName: user.full_name,
+  });
+  redirect(next ?? "/candidate/dashboard");
+}
 
-  const user = await findUserByEmail(email);
-  if (user && user.role === "employer") {
-    const rateKey = `pwd-reset-send:${email}`;
-    if (!canSendVerificationEmail(rateKey, 5, 60 * 60 * 1000)) {
-      redirect("/employer/forgot-password?error=email-rate-limited");
-    }
-    const plaintext = await createEmailVerificationToken(user.id, "password_reset");
-    if (plaintext) {
-      try {
-        await sendEmployerPasswordResetEmail({
-          to: user.email,
-          fullName: user.full_name,
-          plaintextToken: plaintext,
-        });
-        recordVerificationEmailSent(rateKey);
-      } catch (e) {
-        logger.warn({ err: e, email }, "password reset email failed");
-        registerFailedAttempt(limiterKey, { maxAttempts: 10, blockMs: 15 * 60 * 1000 });
-        redirect("/employer/forgot-password?error=email-failed");
-      }
-    }
-  }
-
-  redirect("/employer/forgot-password?forgot=1");
+export async function requestEmployerPasswordResetAction() {
+  redirect("/employer/forgot-password");
 }
 
 export async function resetEmployerPasswordAction(formData: FormData) {
@@ -291,50 +287,8 @@ export async function resetEmployerPasswordAction(formData: FormData) {
   redirect("/employer/login?reset=1");
 }
 
-export async function requestAdminPasswordResetAction(formData: FormData) {
-  if (!hasDatabase()) {
-    redirect("/admin/forgot-password?error=db-required");
-  }
-
-  const email = normalizeEmail(String(formData.get("email") ?? ""));
-  if (!email) {
-    redirect("/admin/forgot-password?error=invalid");
-  }
-
-  const limiterKey = `admin-pwd-reset-req:${email}`;
-  const rate = getRateLimitState(limiterKey);
-  if (rate.blocked) {
-    redirect("/admin/forgot-password?error=rate-limited");
-  }
-
-  if (!getResendClient()) {
-    redirect("/admin/forgot-password?error=email-config");
-  }
-
-  const user = await findUserByEmail(email);
-  if (user && user.role === "admin") {
-    const rateKey = `admin-pwd-reset-send:${email}`;
-    if (!canSendVerificationEmail(rateKey, 5, 60 * 60 * 1000)) {
-      redirect("/admin/forgot-password?error=email-rate-limited");
-    }
-    const plaintext = await createEmailVerificationToken(user.id, "admin_password_reset");
-    if (plaintext) {
-      try {
-        await sendAdminPasswordResetEmail({
-          to: user.email,
-          fullName: user.full_name,
-          plaintextToken: plaintext,
-        });
-        recordVerificationEmailSent(rateKey);
-      } catch (e) {
-        logger.warn({ err: e, email }, "admin password reset email failed");
-        registerFailedAttempt(limiterKey, { maxAttempts: 10, blockMs: 15 * 60 * 1000 });
-        redirect("/admin/forgot-password?error=email-failed");
-      }
-    }
-  }
-
-  redirect("/admin/forgot-password?forgot=1");
+export async function requestAdminPasswordResetAction() {
+  redirect("/admin/forgot-password");
 }
 
 export async function resetAdminPasswordAction(formData: FormData) {

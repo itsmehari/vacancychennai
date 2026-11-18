@@ -10,6 +10,7 @@ export function isJobsExplorePath(pathname: string): boolean {
   if (pathname === "/internships-chennai" || pathname === "/contract-jobs-chennai") return true;
   if (pathname === "/temporary-jobs-chennai" || pathname === "/areas") return true;
   if (pathname === "/salary-guide-chennai" || pathname === "/jobs-this-week" || pathname === "/share-areas") return true;
+  if (pathname === "/for-job-seekers" || pathname === "/for-local-businesses") return true;
   if (pathname === "/roles" || pathname.startsWith("/roles/")) return true;
   if (pathname.startsWith("/local-job-request-")) return true;
   if (/^\/jobs\/[^/]+$/.test(pathname)) return true;

@@ -1,6 +1,4 @@
 import { listLocations, listPublishedJobsCreatedSince } from "@/features/core/repository";
-import { sendJobDigestEmail, sendSmsFallbackDigestEmail } from "@/lib/email/send-digest-email";
-import { getResendClient } from "@/lib/email/resend-client";
 import { logger } from "@/lib/logger";
 import { dbQuery, hasDatabase } from "@/lib/db";
 import { jobMatchesRole } from "@/lib/discover/match";
@@ -116,24 +114,13 @@ export async function runScheduledNotifications(): Promise<ScheduledNotification
 
   const base = getSiteBaseUrl();
 
-  let emailsSent = 0;
-  let emailsFailed = 0;
-  const resendReady = getResendClient();
-  if (emailRows.length > 0 && !resendReady) {
-    logger.warn("scheduled notifications: Resend not configured; skipping digest emails");
-    emailsFailed = emailRows.length;
-  } else if (emailRows.length > 0 && resendReady) {
-    for (const row of emailRows) {
-      const matched = jobsForInterest(published, locationsById, row.interest_area, row.interest_role);
-      if (matched.length === 0) continue;
-      try {
-        await sendJobDigestEmail({ to: row.address.trim().toLowerCase(), jobs: matched });
-        emailsSent += 1;
-      } catch (e) {
-        logger.warn({ err: e, to: row.address }, "digest email send failed");
-        emailsFailed += 1;
-      }
-    }
+  const emailsSent = 0;
+  const emailsFailed = 0;
+  if (emailRows.length > 0) {
+    logger.info(
+      { subscribers: emailRows.length },
+      "scheduled notifications: email digests are off",
+    );
   }
 
   let smsSent = 0;
@@ -159,17 +146,8 @@ export async function runScheduledNotifications(): Promise<ScheduledNotification
     } else {
       smsFailed = smsNumbers.length;
       logger.warn("scheduled notifications: Twilio not configured; SMS reminders skipped");
-      if (fallbackTo && getResendClient()) {
-        try {
-          await sendSmsFallbackDigestEmail({
-            to: fallbackTo,
-            jobCount: published.length,
-            smsRecipients: smsNumbers.map((row) => row.address.trim()),
-          });
-          smsFallbackEmailSent = true;
-        } catch (e) {
-          logger.warn({ err: e }, "SMS fallback email failed");
-        }
+      if (fallbackTo) {
+        logger.info({ to: fallbackTo }, "scheduled notifications: SMS fallback email is off");
       }
     }
   }

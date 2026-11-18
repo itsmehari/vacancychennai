@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "db_required" }, { status: 503 });
   }
   const session = await getSession();
-  if (!session || session.role !== "employer") {
+  if (!session || (session.role !== "employer" && session.role !== "candidate")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -22,6 +22,12 @@ export async function POST(request: Request) {
   const sku = getSku(skuId);
   if (!sku) {
     return NextResponse.json({ error: "invalid_sku" }, { status: 400 });
+  }
+  if (sku.entitlementType === "seeker_pass" && session.role !== "candidate") {
+    return NextResponse.json({ error: "candidate_only" }, { status: 403 });
+  }
+  if (sku.entitlementType !== "seeker_pass" && session.role !== "employer") {
+    return NextResponse.json({ error: "employer_only" }, { status: 403 });
   }
 
   const template = getSuperProfilePaymentTemplate();

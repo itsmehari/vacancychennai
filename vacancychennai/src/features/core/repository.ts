@@ -18,6 +18,7 @@ import {
   setJobFeatured,
   suggestCandidatesForJob as mockSuggestCandidatesForJob,
   updateApplicationStage,
+  setCandidatePhoneVerification,
   updateCandidateProfile,
   updateJobStatus,
 } from "@/features/core/mock-db";
@@ -27,7 +28,25 @@ import {
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
+import { candidateCanViewEmployerContact, type PhoneVerificationStatus } from "@/lib/candidate-profile-constants";
+import { normalizePhone } from "@/lib/phone";
 import type { CandidateProfile, Job, JobApplication, JobStatus, Location } from "@/types/domain";
+
+export class PhoneTakenError extends Error {
+  constructor() {
+    super("phone-taken");
+    this.name = "PhoneTakenError";
+  }
+}
+
+function isUniqueViolation(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "23505"
+  );
+}
 
 type DbJobRow = {
   id: string;
@@ -446,12 +465,17 @@ export async function listCandidatesForResumeDb(): Promise<CandidateProfile[]> {
     resume_file_key: string | null;
     profile_completed: boolean;
     resume_contacts_unlocked: boolean;
+    education: string | null;
+    job_preferences: string[] | null;
+    phone_verification_status: string | null;
   }>(
     `select cp.id as profile_id, u.id as user_id, u.full_name, coalesce(u.phone, '') as phone, u.email,
             coalesce(cp.skills, '{}') as skills, cp.location_id, cp.bio, cp.experience_level,
             cp.resume_url, cp.resume_file_key,
             coalesce(cp.profile_completed, false) as profile_completed,
-            coalesce(cp.resume_contacts_unlocked, false) as resume_contacts_unlocked
+            coalesce(cp.resume_contacts_unlocked, false) as resume_contacts_unlocked,
+            cp.education, coalesce(cp.job_preferences, '{}') as job_preferences,
+            coalesce(cp.phone_verification_status, 'pending') as phone_verification_status
      from candidate_profiles cp
      join users u on u.id = cp.user_id
      where u.role = 'candidate' and u.status = 'active'
@@ -474,7 +498,14 @@ function mapDbRowToCandidateProfile(row: {
   resume_file_key: string | null;
   profile_completed: boolean;
   resume_contacts_unlocked: boolean;
+  education: string | null;
+  job_preferences: string[] | null;
+  phone_verification_status: string | null;
 }): CandidateProfile {
+  const phoneVerificationStatus: PhoneVerificationStatus =
+    row.phone_verification_status === "verified" || row.phone_verification_status === "rejected"
+      ? row.phone_verification_status
+      : "pending";
   return {
     id: row.profile_id,
     userId: row.user_id,
@@ -489,6 +520,9 @@ function mapDbRowToCandidateProfile(row: {
     experienceLevel: row.experience_level ?? "",
     resumeUrl: row.resume_url ?? "",
     hasUploadedResumeFile: resumeFileKeyIndicatesUpload(row.resume_file_key),
+    education: row.education ?? "",
+    jobPreferences: row.job_preferences ?? [],
+    phoneVerificationStatus,
   };
 }
 
@@ -512,12 +546,17 @@ export async function getCandidateDashboardProfile(
     resume_file_key: string | null;
     profile_completed: boolean;
     resume_contacts_unlocked: boolean;
+    education: string | null;
+    job_preferences: string[] | null;
+    phone_verification_status: string | null;
   }>(
     `select u.id as user_id, cp.id as profile_id, u.full_name, coalesce(u.phone, '') as phone, u.email,
             coalesce(cp.skills, '{}') as skills, cp.location_id, cp.bio, cp.experience_level,
             cp.resume_url, cp.resume_file_key,
             coalesce(cp.profile_completed, false) as profile_completed,
-            coalesce(cp.resume_contacts_unlocked, false) as resume_contacts_unlocked
+            coalesce(cp.resume_contacts_unlocked, false) as resume_contacts_unlocked,
+            cp.education, coalesce(cp.job_preferences, '{}') as job_preferences,
+            coalesce(cp.phone_verification_status, 'pending') as phone_verification_status
      from users u
      left join candidate_profiles cp on cp.user_id = u.id
      where u.id = $1
@@ -541,6 +580,12 @@ export async function getCandidateDashboardProfile(
       experienceLevel: "",
       resumeUrl: "",
       hasUploadedResumeFile: false,
+      education: row.education ?? "",
+      jobPreferences: row.job_preferences ?? [],
+      phoneVerificationStatus:
+        row.phone_verification_status === "verified" || row.phone_verification_status === "rejected"
+          ? row.phone_verification_status
+          : "pending",
     };
   }
   return mapDbRowToCandidateProfile({
@@ -557,6 +602,9 @@ export async function getCandidateDashboardProfile(
     resume_file_key: row.resume_file_key,
     profile_completed: row.profile_completed,
     resume_contacts_unlocked: row.resume_contacts_unlocked,
+    education: row.education,
+    job_preferences: row.job_preferences,
+    phone_verification_status: row.phone_verification_status,
   });
 }
 
@@ -587,35 +635,48 @@ async function resolveLocationIdForDbColumn(locationId: string): Promise<string 
 export async function upsertCandidateProfileAfterEdit(input: {
   userId: string;
   name: string;
+  phone: string;
   skills: string[];
   locationId: string;
   headline: string;
   experienceLevel: string;
   resumeUrl: string;
+  education: string;
+  jobPreferences: string[];
   newResumeUploaded: boolean;
   /** When `newResumeUploaded`, set to blob URL or `memory:${userId}` (DB mode). Ignored for mock. */
   resumeFileStorageKey?: string | null;
 }): Promise<void> {
+  const phone = normalizePhone(input.phone) ?? "";
+
   if (!hasDatabase()) {
     const existing = getCandidateById(input.userId);
     const hasUploadedResumeFile = input.newResumeUploaded || (existing?.hasUploadedResumeFile ?? false);
     updateCandidateProfile(input.userId, {
       name: input.name,
+      phone,
       skills: input.skills,
       locationId: input.locationId,
       headline: input.headline,
       experienceLevel: input.experienceLevel,
       resumeUrl: input.resumeUrl,
+      education: input.education,
+      jobPreferences: input.jobPreferences,
       hasUploadedResumeFile,
     });
     return;
   }
 
-  const prevRows = await dbQuery<{ resume_file_key: string | null }>(
-    `select resume_file_key from candidate_profiles where user_id = $1 limit 1`,
+  const prevRows = await dbQuery<{ resume_file_key: string | null; phone: string | null; email: string }>(
+    `select cp.resume_file_key, u.phone, u.email
+     from users u
+     left join candidate_profiles cp on cp.user_id = u.id
+     where u.id = $1
+     limit 1`,
     [input.userId],
   );
-  let resumeFileKey = prevRows[0]?.resume_file_key ?? null;
+  const previous = prevRows[0];
+  let resumeFileKey = previous?.resume_file_key ?? null;
   if (input.newResumeUploaded) {
     resumeFileKey =
       input.resumeFileStorageKey !== undefined && input.resumeFileStorageKey !== null
@@ -623,16 +684,34 @@ export async function upsertCandidateProfileAfterEdit(input: {
         : `memory:${input.userId}`;
   }
 
-  await dbExecute(`update users set full_name = $2, updated_at = now() where id = $1`, [
-    input.userId,
-    input.name,
-  ]);
+  const phoneChanged = normalizePhone(previous?.phone ?? "") !== (phone || null);
+  const completed = candidateCanViewEmployerContact({
+    name: input.name,
+    email: previous?.email ?? "",
+    phone,
+    locationId: input.locationId,
+    education: input.education,
+    jobPreferences: input.jobPreferences,
+  });
+
+  try {
+    await dbExecute(
+      `update users set full_name = $2, phone = $3, updated_at = now() where id = $1`,
+      [input.userId, input.name, phone || null],
+    );
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new PhoneTakenError();
+    throw error;
+  }
 
   const dbLocationId = await resolveLocationIdForDbColumn(input.locationId);
 
   await dbExecute(
-    `insert into candidate_profiles (user_id, location_id, skills, bio, experience_level, resume_url, resume_file_key, profile_completed)
-     values ($1, $2, $3, $4, $5, $6, $7, true)
+    `insert into candidate_profiles (
+       user_id, location_id, skills, bio, experience_level, resume_url, resume_file_key,
+       education, job_preferences, profile_completed, phone_verification_status
+     )
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
      on conflict (user_id) do update set
        location_id = excluded.location_id,
        skills = excluded.skills,
@@ -640,7 +719,13 @@ export async function upsertCandidateProfileAfterEdit(input: {
        experience_level = excluded.experience_level,
        resume_url = excluded.resume_url,
        resume_file_key = excluded.resume_file_key,
-       profile_completed = true,
+       education = excluded.education,
+       job_preferences = excluded.job_preferences,
+       profile_completed = excluded.profile_completed,
+       phone_verification_status = case
+         when $11::boolean then 'pending'
+         else candidate_profiles.phone_verification_status
+       end,
        updated_at = now()`,
     [
       input.userId,
@@ -650,8 +735,87 @@ export async function upsertCandidateProfileAfterEdit(input: {
       input.experienceLevel || null,
       input.resumeUrl || null,
       resumeFileKey,
+      input.education || null,
+      input.jobPreferences,
+      completed,
+      phoneChanged,
     ],
   );
+}
+
+export type CreateCandidateRegistrationInput = {
+  fullName: string;
+  email: string;
+  phone: string;
+  locationId: string;
+  education: string;
+  jobPreferences: string[];
+  passwordHash: string;
+};
+
+export async function createCandidateRegistration(
+  input: CreateCandidateRegistrationInput,
+): Promise<
+  | { ok: true; userId: string }
+  | { ok: false; error: "email-taken" | "phone-taken" | "invalid-location" | "failed" }
+> {
+  const phone = normalizePhone(input.phone);
+  if (!phone) return { ok: false, error: "failed" };
+
+  const emailOwner = await dbQuery<{ id: string }>(
+    `select id from users where lower(email) = lower($1) limit 1`,
+    [input.email],
+  );
+  if (emailOwner[0]) return { ok: false, error: "email-taken" };
+
+  const phoneOwner = await dbQuery<{ id: string }>(
+    `select id from users where phone = $1 limit 1`,
+    [phone],
+  );
+  if (phoneOwner[0]) return { ok: false, error: "phone-taken" };
+
+  const dbLocationId = await resolveLocationIdForDbColumn(input.locationId);
+  if (!dbLocationId) return { ok: false, error: "invalid-location" };
+
+  let userId = "";
+  try {
+    const inserted = await dbQuery<{ id: string }>(
+      `insert into users (role, full_name, email, phone, password_hash, status)
+       values ('candidate'::user_role, $1, $2, $3, $4, 'active'::account_status)
+       returning id`,
+      [input.fullName, input.email, phone, input.passwordHash],
+    );
+    userId = inserted[0]?.id ?? "";
+    if (!userId) return { ok: false, error: "failed" };
+
+    await dbExecute(
+      `insert into candidate_profiles (
+         user_id, location_id, education, job_preferences, profile_completed, phone_verification_status
+       ) values ($1, $2, $3, $4, true, 'pending')`,
+      [userId, dbLocationId, input.education, input.jobPreferences],
+    );
+    return { ok: true, userId };
+  } catch (error) {
+    if (userId) {
+      await dbExecute(`delete from users where id = $1`, [userId]);
+    }
+    if (isUniqueViolation(error)) return { ok: false, error: "phone-taken" };
+    return { ok: false, error: "failed" };
+  }
+}
+
+export async function setSeekerPhoneVerificationStatus(
+  userId: string,
+  status: PhoneVerificationStatus,
+): Promise<boolean> {
+  if (!hasDatabase()) return setCandidatePhoneVerification(userId, status);
+  const result = await dbExecute(
+    `update candidate_profiles
+     set phone_verification_status = $2, updated_at = now()
+     where user_id = $1`,
+    [userId, status],
+  );
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function unlockCandidateResumeInDb(profileId: string) {
@@ -756,19 +920,26 @@ export async function countApplications(): Promise<number> {
 
 export async function listApplicationsForCandidateUser(userId: string): Promise<JobApplication[]> {
   if (!hasDatabase()) {
-    return applications.filter((a) => a.candidateId === userId);
+    return applications
+      .filter((a) => a.candidateId === userId)
+      .map((application) => ({
+        ...application,
+        jobTitle: jobs.find((job) => job.id === application.jobId)?.title,
+      }));
   }
   const rows = await dbQuery<{
     id: string;
     job_id: string;
+    title: string | null;
     applicant_name: string;
     applicant_phone: string;
     stage: JobApplication["stage"];
     created_at: string;
   }>(
-    `select a.id, a.job_id, a.applicant_name, a.applicant_phone, a.stage, a.created_at
+    `select a.id, a.job_id, j.title, a.applicant_name, a.applicant_phone, a.stage, a.created_at
      from applications a
      inner join candidate_profiles cp on cp.id = a.candidate_id
+     left join jobs j on j.id = a.job_id
      where cp.user_id = $1
      order by a.created_at desc`,
     [userId],
@@ -776,6 +947,7 @@ export async function listApplicationsForCandidateUser(userId: string): Promise<
   return rows.map((row) => ({
     id: row.id,
     jobId: row.job_id,
+    jobTitle: row.title ?? undefined,
     candidateId: userId,
     applicantName: row.applicant_name,
     applicantPhone: row.applicant_phone,

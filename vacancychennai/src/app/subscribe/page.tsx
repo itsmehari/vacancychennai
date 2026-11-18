@@ -24,7 +24,7 @@ function parseChannel(ch: string | undefined): SubscriptionChannel | null {
 const labels: Record<SubscriptionChannel, { title: string; hint: string; input: string; type: string }> = {
   email_digest: {
     title: "Email digest",
-    hint: "Occasional roundups of new and featured Chennai jobs.",
+    hint: "Email alerts are off. Browse the jobs board, or switch to text reminders.",
     input: "Email address",
     type: "email",
   },
@@ -36,7 +36,7 @@ const labels: Record<SubscriptionChannel, { title: string; hint: string; input: 
   },
   job_alerts: {
     title: "Job alerts",
-    hint: "Email when new listings match the area and role you pick. Leave both blank for every new Chennai listing.",
+    hint: "Email alerts are off. Browse the jobs board, or switch to text reminders.",
     input: "Email address",
     type: "email",
   },
@@ -48,7 +48,7 @@ type Props = {
 
 export default async function SubscribePage({ searchParams }: Props) {
   const q = await searchParams;
-  const channel = parseChannel(q.ch) ?? "email_digest";
+  const channel = parseChannel(q.ch) ?? "sms_reminder";
   const meta = labels[channel];
   const errorMessage = loginQueryErrorMessage(q.error);
   const infoMessage = loginQueryInfoMessage({ subscribed: q.subscribed });
@@ -104,7 +104,17 @@ export default async function SubscribePage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        {db ? (
+        {db && channel !== "sms_reminder" ? (
+          <p className="mt-6 text-sm leading-relaxed text-slate-700">
+            We do not send job emails. Open{" "}
+            <Link href="/jobs-in-chennai" className={linkInline}>
+              jobs in Chennai
+            </Link>{" "}
+            or choose Text above.
+          </p>
+        ) : null}
+
+        {db && channel === "sms_reminder" ? (
           <form action={subscribeAlertsAction} className="mt-6 space-y-4">
             <input type="hidden" name="channel" value={channel} />
             <div className="space-y-1">

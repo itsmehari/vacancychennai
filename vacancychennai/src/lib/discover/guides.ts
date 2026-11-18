@@ -413,7 +413,7 @@ export const guidePages: GuidePage[] = [
       {
         question: "Can I apply without creating a password?",
         answer:
-          "Yes on quick-apply listings. Candidate login is a magic link when the site is running on the database. You can skip it until you want tracking.",
+          "Yes on quick-apply listings. A candidate profile uses email and a password, and you are signed in as soon as it is saved. You can skip it until you want tracking or employer contact.",
       },
     ],
     related: [

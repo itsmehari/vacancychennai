@@ -33,8 +33,8 @@ export default function JobSeekerProfileCta({ variant = "card", dataCta = "job-s
         Stand out beyond a single application
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
-        Add a short headline, your area, experience band, and an optional résumé (PDF or Word, up to 2MB).
-        Browsing and applying stay free; your profile is optional and tied to your candidate login.
+        A free profile — name, email, mobile, area, qualification, and job preferences — is what unlocks
+        employer phone, email, and WhatsApp on a listing. Quick apply stays available without that step.
       </p>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Link href="/job-seeker-profile" className={btnPrimary} data-cta={`${dataCta}-learn`}>

@@ -162,6 +162,27 @@ export async function fulfillPaymentOrderById(
     return { ok: false, error: "invalid_order_metadata" };
   }
 
+  if (sku.entitlementType === "seeker_pass") {
+    const existingPass = await dbQuery<{ id: string }>(
+      `select id from entitlements where source_order_id = $1::uuid limit 1`,
+      [order.id],
+    );
+    if (existingPass.length === 0) {
+      await dbExecute(
+        `insert into entitlements (owner_user_id, entitlement_type, entitlement_ref, source_order_id, status, starts_at, ends_at)
+         values ($1::uuid, 'seeker_pass', $2::text, $3::uuid, 'active', now(), now() + interval '30 days')`,
+        [order.employer_id, JSON.stringify(sku.buildEntitlementRef()), order.id],
+      );
+    }
+    const payId = (providerPaymentId ?? `superprofile_${Date.now()}`).slice(0, 140);
+    await dbExecute(
+      `update payment_orders set status = 'paid', updated_at = now(), provider_payment_id = $2
+       where id = $1::uuid`,
+      [order.id, payId],
+    );
+    return { ok: true };
+  }
+
   const existingEnt = await dbQuery<{ id: string }>(
     `select id from entitlements where source_order_id = $1::uuid limit 1`,
     [order.id],

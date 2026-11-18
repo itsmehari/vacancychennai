@@ -56,8 +56,9 @@ export default function HireInChennaiPage() {
           ]}
         />
         <p className={`${sectionCard} max-w-3xl text-base leading-relaxed text-slate-800`}>
-          Vacancy Chennai publishes moderated listings for Greater Chennai. Candidates are not charged. You submit the
-          role, we review it, and applicants reach you through the contact path on that job.
+          Vacancy Chennai publishes moderated listings for Greater Chennai. Candidates are not charged to read or apply.
+          A shop or startup with its own address starts at the local plan: five posts. You submit the role, we review
+          it, and applicants reach you through the contact path on that job.
         </p>
         <ol className="grid gap-4 md:grid-cols-2">
           {hireSteps.map((step, index) => (
@@ -69,6 +70,9 @@ export default function HireInChennaiPage() {
           ))}
         </ol>
         <p className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <Link href="/for-local-businesses" className={linkInline}>
+            For a shop or startup
+          </Link>
           <Link href="/post-job" className={linkInline}>
             Post a job
           </Link>

@@ -8,15 +8,24 @@ import {
 } from "@/features/core/repository";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { requireRole } from "@/lib/auth";
-import { EXPERIENCE_LEVEL_OPTIONS } from "@/lib/candidate-profile-constants";
+import {
+  EDUCATION_OPTIONS,
+  EXPERIENCE_LEVEL_OPTIONS,
+  JOB_PREFERENCE_OPTIONS,
+  candidateCanViewEmployerContact,
+  phoneVerificationLabel,
+} from "@/lib/candidate-profile-constants";
+import { safeCandidateNextPath } from "@/lib/safe-next-path";
 import { btnPrimary, btnSecondary, focusRing, formInput, linkInline, sectionCard } from "@/lib/ui";
 
 type Props = {
-  searchParams: Promise<{ success?: string; error?: string }>;
+  searchParams: Promise<{ success?: string; error?: string; next?: string }>;
 };
 
 const errorCopy: Record<string, string> = {
-  "invalid-profile": "Check your name, area, and experience fields, then try again.",
+  "invalid-profile":
+    "Check your name, mobile, area, qualification, and at least one job preference, then try again.",
+  "phone-taken": "That mobile number is already on another account.",
   "rate-limited": "Too many saves in a short time. Please wait a minute and retry.",
   "resume-too-large": "Résumé must be 2MB or smaller.",
   "resume-bad-type": "Use PDF, DOC, or DOCX only.",
@@ -40,17 +49,35 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
   }
 
   const savedArea = locs.find((location) => location.id === profile.locationId);
+  const contactReady = candidateCanViewEmployerContact(profile);
+  const returnPath = safeCandidateNextPath(query.next);
 
   return (
     <div className="space-y-6">
       <DashboardWelcome title="Candidate dashboard" subtitle={`Welcome, ${session.displayName}`}>
         <p className="mt-2 text-sm text-slate-600">
-          Profile completion: {profile.profileCompleted ? "Completed" : "In progress"}
+          Profile for employer contact: {contactReady ? "Complete" : "Still missing required fields"}
+        </p>
+        <p className="mt-1 text-sm text-slate-600">
+          Mobile check: {phoneVerificationLabel(profile.phoneVerificationStatus)}. Our team reviews the number
+          separately. A pending check does not hide employer contact once this profile is complete.
+        </p>
+        <p className="mt-3">
+          <Link href="/candidate/billing" className={linkInline}>
+            Seeker pass — ₹99/month for alerts
+          </Link>
         </p>
         {savedArea ? (
           <p className="mt-3">
             <Link href={jobsInAreaPath(savedArea.area)} className={btnSecondary}>
               Jobs in {savedArea.area}
+            </Link>
+          </p>
+        ) : null}
+        {returnPath ? (
+          <p className="mt-3 text-sm text-slate-600">
+            <Link href={returnPath} className={linkInline}>
+              Back to the page you came from
             </Link>
           </p>
         ) : null}
@@ -69,9 +96,8 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
       <section className={sectionCard}>
         <h2 className="text-lg font-semibold">Job seeker profile</h2>
         <p className="mt-1 text-sm text-slate-600">
-          Résumé files are optional. On this MVP, uploaded files stay in server memory until restart — also
-          add a{" "}
-          <strong>résumé link</strong> for a stable URL. How we use your data:{" "}
+          Name, mobile, area, qualification, and job preferences are required before a job page shows the
+          employer&apos;s phone, email, or WhatsApp. Résumé files are optional. How we use your data:{" "}
           <Link href="/privacy" className={linkInline}>
             Privacy
           </Link>
@@ -89,6 +115,15 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
             className={formInput}
             required
             autoComplete="name"
+          />
+          <input
+            name="phone"
+            defaultValue={profile.phone}
+            placeholder="Mobile number"
+            className={formInput}
+            required
+            autoComplete="tel"
+            inputMode="tel"
           />
           <select
             name="locationId"
@@ -112,6 +147,39 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
             maxLength={200}
             className={`md:col-span-2 ${formInput}`}
           />
+          <label className="grid gap-1 text-sm text-slate-700">
+            <span className="font-medium text-slate-800">Educational qualification</span>
+            <select name="education" defaultValue={profile.education} required className={formInput}>
+              <option value="" disabled>
+                Select qualification
+              </option>
+              {EDUCATION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <fieldset className="md:col-span-2 space-y-2">
+            <legend className="text-sm font-medium text-slate-800">Job preferences</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {JOB_PREFERENCE_OPTIONS.map((option) => (
+                <label
+                  key={option.value}
+                  className="flex min-h-11 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800"
+                >
+                  <input
+                    type="checkbox"
+                    name="jobPreferences"
+                    value={option.value}
+                    defaultChecked={profile.jobPreferences.includes(option.value)}
+                    className="size-4"
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label className="md:col-span-2 grid gap-1 text-sm text-slate-700">
             <span className="font-medium text-slate-800">Experience band</span>
             <select
@@ -172,16 +240,19 @@ export default async function CandidateDashboardPage({ searchParams }: Props) {
         <h2 className="text-lg font-semibold">My applications</h2>
         {myApplications.length === 0 && (
           <p className="text-sm text-slate-600">
-            No applications yet. Apply from any job page.
+            No applications yet. Use Quick apply on a job page while you are signed in. Listings that
+            use email, phone, or WhatsApp go to the employer directly and do not appear here.
           </p>
         )}
         {myApplications.map((application) => (
           <div key={application.id} className="rounded-[var(--radius-md)] border border-slate-200/90 bg-slate-50/50 p-4 text-sm">
-            <p>
-              Application ID: <strong>{application.id}</strong>
+            <p className="font-semibold text-slate-900">
+              <Link href={`/jobs/${application.jobId}`} className={linkInline}>
+                {application.jobTitle || "Job"}
+              </Link>
             </p>
-            <p>Stage: {application.stage}</p>
-            <p>Submitted: {new Date(application.createdAt).toLocaleString()}</p>
+            <p className="mt-1">Stage: {application.stage}</p>
+            <p>Submitted: {new Date(application.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
           </div>
         ))}
         <Link href="/jobs-in-chennai" className={`mt-2 inline-flex ${btnSecondary}`}>

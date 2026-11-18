@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Noto_Sans_Tamil, Poppins } from "next/font/google";
+import { Geist_Mono, Noto_Sans_Tamil, Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { MicrosoftClarity } from "@/components/microsoft-clarity";
@@ -26,6 +26,15 @@ const notoTamil = Noto_Sans_Tamil({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/** Italic only — used for the corridor names in the home hero. */
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: "600",
+  style: "italic",
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -59,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-IN"
-      className={`${poppins.variable} ${notoTamil.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${notoTamil.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-slate-50 font-sans text-slate-900 antialiased">
         <GoogleAnalytics />

@@ -7,10 +7,14 @@ import {
   getRateLimitState,
   registerFailedAttempt,
 } from "@/lib/rate-limit";
+import { addAudit, setSeekerPhoneVerificationStatus } from "@/features/core/repository";
+import { isPhoneVerificationStatus } from "@/lib/candidate-profile-constants";
 import {
   createSuperAdminSession,
   destroySuperAdminSession,
+  isSuperAdmin,
   secretsMatch,
+  superAdminEmail,
   superAdminPassword,
   superAdminUsername,
 } from "@/lib/super-admin-session";
@@ -29,9 +33,12 @@ export async function superAdminLoginAction(formData: FormData) {
     redirect("/super-admin/login?error=rate");
   }
 
-  const username = String(formData.get("username") ?? "").trim();
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const usernameOk = secretsMatch(username, superAdminUsername());
+  const legacyName = superAdminUsername();
+  const usernameOk =
+    secretsMatch(username, superAdminEmail()) ||
+    (legacyName.length > 0 && secretsMatch(username, legacyName));
   const passwordOk = secretsMatch(password, superAdminPassword());
   if (!usernameOk || !passwordOk) {
     registerFailedAttempt(key, { maxAttempts: 8, blockMs: 15 * 60 * 1000 });
@@ -46,4 +53,23 @@ export async function superAdminLoginAction(formData: FormData) {
 export async function superAdminLogoutAction() {
   await destroySuperAdminSession();
   redirect("/super-admin/login");
+}
+
+export async function setSeekerPhoneVerificationAction(formData: FormData) {
+  if (!(await isSuperAdmin())) redirect("/super-admin/login");
+  const userId = String(formData.get("userId") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  if (!userId || !isPhoneVerificationStatus(status)) {
+    redirect("/super-admin/candidates?error=invalid");
+  }
+  const updated = await setSeekerPhoneVerificationStatus(userId, status);
+  if (!updated) redirect("/super-admin/candidates?error=invalid");
+  await addAudit({
+    actorRole: "admin",
+    actorId: "super-admin",
+    action: "update",
+    entityType: "candidate_phone_verification",
+    entityId: userId,
+  });
+  redirect("/super-admin/candidates?updated=1");
 }

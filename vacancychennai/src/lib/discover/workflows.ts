@@ -9,11 +9,11 @@ export const applySteps = [
   },
   {
     name: "Apply on that page",
-    text: "Use quick apply with your name and phone, or the external link or direct contact printed on the job. Do not pay a third party to submit it.",
+    text: "Use quick apply with your name and phone, or the employer form when the listing uses one. Phone, email, and WhatsApp for a listing appear after a free profile (name, email, mobile, area, qualification, and job preferences). Do not pay a third party to submit it.",
   },
   {
     name: "Keep the job URL",
-    text: "Save the vacancychennai.in job link. Use it if you need to report a fee demand or a mismatch. Candidate login is optional and only for tracking.",
+    text: "Save the vacancychennai.in job link. Use it if you need to report a fee demand or a mismatch. A completed candidate profile is required to see employer contact on that job.",
   },
 ] as const;
 

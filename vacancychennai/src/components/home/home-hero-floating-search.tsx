@@ -61,6 +61,8 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
             <option value="full-time">Full-time</option>
             <option value="part-time">Part-time</option>
             <option value="internship">Internship</option>
+            <option value="contract">Contract</option>
+            <option value="temporary">Temporary</option>
           </select>
           <span className={chevronWrap} aria-hidden>
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

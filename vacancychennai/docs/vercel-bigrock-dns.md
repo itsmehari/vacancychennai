@@ -44,6 +44,10 @@ git commit --allow-empty -m "chore: trigger Vercel production deployment"
 git push origin master
 ```
 
+## Mail
+
+The app does not send email. Sign-in is email plus password for candidates and employers. Do not add Resend DNS or `RESEND_FROM` for registration. Text alerts still use Twilio when those env vars are set.
+
 ## Verify
 
 ```bash

@@ -1,6 +1,7 @@
 import JobSeekerProfileCta from "@/components/marketing/job-seeker-profile-cta";
 import { quickApplyAction } from "@/features/applications/actions";
-import { btnPrimary, formInput, sectionCard } from "@/lib/ui";
+import { btnPrimary, btnSecondary, formInput, sectionCard } from "@/lib/ui";
+import Link from "next/link";
 
 type DirectContact = {
   email: string;
@@ -28,6 +29,10 @@ type Props = {
   prefill: Prefill;
   jobUrl: string;
   sourceChannel?: string;
+  contactLocked?: boolean;
+  registerHref?: string;
+  loginHref?: string;
+  signedIn?: boolean;
 };
 
 export function JobApplyPanel({
@@ -41,10 +46,41 @@ export function JobApplyPanel({
   prefill,
   jobUrl,
   sourceChannel,
+  contactLocked = false,
+  registerHref = "/candidate/register",
+  loginHref = "/candidate/login",
+  signedIn = false,
 }: Props) {
   return (
     <section className={sectionCard} aria-labelledby="job-apply-heading">
-      {whatsappOnly ? (
+      {contactLocked ? (
+        <>
+          <h2 id="job-apply-heading" className="text-lg font-semibold text-slate-900">
+            Employer contact
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            Phone, email, and WhatsApp for this job are shown after you save a free profile: name, email,
+            mobile, area, qualification, and the work you want. Our team can verify the mobile later. You
+            can view the contact as soon as the profile is saved.
+          </p>
+          <div className="mt-4 grid gap-2">
+            {signedIn ? (
+              <Link href="/candidate/dashboard" className={`${btnPrimary} inline-flex w-full justify-center`}>
+                Finish your profile
+              </Link>
+            ) : (
+              <>
+                <Link href={registerHref} className={`${btnPrimary} inline-flex w-full justify-center`}>
+                  Register to view contact
+                </Link>
+                <Link href={loginHref} className={`${btnSecondary} inline-flex w-full justify-center`}>
+                  Already registered? Sign in
+                </Link>
+              </>
+            )}
+          </div>
+        </>
+      ) : whatsappOnly ? (
         <>
           <h2 id="job-apply-heading" className="text-lg font-semibold text-slate-900">
             How to apply
@@ -112,16 +148,22 @@ export function JobApplyPanel({
             Contact the employer directly. Vacancy Chennai does not collect applications for this
             posting.
           </p>
-          <a
-            href={`mailto:${directContact.email}?subject=${encodeURIComponent(`Application: ${jobTitle}`)}`}
-            className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
-            data-cta="job-direct-email-apply"
-          >
-            Email {directContact.email}
-          </a>
+          {directContact.email.startsWith("external.") ? null : (
+            <a
+              href={`mailto:${directContact.email}?subject=${encodeURIComponent(`Application: ${jobTitle}`)}`}
+              className={`${btnPrimary} mt-4 inline-flex w-full justify-center`}
+              data-cta="job-direct-email-apply"
+            >
+              Email {directContact.email}
+            </a>
+          )}
           <a
             href={`tel:${directContact.phoneE164.replace(/\s/g, "")}`}
-            className={`${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`}
+            className={
+              directContact.email.startsWith("external.")
+                ? `${btnPrimary} mt-4 inline-flex w-full justify-center`
+                : `${btnPrimary} mt-3 inline-flex w-full justify-center bg-slate-800 ring-slate-800 hover:bg-slate-900`
+            }
             data-cta="job-direct-phone-apply"
           >
             Call {directContact.phoneLabel}

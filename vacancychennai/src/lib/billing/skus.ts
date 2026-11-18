@@ -4,6 +4,8 @@
  */
 
 export type BillingSkuId =
+  | "seeker_pass"
+  | "local_5"
   | "post_single"
   | "post_overage"
   | "employer_monthly_pass"
@@ -19,7 +21,7 @@ export type BillingSku = {
   label: string;
   shortDescription: string;
   /** Stored on payment_orders.entitlement_type */
-  entitlementType: "post_credit" | "monthly_pass" | "volume_pack";
+  entitlementType: "post_credit" | "monthly_pass" | "volume_pack" | "seeker_pass";
   /** JSON stored on entitlements.entitlement_ref after payment */
   buildEntitlementRef: () => Record<string, unknown>;
   /** Calendar days listing stays live after first publish (single + volume). */
@@ -31,6 +33,24 @@ const LISTING_DAYS = 120;
 export const OVERAGE_PER_POST_PAISE = 5500; /** Rs 55 — volume pack overage */
 
 export const BILLING_SKUS: Record<BillingSkuId, BillingSku> = {
+  seeker_pass: {
+    id: "seeker_pass",
+    amountPaise: 9900,
+    label: "Job seeker pass",
+    shortDescription: "30 days of area and role alerts, plus your profile kept ready. Reading jobs and applying stay free.",
+    entitlementType: "seeker_pass",
+    buildEntitlementRef: () => ({ sku: "seeker_pass" }),
+    listingDays: 30,
+  },
+  local_5: {
+    id: "local_5",
+    amountPaise: 19900,
+    label: "Local business — 5 posts",
+    shortDescription: "Five publishes in 30 days for a shop, startup, or office with a street address.",
+    entitlementType: "volume_pack",
+    buildEntitlementRef: () => ({ sku: "local_5", credits: 5 }),
+    listingDays: LISTING_DAYS,
+  },
   post_overage: {
     id: "post_overage",
     amountPaise: OVERAGE_PER_POST_PAISE,
@@ -79,19 +99,19 @@ export const BILLING_SKUS: Record<BillingSkuId, BillingSku> = {
   volume_10: {
     id: "volume_10",
     amountPaise: 49000,
-    label: "Volume — 10 posts / month",
-    shortDescription: "10 prepaid publishes within 30 days (Rs 49 each).",
+    label: "Verified employer — 10 posts",
+    shortDescription: "For a mid-size Chennai IT team. 10 publishes in 30 days. Verified badge after the company name and office address match.",
     entitlementType: "volume_pack",
-    buildEntitlementRef: () => ({ sku: "volume_10", credits: 10 }),
+    buildEntitlementRef: () => ({ sku: "volume_10", credits: 10, verified: true }),
     listingDays: LISTING_DAYS,
   },
   volume_20: {
     id: "volume_20",
     amountPaise: 98000,
-    label: "Volume — 20 posts / month",
-    shortDescription: "20 prepaid publishes within 30 days (Rs 49 each).",
+    label: "Corporate desk — 20 posts",
+    shortDescription: "20 publishes in 30 days for a larger Chennai office. Same review rules. Verified badge after the office address matches.",
     entitlementType: "volume_pack",
-    buildEntitlementRef: () => ({ sku: "volume_20", credits: 20 }),
+    buildEntitlementRef: () => ({ sku: "volume_20", credits: 20, verified: true }),
     listingDays: LISTING_DAYS,
   },
 };
@@ -103,6 +123,7 @@ export function getSku(id: string): BillingSku | null {
 
 export function listPublicSkus(): BillingSku[] {
   return [
+    BILLING_SKUS.local_5,
     BILLING_SKUS.post_single,
     BILLING_SKUS.employer_monthly_pass,
     BILLING_SKUS.volume_3,
@@ -111,4 +132,9 @@ export function listPublicSkus(): BillingSku[] {
     BILLING_SKUS.volume_20,
     BILLING_SKUS.post_overage,
   ];
+}
+
+/** Employer checkout only. The seeker pass is sold to candidate accounts. */
+export function listEmployerSkus(): BillingSku[] {
+  return listPublicSkus();
 }

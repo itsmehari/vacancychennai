@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const title = "How to apply for jobs in Chennai";
 const description =
-  "Apply on the Vacancy Chennai listing with your name and phone. No candidate fee. An account is only for tracking applications.";
+  "Apply on the Vacancy Chennai listing with your name and phone. Employer contact is shown after a free profile. No candidate fee.";
 
 export const metadata = baseMetadata(title, description, "/how-to-apply");
 
@@ -52,7 +52,8 @@ export default function HowToApplyPage() {
         />
         <p className={`${sectionCard} max-w-3xl text-base leading-relaxed text-slate-800`}>
           Open a listing you can commute to, read the employer and the area, then submit your name and phone if the job
-          uses quick apply. Your number is shared with that employer. It is not printed on the public page.
+          uses quick apply. Your number is shared with that employer. It is not printed on the public page. The
+          employer&apos;s own phone, email, or WhatsApp is shown after you complete a free profile.
         </p>
         <ol className="grid gap-4 md:grid-cols-2">
           {applySteps.map((step, index) => (

@@ -10,73 +10,87 @@ import {
 } from "@/lib/ui";
 
 export const metadata = baseMetadata(
-  "Employer pricing — Vacancy Chennai",
-  "Pay-per-post, monthly pass, and volume packs for Chennai employers. Hyperlocal listings, moderation, and checkout via SuperProfile payment links.",
+  "Pricing — Vacancy Chennai",
+  "Job seekers browse free. A ₹99 pass adds alerts. Local businesses post 5 jobs for ₹199 a month. Verified and corporate plans cover larger Chennai offices.",
   "/pricing",
 );
 
 const faqs = [
   {
     q: "What is free vs paid?",
-    a: "Registering and submitting a job for review is free. You pay when you need publish credits or a monthly pass so listings can go live on the board (after moderation).",
+    a: "Reading a job and applying with your name and phone is free. Job seekers can add a ₹99 pass for area and role alerts. Employers pay when a reviewed listing is published.",
+  },
+  {
+    q: "Who is the ₹199 plan for?",
+    a: "A shop, clinic, cafe, startup, or any Chennai business with its own street address. It includes five publishes in 30 days.",
   },
   {
     q: "When are credits used?",
-    a: "A prepaid credit is consumed when our team first sets your job to Published — not when you save a draft. If we reject a listing before publish, that job does not consume a credit.",
+    a: "A prepaid credit is consumed when our team first sets your job to Published — not when you paste a draft. If we reject a listing before publish, that job does not consume a credit.",
   },
   {
-    q: "What is the monthly pass?",
-    a: `For ₹${BILLING_SKUS.employer_monthly_pass.amountPaise / 100}/month you can keep up to ${(BILLING_SKUS.employer_monthly_pass.buildEntitlementRef() as { max_live_posts?: number }).max_live_posts ?? 2} job(s) live at the same time for 30 days, subject to the same review rules.`,
-  },
-  {
-    q: "How do volume packs work?",
-    a: "Volume packs bundle publishes at an effective ₹49 each (3, 5, 10, or 20 posts). They expire 30 days after purchase. If you need more in the same window, buy another pack or use a single post / overage post.",
+    q: "What are the later employer levels?",
+    a: "Verified employer is 10 posts in 30 days for a mid-size IT team, after the company name and office address match. Corporate desk is 20 posts for a larger office. The same review applies.",
   },
   {
     q: "How do I pay?",
-    a: "Signed-in employers open a SuperProfile payment page (links are configured per plan in production). Use the same email on SuperProfile as on Vacancy Chennai. Credits appear after payment is confirmed — via automation webhook or our team marking the order paid.",
+    a: "Sign in, then open billing. Checkout uses a SuperProfile payment page. Use the same email as your Vacancy Chennai account. Credits appear after payment is confirmed.",
   },
   {
     q: "Refunds?",
-    a: "If a role never reaches Published, you have not used a publish credit for that job. For payment issues, email us with your SuperProfile receipt and Vacancy Chennai order id within 14 days — see our billing policy doc in the repository docs folder.",
+    a: "If a role never reaches Published, you have not used a publish credit for that job. For payment issues, email support@vacancychennai.in with your SuperProfile receipt and Vacancy Chennai order id within 14 days.",
   },
 ] as const;
 
 export default function PricingPage() {
   const tiers = [
-    BILLING_SKUS.post_single,
-    BILLING_SKUS.employer_monthly_pass,
-    BILLING_SKUS.volume_3,
-    BILLING_SKUS.volume_5,
+    BILLING_SKUS.local_5,
     BILLING_SKUS.volume_10,
     BILLING_SKUS.volume_20,
+    BILLING_SKUS.post_single,
   ];
+  const seeker = BILLING_SKUS.seeker_pass;
+  const monthlyIds = new Set(["local_5", "volume_10", "volume_20", "seeker_pass"]);
 
   return (
     <>
       <InnerPageHero
-        eyebrow="Employers"
-        title="Choose how you want to hire in Chennai"
-        description="Start free: create an account and send roles to our moderation queue. When you are ready for live visibility, buy a single post (120 days on the board), a monthly pass for up to two concurrent listings, or a volume pack for HR teams."
+        eyebrow="Pricing"
+        title="Cheap for a shop. Clear for a larger office."
+        description="First we serve Chennai businesses with their own address. Job seekers can read and apply without paying. A ₹99 pass is only for alerts and a saved profile."
         actions={
           <>
-            <Link href="/employer/register" className={btnPrimary}>
-              Create employer account
+            <Link href="/for-local-businesses" className={btnPrimary}>
+              For local businesses
             </Link>
             <Link
-              href="/employer/login"
+              href="/for-job-seekers"
               className={`inline-flex min-h-[44px] items-center justify-center rounded-[var(--radius-md)] border border-white/45 bg-white/5 px-5 py-2 text-sm font-semibold text-white hover:bg-white/12 ${focusRingOnDark} ${transitionFast}`}
             >
-              Already registered? Sign in
+              For job seekers
             </Link>
           </>
         }
       />
 
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-8">
+        <article className={`${sectionCard} mb-5 max-w-xl`}>
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Job seekers</p>
+          <h2 className="mt-1 text-lg font-semibold text-slate-900">{seeker.label}</h2>
+          <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+            ₹{seeker.amountPaise / 100}
+            <span className="text-base font-semibold text-slate-600"> / month</span>
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-700">{seeker.shortDescription}</p>
+          <Link href="/candidate/billing" className={`mt-6 inline-flex ${btnPrimary}`}>
+            Get the seeker pass
+          </Link>
+        </article>
+
+        <h2 className="mb-4 text-xl font-semibold text-slate-900">Employers</h2>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {tiers.map((plan) => {
-            const popular = plan.id === "employer_monthly_pass";
+            const popular = plan.id === "local_5";
             return (
               <article
                 key={plan.id}
@@ -92,7 +106,7 @@ export default function PricingPage() {
                 <h2 className="text-lg font-semibold text-slate-900">{plan.label}</h2>
                 <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
                   ₹{(plan.amountPaise / 100).toFixed(plan.amountPaise % 100 === 0 ? 0 : 2)}
-                  {plan.id === "employer_monthly_pass" ? (
+                  {monthlyIds.has(plan.id) ? (
                     <span className="text-base font-semibold text-slate-600"> / month</span>
                   ) : null}
                 </p>
@@ -118,10 +132,9 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-6 rounded-[var(--radius-md)] border border-slate-200/90 bg-slate-50/60 p-4 text-center text-sm text-slate-700">
-          <strong className="text-slate-900">India anchor:</strong> single post ₹
-          {BILLING_SKUS.post_single.amountPaise / 100} · volume from ₹
-          {BILLING_SKUS.volume_3.amountPaise / 100} (3 posts). Overage single post ₹
-          {BILLING_SKUS.post_overage.amountPaise / 100} when offered in billing.
+          <strong className="text-slate-900">Also on billing:</strong> a two-listing monthly pass, 3-post and 5-post packs, and a single extra post at ₹
+          {BILLING_SKUS.post_overage.amountPaise / 100}. The first plan to buy is local business, five posts for ₹
+          {BILLING_SKUS.local_5.amountPaise / 100}.
         </div>
 
         <p className="mt-4 text-center text-sm leading-relaxed text-slate-600">

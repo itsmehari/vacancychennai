@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import {
-  jobRequestMagicLinkAction,
+  jobRequestContinueAction,
   jobRequestOtpAction,
   jobRequestVerifyOtpAction,
 } from "@/features/local-job-request/actions";
@@ -26,17 +26,17 @@ function AuthSubmitButtons() {
     <div className="flex flex-col gap-2 sm:flex-row md:col-span-2">
       <button
         type="submit"
-        formAction={jobRequestMagicLinkAction}
+        formAction={jobRequestContinueAction}
         disabled={pending}
-        className={`${btn} border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-50`}
+        className={`${btn} bg-blue-600 text-white hover:bg-blue-700`}
       >
-        {pending ? "Sending…" : "Email me a sign-in link"}
+        {pending ? "Signing in…" : "Continue"}
       </button>
       <button
         type="submit"
         formAction={jobRequestOtpAction}
         disabled={pending}
-        className={`${btn} bg-blue-600 text-white hover:bg-blue-700`}
+        className={`${btn} border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-50`}
       >
         {pending ? "Sending…" : "Send SMS code"}
       </button>
@@ -131,7 +131,7 @@ export function JobRequestAuthPanel({
       </label>
       <AuthSubmitButtons />
       <p className="text-xs text-slate-500 md:col-span-2">
-        Use email link or SMS code — whichever is easier. One free job request per account.
+        Continue signs you in immediately. SMS is optional. One free job request per account.
       </p>
     </form>
   );

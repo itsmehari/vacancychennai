@@ -1,13 +1,20 @@
+import { AdminNav } from "@/components/admin/admin-nav";
 import DashboardWelcome from "@/components/layout/dashboard-welcome";
 import { auditLogs } from "@/features/core/mock-db";
 import { countApplications, listAllJobs } from "@/features/core/repository";
 import { grantEmployerPostCreditFromJobAction } from "@/features/billing/admin-grant-action";
 import { markSuperProfileOrderPaidAction } from "@/features/billing/mark-superprofile-paid-action";
 import { listPendingSuperProfileOrders } from "@/features/billing/payment-order-queries";
+import { curatedPublishedJobs } from "@/features/core/static-curated-jobs";
 import { updateJobStatusAction } from "@/features/jobs/actions";
+import {
+  listEmployersForAdmin,
+  listSeekersForAdmin,
+} from "@/features/super-admin/directory";
 import { requireRole } from "@/lib/auth";
 import { hasDatabase } from "@/lib/db";
 import { btnDenseDanger, btnDenseNeutral, btnDenseSuccess, sectionCard } from "@/lib/ui";
+import Link from "next/link";
 
 type Props = {
   searchParams: Promise<{ success?: string; error?: string }>;
@@ -17,16 +24,67 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
   await requireRole("admin", "/admin/login");
   const query = await searchParams;
 
-  const allJobs = await listAllJobs();
-  const appCount = await countApplications();
+  const [allJobs, appCount, seekers, employers] = await Promise.all([
+    listAllJobs(),
+    countApplications(),
+    listSeekersForAdmin(),
+    listEmployersForAdmin(),
+  ]);
   const pendingPayments = hasDatabase() ? await listPendingSuperProfileOrders(30) : [];
 
   const pendingJobs = allJobs.filter((job) => job.status === "review");
   const publishedJobs = allJobs.filter((job) => job.status === "published");
+  const jobIds = new Set(allJobs.map((job) => job.id));
+  const catalogOnly = curatedPublishedJobs.filter((job) => !jobIds.has(job.id)).length;
+  const pendingPhones = seekers.filter(
+    (row) => row.phoneVerificationStatus === "pending" && row.phone,
+  ).length;
+
+  const hubCards = [
+    {
+      href: "/admin/candidates",
+      label: "Candidates",
+      value: seekers.length,
+      note: `${pendingPhones} mobiles awaiting review`,
+    },
+    {
+      href: "/admin/employers",
+      label: "Employers",
+      value: employers.length,
+      note: "Accounts on file",
+    },
+    {
+      href: "/admin/jobs",
+      label: "Job posts",
+      value: allJobs.length + catalogOnly,
+      note: `${pendingJobs.length} in moderation`,
+    },
+    {
+      href: "/admin/applications",
+      label: "Applications",
+      value: appCount,
+      note: "Quick applies stored in the app",
+    },
+  ];
 
   return (
     <div className="space-y-6">
+      <AdminNav />
       <DashboardWelcome title="Admin dashboard">
+        <p className="mt-1 text-sm text-slate-600">
+          Manage candidates, employers, job posts, and applications from one place.
+        </p>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {hubCards.map((card) => (
+            <li key={card.href}>
+              <Link href={card.href} className="block rounded-[var(--radius-md)] border border-slate-200/90 bg-slate-50/60 p-4 hover:border-blue-200 hover:bg-white">
+                <p className="text-sm font-medium text-slate-600">{card.label}</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums text-slate-900">{card.value}</p>
+                <p className="mt-1 text-xs text-slate-500">{card.note}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <div className="rounded-[var(--radius-md)] border border-slate-200/90 bg-slate-50/60 p-4">
             <p className="text-sm font-medium text-slate-600">Published jobs</p>
@@ -120,7 +178,12 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
       ) : null}
 
       <section className={sectionCard}>
-        <h2 className="text-xl font-semibold text-slate-900">Moderation queue</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-xl font-semibold text-slate-900">Moderation queue</h2>
+          <Link href="/admin/jobs" className="text-sm font-semibold text-blue-700 hover:text-blue-900">
+            All job posts
+          </Link>
+        </div>
         {pendingJobs.length === 0 && (
           <p className="mt-2 text-sm text-slate-600">No jobs in review queue.</p>
         )}
@@ -134,6 +197,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
               <p className="text-sm text-slate-600">{job.category}</p>
               <form action={updateJobStatusAction} className="mt-3 flex flex-wrap gap-2">
                 <input type="hidden" name="jobId" value={job.id} />
+                <input type="hidden" name="returnTo" value="/admin/dashboard" />
                 <button className={btnDenseSuccess} name="status" value="published" type="submit">
                   Publish
                 </button>
@@ -147,6 +211,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
               {hasDatabase() ? (
                 <form action={grantEmployerPostCreditFromJobAction} className="mt-2">
                   <input type="hidden" name="jobId" value={job.id} />
+                  <input type="hidden" name="returnTo" value="/admin/dashboard" />
                   <button
                     type="submit"
                     className="text-xs font-semibold text-blue-700 underline-offset-2 hover:underline"

@@ -317,12 +317,6 @@ async function testDbRegistrationDryRun() {
     skip("DB candidate register happy path", "no DATABASE_URL");
     return;
   }
-  if (!hasResend) {
-    skip("DB employer register happy path", "no RESEND_API_KEY (would fail email-config)");
-    skip("DB candidate register happy path", "no RESEND_API_KEY");
-    return;
-  }
-
   const ts = Date.now();
   const empEmail = `e2e-employer-${ts}@vacancychennai.test`;
   const candEmail = `e2e-candidate-${ts}@vacancychennai.test`;
@@ -340,7 +334,7 @@ async function testDbRegistrationDryRun() {
       passwordConfirm: "testpass123",
     });
     const loc = emp.location ?? "";
-    if ((emp.status === 303 || emp.status === 302) && loc.includes("registered=1")) {
+    if ((emp.status === 303 || emp.status === 302) && loc.includes("/employer/dashboard")) {
       pass("DB employer register", loc);
     } else {
       fail("DB employer register", `status=${emp.status} location=${loc}`);

@@ -26,7 +26,7 @@ export default async function EmployerRegisterPage({ searchParams }: Props) {
       <section className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:max-w-lg md:p-8">
         <h1 className="text-2xl font-bold text-slate-900">Create employer account</h1>
         <p className="mt-1 text-sm text-slate-600">
-          We’ll email you a link to verify your address before you can use the dashboard.
+          Choose a password and you can open the dashboard straight away. No email step.
         </p>
 
         {!db ? (

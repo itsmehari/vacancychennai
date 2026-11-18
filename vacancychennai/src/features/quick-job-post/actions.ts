@@ -93,7 +93,7 @@ export async function updateQuickJobPostStatusAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   const filter = String(formData.get("filter") ?? "new");
-  const back = `/super-admin?status=${encodeURIComponent(filter)}`;
+  const back = `/super-admin/inbox?status=${encodeURIComponent(filter)}`;
   if (!isDatabaseUuid(id) || !isQuickJobStatus(status)) {
     redirect(`${back}&error=invalid`);
   }

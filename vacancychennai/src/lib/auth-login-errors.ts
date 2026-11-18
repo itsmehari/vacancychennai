@@ -8,15 +8,21 @@ export function loginQueryErrorMessage(error: string | undefined): string | null
     case "invalid-candidate":
       return "We could not find a candidate account for that email. Use the same address you apply with, or browse jobs to get started.";
     case "unverified":
-      return "Your email is not verified yet. Open the link we sent to your inbox to finish signing in.";
+      return "Sign in with your email and password. No verification email is required.";
     case "invalid-token":
-      return "This sign-in or verification link is invalid or has expired. Request a new one from the login page.";
+      return "This link is invalid or has expired. Sign in with your password.";
     case "email-config":
-      return "Sign-in email is not configured on this server. Ask the site admin to set RESEND_API_KEY, RESEND_FROM, and NEXT_PUBLIC_SITE_URL.";
     case "email-failed":
-      return "We could not send the email. Try again in a moment or contact support if it continues.";
+    case "email-sandbox":
+      return "Sign in with your email and password. This site does not send sign-in email.";
+    case "no-password":
+      return "This account has no password yet. Set one below. If no mobile is saved yet, the number you enter is stored on the account.";
+    case "no-phone":
+      return "Add the mobile number for this account in the form below, then choose a password.";
+    case "phone-mismatch":
+      return "That mobile number does not match this account.";
     case "email-rate-limited":
-      return "Too many emails sent to this address. Please wait up to an hour before trying again.";
+      return "Please wait a few minutes, then try again.";
     case "email-taken":
       return "An account already exists with this email. Try signing in or use a different address.";
     case "weak-password":
@@ -24,7 +30,15 @@ export function loginQueryErrorMessage(error: string | undefined): string | null
     case "password-mismatch":
       return "Passwords do not match.";
     case "invalid-phone":
-      return "Enter a valid phone number (10+ digits, optional country code).";
+      return "Enter a valid phone number (10 digits, or include the country code).";
+    case "invalid-education":
+      return "Choose your educational qualification.";
+    case "invalid-preferences":
+      return "Choose at least one kind of work you want.";
+    case "invalid-location":
+      return "Choose an area from the list.";
+    case "phone-taken":
+      return "That mobile number is already on another account. Sign in with the email you used, or use a different number.";
     case "db-required":
       return "Registration and subscriptions require the live database. Try again later or contact support.";
     default:
@@ -41,10 +55,10 @@ export function loginQueryInfoMessage(query: {
   subscribed?: string;
 }): string | null {
   if (query.forgot === "1") {
-    return "If an account exists for that email, we sent password reset instructions. Check your inbox (and spam).";
+    return "Password reset by email is off. Sign in with your password, or write to support@vacancychennai.in.";
   }
   if (query.registered === "1") {
-    return "Account created. Check your email to verify your address, then sign in.";
+    return "Account created. Sign in with the password you chose.";
   }
   if (query.reset === "1") {
     return "Password updated. Sign in with your new password.";
@@ -52,11 +66,8 @@ export function loginQueryInfoMessage(query: {
   if (query.subscribed === "1") {
     return "You’re subscribed. We’ll use this to send updates when we add that channel.";
   }
-  if (query.sent === "1") {
-    return "If this email is registered, we sent a sign-in link. Check your inbox (and spam) — it expires in about an hour.";
-  }
-  if (query.resent === "1") {
-    return "If this address has an unverified employer account, we sent another verification email.";
+  if (query.sent === "1" || query.resent === "1") {
+    return "Sign in with your email and password.";
   }
   return null;
 }

@@ -6,9 +6,13 @@ This document freezes commercial rules referenced by the product and [`src/lib/b
 
 | SKU | Price (INR) | What you get |
 |-----|---------------|----------------|
+| Job seeker pass | **99** | 30 days of area and role alerts. Browsing and apply stay free. Sold to candidate accounts. |
+| Local business | **199** | **5** publishes within **30 days**. First plan for a shop, startup, or office with a street address. |
 | Single post | **75** | One **published** listing, visible up to **120 days** from first publish (or until you close it). |
 | Employer monthly pass | **120** | **30 days** from purchase; up to **2 concurrent published** jobs at a time. Moderation still applies. |
-| Volume 3 / 5 / 10 / 20 | **147 / 245 / 490 / 980** | **3 / 5 / 10 / 20** publishes within **30 days** of purchase (effective **Rs 49** per post on those packs). |
+| Volume 3 / 5 | **147 / 245** | **3 / 5** publishes within **30 days**. |
+| Verified employer (volume 10) | **490** | **10** publishes in **30 days** for a mid-size Chennai IT team. Verified after the company name and office address match. |
+| Corporate desk (volume 20) | **980** | **20** publishes in **30 days** for a larger office. |
 
 ## When you are charged
 

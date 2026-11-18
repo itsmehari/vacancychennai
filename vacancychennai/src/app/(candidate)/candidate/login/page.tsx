@@ -5,10 +5,11 @@ import { loginQueryErrorMessage, loginQueryInfoMessage } from "@/lib/auth-login-
 import { hasDatabase } from "@/lib/db";
 import { resumeDoctorReferralUrl } from "@/lib/partner-resumedoctor";
 import { shouldShowDemoLoginHint } from "@/lib/demo-login-hint";
+import { safeCandidateNextPath } from "@/lib/safe-next-path";
 import { CandidateLoginForm } from "./candidate-login-form";
 
 type Props = {
-  searchParams: Promise<{ error?: string; new?: string; sent?: string }>;
+  searchParams: Promise<{ error?: string; new?: string; sent?: string; next?: string }>;
 };
 
 export async function generateMetadata({
@@ -29,10 +30,11 @@ export async function generateMetadata({
 
 export default async function CandidateLoginPage({ searchParams }: Props) {
   const query = await searchParams;
+  const nextPath = safeCandidateNextPath(query.next);
   const errorMessage = loginQueryErrorMessage(query.error);
   const infoMessage = loginQueryInfoMessage({ sent: query.sent });
   const showDemoHint = shouldShowDemoLoginHint();
-  const magicLinkMode = hasDatabase();
+  const passwordMode = hasDatabase();
   const fromHomeSignup = query.new === "1" || query.new === "true";
   const resumeDoctorUrl = resumeDoctorReferralUrl("auth_candidate_login");
 
@@ -51,9 +53,9 @@ export default async function CandidateLoginPage({ searchParams }: Props) {
             Demo: sign in with <span className="font-medium">candidate@vacancychennai.in</span> (email
             only in mock mode).
           </p>
-        ) : magicLinkMode ? (
+        ) : passwordMode ? (
           <p className="mt-1 text-sm text-slate-600">
-            Enter the email you use for applications — we&apos;ll send a secure one-time link to sign in.
+            Sign in with the email and password you chose when you created your profile.
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-600">
@@ -78,7 +80,8 @@ export default async function CandidateLoginPage({ searchParams }: Props) {
         ) : null}
         <CandidateLoginForm
           showDevNote={showDemoHint}
-          magicLinkMode={magicLinkMode}
+          passwordMode={passwordMode}
+          nextPath={nextPath}
         />
         <p className="mt-5 text-center text-xs leading-relaxed text-slate-500">
           Updating your résumé before uploads?{" "}
@@ -113,7 +116,10 @@ export default async function CandidateLoginPage({ searchParams }: Props) {
           </Link>
         </p>
         <p className="mt-3 text-center text-sm text-slate-600">
-          <Link href="/candidate/register" className="font-medium text-blue-600 hover:text-blue-800">
+          <Link
+            href={nextPath ? `/candidate/register?next=${encodeURIComponent(nextPath)}` : "/candidate/register"}
+            className="font-medium text-blue-600 hover:text-blue-800"
+          >
             Create free account
           </Link>
           <span className="mx-2 text-slate-400" aria-hidden>

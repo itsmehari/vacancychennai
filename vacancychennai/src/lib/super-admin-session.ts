@@ -12,12 +12,17 @@ function sessionSecret() {
   );
 }
 
+export function superAdminEmail() {
+  return (process.env.SUPER_ADMIN_EMAIL || "harikrishnanhk1988@gmail.com").trim().toLowerCase();
+}
+
+/** Optional second sign-in name when `SUPER_ADMIN_USERNAME` is set in the environment. */
 export function superAdminUsername() {
-  return (process.env.SUPER_ADMIN_USERNAME || "adminchennai").trim();
+  return (process.env.SUPER_ADMIN_USERNAME || "").trim().toLowerCase();
 }
 
 export function superAdminPassword() {
-  return process.env.SUPER_ADMIN_PASSWORD || "chennaiadmin";
+  return process.env.SUPER_ADMIN_PASSWORD || "Mylapore@21g";
 }
 
 export function secretsMatch(given: string, expected: string) {

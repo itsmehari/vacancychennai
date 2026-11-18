@@ -187,6 +187,8 @@ export function discoverSitemapEntries(): DiscoverSitemapEntry[] {
     { path: "/faq", changeFrequency: "monthly", priority: 0.68 },
     { path: "/glossary", changeFrequency: "monthly", priority: 0.6 },
     { path: "/hire-in-chennai", changeFrequency: "weekly", priority: 0.8 },
+    { path: "/for-local-businesses", changeFrequency: "weekly", priority: 0.82 },
+    { path: "/for-job-seekers", changeFrequency: "weekly", priority: 0.8 },
     { path: "/jobs-this-week", changeFrequency: "daily", priority: 0.76 },
     ...jobTypeHubs.map((hub) => ({
       path: hub.path,

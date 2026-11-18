@@ -51,14 +51,13 @@ Conventions learned from shipping the marketing shell, auth/dashboard polish, bl
 - **Public post:** `/post-job` is the short paste flow (phone, email, vacancy text) saved to `quick_job_posts` and reviewed at `/super-admin`. The previous draft form stays at `/post-job/classic` and is not linked.
 - `createJobAction` redirects to `?success=job-created`. Dashboard copy for that query param should stay aligned with the real moderation lifecycle (see `docs/PROJECT_UPDATE.md`).
 
-## Auth email (Resend) — employer + candidate + admin reset
+## Auth — password only. No Resend.
 
-- **DB mode only:** When `DATABASE_URL` is set, **employers** need `users.email_verified_at` after a valid password; otherwise send verification email and redirect with `?error=unverified` (no session). **Candidates** use a **magic link** from the login form — no session until `GET /api/auth/email/verify` consumes the token.
-- **Admin password reset:** Separate token purpose **`admin_password_reset`** (migration `008_*`). **`requestAdminPasswordResetAction` / `resetAdminPasswordAction`** in `account-actions.ts`; **`sendAdminPasswordResetEmail`**; pages **`/admin/forgot-password`**, **`/admin/reset-password`**. Employer reset stays on **`password_reset`** + `/employer/reset-password`.
-- **Mock mode:** `!hasDatabase()` keeps instant employer/candidate login; do not require Resend.
-- **Files:** `src/features/auth/actions.ts`, `src/features/auth/account-actions.ts` (register, subscribe, password resets), `src/app/api/auth/email/verify/route.ts`, `src/lib/email/*`, `src/lib/auth-login-errors.ts`, `src/lib/rate-limit.ts` (verification send caps), migrations `006_email_verification.sql`, `007_signup_password_reset_subscriptions.sql`, `008_admin_password_reset_purpose.sql`.
-- **Env:** `RESEND_API_KEY`, `RESEND_FROM`, `NEXT_PUBLIC_SITE_URL` (link base in emails). Never log plaintext tokens or full API keys; never commit `.env.local`.
-- **UI:** Employer login uses `showVerificationResend`, `loginQueryInfoMessage({ resent })`, and `EmployerLoginForm` resend action. Candidate login uses `magicLinkMode={hasDatabase()}` and `?sent=1` info copy. Admin login: forgot link + `loginQueryInfoMessage` for `reset` / `forgot`.
+- **DB mode:** Employer and candidate registration store a password and call `createSession` immediately. Employer insert sets `email_verified_at = now()`. Login does not check that column, so older unverified employers can still sign in. Do not add a verification email, magic link, or password-reset email.
+- **Forgot password:** `/employer/forgot-password` and `/admin/forgot-password` tell the person to contact `support@vacancychennai.in`. An old reset link can still finish on `/employer/reset-password` or `/admin/reset-password`.
+- **Candidates:** Older rows with a null `password_hash` set a password on the login page (stored `users.phone` must match; a null phone is saved from the form).
+- **Mock mode:** `!hasDatabase()` keeps instant employer/candidate login.
+- **Files:** `src/features/auth/actions.ts`, `src/features/auth/account-actions.ts`. Do not restore `src/lib/email/resend-client.ts`.
 
 ## Roles and route guards
 
@@ -69,7 +68,7 @@ Conventions learned from shipping the marketing shell, auth/dashboard polish, bl
 
 - **Endpoint:** `src/app/api/cron/notifications/route.ts` — **`CRON_SECRET`** required (`Bearer` or `?secret=`). **`runtime: "nodejs"`**.
 - **Runner:** `src/lib/notifications/run-scheduled-notifications.ts` + **`listPublishedJobsCreatedSince`** in `repository.ts`; subscribers from **`email_subscriptions`**.
-- **Integrations:** Resend (`send-digest-email.ts`), optional Twilio (`twilio-sms.ts`), optional **`ADMIN_SMS_DIGEST_EMAIL`** fallback. **`vercel.json`** cron schedule in app root.
+- **Integrations:** Email digests and billing reminder emails are off. SMS still uses optional Twilio (`twilio-sms.ts`). **`vercel.json`** cron schedule in app root.
 - **Env:** See `.env.example` (`CRON_SECRET`, `NOTIFICATION_DIGEST_WINDOW_HOURS`, Twilio vars). Do not expose `CRON_SECRET` in client bundles.
 
 ## Documentation

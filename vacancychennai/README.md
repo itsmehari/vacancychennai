@@ -101,17 +101,11 @@ Re-running the seed updates the three users by email and skips duplicate jobs (b
 - Open the live site and confirm listings match what you see in Neon (not only mock data).
 - Sign in as employer/admin only if you intentionally kept demo accounts on production; otherwise create real users and rotate passwords.
 
-### Email (Resend) — required for DB auth email flows
+### Sign-in
 
-When `DATABASE_URL` is set, **employer** sign-in expects a verified email (`users.email_verified_at`): after a correct password, the app emails a verification link via Resend if needed. **Candidates** sign in with a **magic link** to their email (no password on the form).
+When `DATABASE_URL` is set, employers and candidates register with a password and go straight to their dashboard. The app does not send verification, reset, digest, or billing emails. Text alerts still need Twilio if you want them.
 
-1. Set **`RESEND_API_KEY`**, **`RESEND_FROM`** (verified domain sender), and **`NEXT_PUBLIC_SITE_URL`** (exact site origin for links, e.g. `https://vacancychennai.in`) on Vercel and locally.
-2. **Vercel integration:** [Resend on the Vercel Marketplace](https://vercel.com/marketplace/resend) can create `RESEND_API_KEY`.
-3. In Resend → **Domains**, verify your domain, then use e.g. `Vacancy Chennai <notifications@your-domain>` as `RESEND_FROM`.
-
-If Resend env vars are missing while using Postgres, employers hit `email-config` and candidates cannot receive magic links. **Password reset** and **job alert** emails are not implemented yet — still backlog.
-
-See `docs/PROJECT_UPDATE.md` and `AGENTS.md` for behaviour details. `.env.example` lists variable names.
+See `docs/PROJECT_UPDATE.md` and `AGENTS.md`. `.env.example` lists variable names.
 
 ## Project Structure (Feature-first)
 - `src/features/auth` - login/logout actions

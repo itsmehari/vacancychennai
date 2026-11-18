@@ -16,15 +16,13 @@ export function jobRequestQueryError(error: string | undefined): string | null {
     case "email-taken":
       return "This email belongs to an employer or admin account. Use a different email for job requests.";
     case "otp-failed":
-      return "We could not send the SMS code. Try email sign-in or try again later.";
+      return "We could not send the SMS code. Use Continue to sign in without a code.";
     case "rate-limited":
       return "Too many attempts. Please wait a few minutes.";
     case "email-config":
-      return "Email sign-in is not configured. Try SMS code or contact support.";
     case "email-failed":
-      return "We could not send the email. Try again or use SMS code.";
     case "email-rate-limited":
-      return "Too many emails sent. Wait up to an hour or use SMS code.";
+      return "Use Continue to sign in with your name, email, and mobile. No email is sent.";
     default:
       return "Something went wrong. Please try again.";
   }
@@ -38,7 +36,7 @@ export function jobRequestQueryInfo(query: {
     return "Your job request is live. Employers can see it below and contact you on WhatsApp.";
   }
   if (query.auth === "sent") {
-    return "Check your email for a sign-in link (about 1 hour). Then complete your job request.";
+    return "You’re signed in. Fill in your job requirement below.";
   }
   if (query.auth === "otp-sent") {
     return "Enter the 6-digit code we sent to your mobile.";

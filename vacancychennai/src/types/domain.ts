@@ -63,6 +63,8 @@ export type JobApplication = {
   createdAt: string;
   /** Where the apply started, e.g. role-telecaller. */
   sourceChannel?: string;
+  /** Filled when the application list is loaded for the seeker dashboard. */
+  jobTitle?: string;
 };
 
 export type EmployerProfile = {
@@ -91,6 +93,12 @@ export type CandidateProfile = {
   resumeUrl: string;
   /** True when a résumé file is available (MVP: in-memory store; see `/api/candidate/resume`). */
   hasUploadedResumeFile: boolean;
+  /** Qualification code from `EDUCATION_OPTIONS`. */
+  education: string;
+  /** Preference codes from `JOB_PREFERENCE_OPTIONS`. */
+  jobPreferences: string[];
+  /** Admin review of the mobile number. Does not block contact access. */
+  phoneVerificationStatus: "pending" | "verified" | "rejected";
 };
 
 export type AuditLog = {

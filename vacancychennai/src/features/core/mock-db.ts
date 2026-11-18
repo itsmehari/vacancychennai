@@ -7,6 +7,8 @@ import {
   JobStatus,
   Location,
 } from "@/types/domain";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-profile-constants";
+import { normalizePhone } from "@/lib/phone";
 import {
   curatedExternalEmployers,
   curatedExternalPublishedJobs,
@@ -21,6 +23,8 @@ import {
   curatedEmployerMpDevelopers,
   curatedEmployerMentorySolutions,
   curatedEmployerBalbhas,
+  curatedEmployerEurekaForbes,
+  curatedEmployerHrSadhana,
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
@@ -87,6 +91,8 @@ export const employers: EmployerProfile[] = [
   curatedEmployerMpDevelopers,
   curatedEmployerMentorySolutions,
   curatedEmployerBalbhas,
+  curatedEmployerEurekaForbes,
+  curatedEmployerHrSadhana,
   ...curatedExternalEmployers,
 ];
 
@@ -104,6 +110,9 @@ export const candidates: CandidateProfile[] = [
     experienceLevel: "",
     resumeUrl: "",
     hasUploadedResumeFile: false,
+    education: "",
+    jobPreferences: [],
+    phoneVerificationStatus: "pending",
   },
   {
     id: "cand-002",
@@ -118,6 +127,9 @@ export const candidates: CandidateProfile[] = [
     experienceLevel: "y1_3",
     resumeUrl: "",
     hasUploadedResumeFile: false,
+    education: "graduate",
+    jobPreferences: ["sales", "full-time"],
+    phoneVerificationStatus: "pending",
   },
 ];
 
@@ -380,11 +392,14 @@ export function setJobFeatured(jobId: string, tier: "featured" | "urgent") {
 
 export type CandidateProfileUpdatePayload = {
   name: string;
+  phone: string;
   skills: string[];
   locationId: string;
   headline: string;
   experienceLevel: string;
   resumeUrl: string;
+  education: string;
+  jobPreferences: string[];
   hasUploadedResumeFile?: boolean;
 };
 
@@ -394,17 +409,35 @@ export function updateCandidateProfile(
 ) {
   const candidate = candidates.find((item) => item.id === candidateId);
   if (!candidate) return undefined;
+  const previousPhone = normalizePhone(candidate.phone);
+  const nextPhone = normalizePhone(payload.phone);
+  if (previousPhone !== nextPhone) {
+    candidate.phoneVerificationStatus = "pending";
+  }
   candidate.name = payload.name;
+  candidate.phone = nextPhone ?? payload.phone.trim();
   candidate.skills = payload.skills;
   candidate.locationId = payload.locationId;
   candidate.headline = payload.headline;
   candidate.experienceLevel = payload.experienceLevel;
   candidate.resumeUrl = payload.resumeUrl;
+  candidate.education = payload.education;
+  candidate.jobPreferences = payload.jobPreferences;
   if (typeof payload.hasUploadedResumeFile === "boolean") {
     candidate.hasUploadedResumeFile = payload.hasUploadedResumeFile;
   }
-  candidate.profileCompleted = true;
+  candidate.profileCompleted = candidateCanViewEmployerContact(candidate);
   return candidate;
+}
+
+export function setCandidatePhoneVerification(
+  candidateId: string,
+  status: CandidateProfile["phoneVerificationStatus"],
+) {
+  const candidate = candidates.find((item) => item.id === candidateId || item.userId === candidateId);
+  if (!candidate) return false;
+  candidate.phoneVerificationStatus = status;
+  return true;
 }
 
 export function getCandidateById(candidateId: string) {

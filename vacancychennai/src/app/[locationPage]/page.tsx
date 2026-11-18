@@ -61,14 +61,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return baseMetadata("Page not found", "Invalid route", `/${locationPage}`);
   }
   const locations = await listLocations();
-  if (!getLocationByAreaSlug(slug, locations)) {
+  const location = getLocationByAreaSlug(slug, locations);
+  if (!location) {
     return baseMetadata(
       "Page not found",
       "This area is not listed on Vacancy Chennai.",
       `/${locationPage}`,
     );
   }
-  const pretty = slug.replaceAll("-", " ");
+  const pretty = location.area;
   return baseMetadata(
     `Jobs in ${pretty} — Vacancy Chennai`,
     `Moderated hyperlocal listings in ${pretty}, Chennai — full-time, part-time, and internships. Quick apply; filter on Vacancy Chennai.`,
@@ -87,15 +88,15 @@ export default async function AreaPage({ params }: Props) {
     getEmployerCompanyNameMap(),
   ]);
 
-  if (!getLocationByAreaSlug(slug, locations)) {
+  const location = getLocationByAreaSlug(slug, locations);
+  if (!location) {
     notFound();
   }
 
   const locationsById = new Map(locations.map((l) => [l.id, l]));
 
   const jobs = filterPublishedJobList(published, locations, { locationSlug: slug });
-  const readable = slug.replaceAll("-", " ");
-  const title = `Jobs in ${readable}`;
+  const title = `Jobs in ${location.area}`;
 
   if (jobs.length === 0) {
     return (
@@ -111,7 +112,7 @@ export default async function AreaPage({ params }: Props) {
           }
         />
         <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
-        <AreaHubShare area={getLocationByAreaSlug(slug, locations)?.area ?? readable} />
+        <AreaHubShare area={location.area} />
         <AreaSeekerRequestCta slug={slug} />
         <div className="pb-4 pt-8">
           <div className={`${sectionCard} text-center`}>
@@ -141,7 +142,7 @@ export default async function AreaPage({ params }: Props) {
         }
       />
       <PageAdSlot shape="rectangle" placement="area_hub" className="pt-8" />
-      <AreaHubShare area={getLocationByAreaSlug(slug, locations)?.area ?? readable} />
+      <AreaHubShare area={location.area} />
       <AreaSeekerRequestCta slug={slug} />
       <section className="grid gap-4 pb-4 pt-8 md:grid-cols-2">
         {jobs.map((job) => {

@@ -33,7 +33,7 @@ Engineering and design notes from implementation work (including the 2026 home/m
 ## UI system (this project)
 
 - **Tokens in `src/lib/ui.ts`:** Reuse `sectionCard`, `formInput`, `btnPrimary`, `btnDense*`, `focusRingOnDark`, etc., instead of one-off class strings on dashboards and forms.
-- **Home hero (above the fold):** Split **light** layout — warm surface (`#faf7f2`), orange “Free for seekers” pill, Playfair italic for brand name, social proof + moderation card, **floating** job filter bar (`HomeHeroFloatingSearch`, client). Right column is CSS illustration, not a single hero asset. Stats strip below stays on a light band.
+- **Home hero (above the fold):** Deep navy (`#060d18` → `#0a1628`) with amber outline CTA, blue account button, and the coast illustration on the right. The white job filter card overlaps the bottom (`HomeHeroFloatingSearch`). Stats sit on a dark band under the hero. This is separate from `InnerPageHero` on inner pages.
 - **Marketing / job hubs (inner pages):** `InnerPageHero` + `HomeBreakout` give a **navy/amber** band — use for `/jobs-in-chennai`, freshers/part-time, area pages, about, etc. Do not assume the **home** hero matches that palette.
 - **Auth surfaces:** `AuthPageShell` wraps the login card; opening tag and closing tag must both be `AuthPageShell` (a stray `</div>` breaks the build).
 - **Dashboards:** `DashboardWelcome` + `sectionCard` keep employer/admin/candidate pages visually aligned.
@@ -77,25 +77,19 @@ Engineering and design notes from implementation work (including the 2026 home/m
 
 - **Employer job create:** Server action redirects with `?success=job-created`. The dashboard should explain **moderation** explicitly so employers know the listing is not live until published.
 - **Stats on home:** `HomeHero` receives `jobCount`, `areaCount`, `categories`, `locations`; floating search posts to `/jobs-in-chennai` with `category`, `jobType`, `location` query params. Hero also links **Create free account** → `/candidate/login?new=1`.
-- **Employer login (DB mode):** Page must define `showVerificationResend = hasDatabase()`, `infoMessage = loginQueryInfoMessage({ resent })`, and pass `resent` in `searchParams` typing so `EmployerLoginForm` and info banners compile.
+- **Employer login (DB mode):** Email and password only. Do not add a resend-verification form.
 
-## Auth email — Resend, employer verification, candidate magic link
+## Auth — password only. No outbound mail.
 
-- **When `DATABASE_URL` is set:** Employer sign-in requires **`users.email_verified_at`** after a valid password. If null, the app sends a **verification email** (Resend) and redirects with `?error=unverified` — no session until the user opens the link.
-- **Candidate sign-in (DB):** No instant session from the login form. Submitting a registered email sends a **magic link**; the user clicks `GET /api/auth/email/verify?token=…&purpose=candidate_magic` to consume the token, set `email_verified_at`, and **then** `createSession`. Redirect after send: `?sent=1` (info banner via `loginQueryInfoMessage`).
-- **Mock mode (`!hasDatabase()`):** Employer and candidate flows stay **unchanged** (instant login for demos).
-- **Tokens:** Stored only as **SHA-256 hashes** in `email_verification_tokens`; plaintext appears once in the email URL. Purposes: `employer_verify` (TTL ~24h), `candidate_magic` (~1h). New token for a user+purpose **deletes** prior unconsumed rows for that pair.
-- **Rate limits:** `canSendVerificationEmail` / `recordVerificationEmailSent` in `src/lib/rate-limit.ts` (default **5 sends / hour / key**) back verification and magic-link sends; keys include the email address.
-- **Env required for mail:** `RESEND_API_KEY`, `RESEND_FROM` (verified domain or Resend test sender), and **`NEXT_PUBLIC_SITE_URL`** (absolute base for links in emails). Missing config → `?error=email-config`; send failures → `email-failed`; rate cap → `email-rate-limited`.
-- **Migration:** `database/migrations/006_email_verification.sql` adds `email_verified_at` + `email_verification_tokens` and backfills demo emails as verified so seeded accounts keep working after `npm run db:migrate`.
+- **When `DATABASE_URL` is set:** `registerEmployerAction` hashes the password, sets `email_verified_at` on insert, writes `employer_profiles`, and calls `createSession`. Login does not read `email_verified_at`.
+- **Candidate sign-in (DB):** Email and password. `registerCandidateAction` hashes the password, writes the profile, and calls `createSession` in the same request. Do not send a magic link. Login with an empty `password_hash` returns `no-password`. `setCandidatePasswordAction` sets one: a stored `users.phone` must match, and a null phone is saved from the form.
+- **Mock mode (`!hasDatabase()`):** Employer and candidate flows stay instant login for demos.
+- **Forgot password:** The pages explain that email reset is off. Do not call an email provider from those actions.
 - **Vercel / Neon:** Set `DATABASE_URL` (pooled Neon URL) per environment; redeploy after env changes. **Never commit** connection strings or paste them into chat logs — rotate DB passwords if exposed.
-- **Query UX:** Extend `loginQueryErrorMessage` / `loginQueryInfoMessage` in `src/lib/auth-login-errors.ts` when adding new `error=` or info params; keep employer **Resend verification** form using `resendEmployerVerificationAction`.
 
 ## Admin password reset (DB)
 
-- **Purpose:** `admin_password_reset` in `email_verification_tokens` (separate from employer `password_reset`) so links route to `/admin/reset-password`. Migration **`008_admin_password_reset_purpose.sql`** extends the purpose check constraint.
-- **Flow:** `requestAdminPasswordResetAction` / `resetAdminPasswordAction` in `src/features/auth/account-actions.ts`; email via **`sendAdminPasswordResetEmail`** in `send-auth-email.ts`; validate/finalize in **`verification-tokens.ts`** (`validateAdminPasswordResetToken`, `finalizeAdminPasswordReset`).
-- **Pages:** `/admin/forgot-password`, `/admin/reset-password`; admin login links **Forgot password?** and accepts `?reset=1` / `?forgot=1` info banners (shared `loginQueryInfoMessage` copy; generic “If an account exists…” for `forgot=1`).
+- **Pages:** `/admin/forgot-password` and `/employer/forgot-password` do not send mail. An already-issued token can still be finished by `resetAdminPasswordAction` / `resetEmployerPasswordAction` via `verification-tokens.ts`.
 
 ## Roles (admin / employer / candidate)
 
@@ -107,8 +101,8 @@ Engineering and design notes from implementation work (including the 2026 home/m
 
 - **Route:** `GET`/`POST` **`/api/cron/notifications`** (`src/app/api/cron/notifications/route.ts`, **`runtime: "nodejs"`**). Authorize with **`Authorization: Bearer <CRON_SECRET>`** or **`?secret=<CRON_SECRET>`**. Returns 401 if `CRON_SECRET` is unset or wrong.
 - **Logic:** `runScheduledNotifications()` in `src/lib/notifications/run-scheduled-notifications.ts` loads **`email_subscriptions`** (`email_digest`, `job_alerts`, `sms_reminder`), loads new **published** jobs since a window via **`listPublishedJobsCreatedSince`** in `repository.ts` (default window **`NOTIFICATION_DIGEST_WINDOW_HOURS`**, fallback 24).
-- **Email:** One digest per unique email when subscribed to digest and/or job alerts (deduped). Uses **`sendJobDigestEmail`** in `src/lib/email/send-digest-email.ts` (needs Resend + **`NEXT_PUBLIC_SITE_URL`**).
-- **SMS:** **`sendTwilioSms`** in `src/lib/sms/twilio-sms.ts` when **`TWILIO_ACCOUNT_SID`**, **`TWILIO_AUTH_TOKEN`**, **`TWILIO_FROM_NUMBER`** are set. If Twilio is missing, optional **`ADMIN_SMS_DIGEST_EMAIL`** receives a **fallback** summary via Resend (`sendSmsFallbackDigestEmail`).
+- **Email:** Digest and job-alert emails are not sent. The public subscribe page offers text reminders only.
+- **SMS:** **`sendTwilioSms`** in `src/lib/sms/twilio-sms.ts` when **`TWILIO_ACCOUNT_SID`**, **`TWILIO_AUTH_TOKEN`**, **`TWILIO_FROM_NUMBER`** are set. There is no email fallback.
 - **Vercel:** Root **`vacancychennai/vercel.json`** defines a daily cron hitting the notifications path; set **`CRON_SECRET`** in the project env (Vercel cron sends the Bearer token when configured).
 - **Subscriptions storage:** Migration **`007_signup_password_reset_subscriptions.sql`** (and earlier schema) — `subscribeAlertsAction` in `account-actions.ts` upserts **`email_subscriptions`**.
 
@@ -117,7 +111,7 @@ Engineering and design notes from implementation work (including the 2026 home/m
 - **Migrations:** **`010_billing_listing_usage.sql`** adds `jobs.published_at` / `expires_at` / `billing_source`, **`entitlement_usages`**, and **`payment_orders.provider_payment_id`**. Run **`npm run db:migrate`** before `next build` when **`DATABASE_URL`** is set — otherwise queries that reference `expires_at` will fail at prerender (e.g. sitemap).
 - **SKU amounts:** [`src/lib/billing/skus.ts`](../src/lib/billing/skus.ts); policy copy in [`docs/EMPLOYER_BILLING_POLICY.md`](./EMPLOYER_BILLING_POLICY.md).
 - **Publish gate:** Set **`BILLING_ENFORCED=true`** (with DB) so admin **`Publish`** requires credits or an active monthly pass (`resolvePublishBilling` in `src/features/billing/publish-and-fulfill.ts` + `updateJobStatusAction` in `src/features/jobs/actions.ts`). Default is off so dev/staging are not blocked.
-- **Checkout:** `POST /api/billing/checkout` creates a **`payment_orders`** row (`provider = superprofile`) and returns a **SuperProfile URL** from env **`SUPERPROFILE_PAYMENT_URL`** (one HTTPS link for every SKU; see [`src/lib/billing/superprofile-links.ts`](../src/lib/billing/superprofile-links.ts)), with `vc_ref` = order id for reconciliation. Client **`SuperProfileSkuButton`** opens that URL. Optional webhook **`POST /api/billing/webhook/superprofile`** (`Authorization: Bearer <SUPERPROFILE_WEBHOOK_SECRET>`) or admin **Mark paid** on `/admin/dashboard` grants entitlements via **`fulfillPaymentOrderById`**. Cron **`/api/cron/billing`** (same **`CRON_SECRET`** as notifications) sends pass-expiry reminder emails when Resend is configured.
+- **Checkout:** `POST /api/billing/checkout` creates a **`payment_orders`** row (`provider = superprofile`) and returns a **SuperProfile URL** from env **`SUPERPROFILE_PAYMENT_URL`** (one HTTPS link for every SKU; see [`src/lib/billing/superprofile-links.ts`](../src/lib/billing/superprofile-links.ts)), with `vc_ref` = order id for reconciliation. Client **`SuperProfileSkuButton`** opens that URL. Optional webhook **`POST /api/billing/webhook/superprofile`** (`Authorization: Bearer <SUPERPROFILE_WEBHOOK_SECRET>`) or admin **Mark paid** on `/admin/dashboard` grants entitlements via **`fulfillPaymentOrderById`**. Cron **`/api/cron/billing`** (same **`CRON_SECRET`** as notifications) no longer sends email.
 - **Promote tier:** `promoteJobAction` checks **`employerEligibleForPremiumTier`** when billing is enforced.
 
 ## References in repo
@@ -134,12 +128,10 @@ Engineering and design notes from implementation work (including the 2026 home/m
 | Footer config | `src/lib/footer-config.ts` |
 | Nav mega / profile config | `src/lib/nav-config.ts` |
 | Crawlers | `src/app/robots.ts`, `src/app/sitemap.ts` |
-| Auth actions (login, resend, DB vs mock) | `src/features/auth/actions.ts` |
-| Email verify route | `src/app/api/auth/email/verify/route.ts` |
-| Resend + templates | `src/lib/email/resend-client.ts`, `send-auth-email.ts` |
+| Auth actions (login, DB vs mock) | `src/features/auth/actions.ts` |
+| Email verify route (old tokens only) | `src/app/api/auth/email/verify/route.ts` |
 | Verification tokens (DB) | `src/lib/email/verification-tokens.ts` |
 | Admin / employer register & subscribe actions | `src/features/auth/account-actions.ts` |
-| Job digest + SMS fallback email | `src/lib/email/send-digest-email.ts` |
 | Twilio SMS | `src/lib/sms/twilio-sms.ts` |
 | Employer billing + publish gate | `src/lib/billing/skus.ts`, `src/lib/billing/superprofile-links.ts`, `src/lib/billing/flags.ts`, `src/features/billing/publish-and-fulfill.ts`, `src/app/api/billing/*`, `/employer/billing` |
 | Cron notification runner | `src/lib/notifications/run-scheduled-notifications.ts` |

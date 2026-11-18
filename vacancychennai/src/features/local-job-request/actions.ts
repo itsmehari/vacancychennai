@@ -3,9 +3,6 @@
 import { redirect } from "next/navigation";
 import { createSession, getSession } from "@/lib/auth";
 import { isAllowedExperienceLevel } from "@/lib/candidate-profile-constants";
-import { getResendClient } from "@/lib/email/resend-client";
-import { sendCandidateMagicLinkEmail } from "@/lib/email/send-auth-email";
-import { createEmailVerificationToken } from "@/lib/email/verification-tokens";
 import { hasDatabase } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -18,12 +15,7 @@ import {
 import { sendLoginOtp } from "@/lib/otp-send";
 import { verifyOtp } from "@/lib/otp-store";
 import { normalizePhone } from "@/lib/phone";
-import {
-  canSendVerificationEmail,
-  getRateLimitState,
-  recordVerificationEmailSent,
-  registerFailedAttempt,
-} from "@/lib/rate-limit";
+import { getRateLimitState, registerFailedAttempt } from "@/lib/rate-limit";
 import { candidates } from "@/features/core/mock-db";
 import {
   createCandidateUserForJobRequest,
@@ -98,55 +90,16 @@ function parseAuthFields(formData: FormData) {
   return { fullName, email, phone };
 }
 
-export async function jobRequestMagicLinkAction(formData: FormData) {
+export async function jobRequestContinueAction(formData: FormData) {
   const { fullName, email, phone } = parseAuthFields(formData);
-
-  if (!hasDatabase()) {
-    const { userId, fullName: name } = await ensureCandidateAccount({ fullName, email, phone });
-    await createSession({ role: "candidate", actorId: userId, displayName: name });
-    redirect(pageUrl({ auth: "signed-in" }));
-  }
-
   const limiterKey = `candidate:${email}`;
   if (getRateLimitState(limiterKey).blocked) {
     redirect(pageUrl({ error: "rate-limited" }));
   }
 
-  await ensureCandidateAccount({ fullName, email, phone });
-
-  if (!getResendClient()) {
-    redirect(pageUrl({ error: "email-config" }));
-  }
-
-  const rateKey = `candidate-magic:${email}`;
-  if (!canSendVerificationEmail(rateKey)) {
-    redirect(pageUrl({ error: "email-rate-limited" }));
-  }
-
-  const user = await findCandidateUserByEmail(email);
-  if (!user || user.role !== "candidate") {
-    redirect(pageUrl({ error: "invalid-auth" }));
-  }
-
-  const plaintext = await createEmailVerificationToken(user.id, "candidate_magic");
-  if (!plaintext) {
-    redirect(pageUrl({ error: "email-failed" }));
-  }
-
-  try {
-    await sendCandidateMagicLinkEmail({
-      to: email,
-      fullName,
-      plaintextToken: plaintext,
-      nextPath: NANGANALLUR_PAGE_PATH,
-    });
-    recordVerificationEmailSent(rateKey);
-  } catch (e) {
-    logger.warn({ err: e, email }, "job request magic link send failed");
-    redirect(pageUrl({ error: "email-failed" }));
-  }
-
-  redirect(pageUrl({ auth: "sent" }));
+  const { userId, fullName: name } = await ensureCandidateAccount({ fullName, email, phone });
+  await createSession({ role: "candidate", actorId: userId, displayName: name });
+  redirect(pageUrl({ auth: "signed-in" }));
 }
 
 export async function jobRequestOtpAction(formData: FormData) {

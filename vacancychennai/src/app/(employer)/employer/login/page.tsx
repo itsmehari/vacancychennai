@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import AuthPageShell from "@/components/layout/auth-page-shell";
 import Link from "next/link";
 import { loginQueryErrorMessage, loginQueryInfoMessage } from "@/lib/auth-login-errors";
-import { hasDatabase } from "@/lib/db";
 import { shouldShowDemoLoginHint } from "@/lib/demo-login-hint";
 import { EmployerLoginForm } from "./employer-login-form";
 
@@ -26,7 +25,6 @@ export default async function EmployerLoginPage({ searchParams }: Props) {
     reset: query.reset,
   });
   const showDemoHint = shouldShowDemoLoginHint();
-  const showVerificationResend = hasDatabase();
 
   return (
     <AuthPageShell>
@@ -35,18 +33,6 @@ export default async function EmployerLoginPage({ searchParams }: Props) {
         {showDemoHint ? (
           <p className="mt-1 text-sm text-slate-600">
             Demo: employer@vacancychennai.in / demo123
-          </p>
-        ) : showVerificationResend ? (
-          <p className="mt-1 text-sm text-slate-600">
-            Sign in with email and password. If your account is new or unverified, we email you a link to
-            confirm your address before opening the dashboard. Wrong account?{" "}
-            <Link
-              href="/candidate/login"
-              className="font-medium text-blue-600 hover:text-blue-800"
-            >
-              Candidate login
-            </Link>
-            .
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-600">
@@ -76,7 +62,7 @@ export default async function EmployerLoginPage({ searchParams }: Props) {
             {infoMessage}
           </p>
         ) : null}
-        <EmployerLoginForm showVerificationResend={showVerificationResend} />
+        <EmployerLoginForm />
         <p className="mt-4 text-center text-sm text-slate-600">
           <Link href="/candidate/login" className="font-medium text-blue-600 hover:text-blue-800">
             Candidate login
