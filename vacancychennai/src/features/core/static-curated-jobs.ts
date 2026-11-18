@@ -127,11 +127,11 @@ export const curatedEmployerHrSadhana: EmployerProfile = {
   password: "nologin",
 };
 
-/** External listing — Assetowns Property Solutions (Padur OMR); apply via WhatsApp. */
+/** External listing — Assetowns Property Solutions (Padur OMR); apply via WhatsApp. Source: MyOMR. */
 export const curatedEmployerAssetowns: EmployerProfile = {
   id: "emp-assetowns-property-solutions",
   companyName: "Assetowns Property Solutions",
-  email: "external.assetowns.property@vacancychennai.in",
+  email: "hr.assetowns.padur@myomr.in",
   password: "nologin",
 };
 
@@ -724,40 +724,53 @@ const hrSadhanaElectricalProjectManagerDescription = [
 ].join("\n");
 
 const ASSETOWNS_LISTING_AT = "2026-11-18T12:00:00.000Z";
+const ASSETOWNS_UPDATED_AT = "2026-11-18T18:00:00.000Z";
 /** Premium featured window: live through end of IST on day 20 (18 Nov → 8 Dec 2026). */
 const ASSETOWNS_EXPIRES_AT = "2026-12-08T18:29:59.000Z";
 const ASSETOWNS_APPLY_WA = "917639001400";
 
-const assetownsSharedFooter = [
-  "",
-  "Workplace: Padur, Old Mahabalipuram Road (OMR), Chennai 603103 — workable from Kelambakkam, Siruseri, Navalur, and the Thoraipakkam corridor.",
-  "",
-  "Salary: Competitive — discuss with HR (no rupee band on the employer notice).",
-  "Apply before: 17 January 2027 (employer notice).",
-  "",
-  "How to apply:",
-  "WhatsApp your CV to +91 76390 01400 with the role name in the first line.",
-  "You can also call +91 76390 01400.",
-  "",
-  "Mention that you saw the opening on Vacancy Chennai.",
-  "",
-  "Safety note: Do not pay any fee to apply. Applications go directly to the employer.",
-].join("\n");
+function assetownsFooter(myomrUrl: string) {
+  return [
+    "",
+    "Workplace: Padur, Old Mahabalipuram Road (OMR), Chennai 603103 — easy commute from Kelambakkam, Siruseri, Navalur, and the Thoraipakkam corridor.",
+    "",
+    "Salary: ₹Competitive — discuss with HR (no rupee band on the employer notice).",
+    "Apply before: 17 January 2027.",
+    "",
+    "How to apply:",
+    "WhatsApp your CV to +91 76390 01400 with the role name in the first line.",
+    "You can also call +91 76390 01400.",
+    "Employer contact on MyOMR: hr.assetowns.padur@myomr.in",
+    "",
+    "Mention that you saw the opening on Vacancy Chennai.",
+    "",
+    `Source listing (MyOMR): ${myomrUrl}`,
+    "",
+    "Safety note: Do not pay any fee to apply. Applications go directly to the employer.",
+  ].join("\n");
+}
 
 const assetownsSeniorTelecallerDescription = [
   "Assetowns Property Solutions (smart-asset / property solutions on OMR) is hiring a Senior Telecaller (Female) at Padur, OMR.",
   "",
   "About the role:",
-  "Handle inbound and outbound calls for property leads. Qualify prospects, schedule site visits, and coordinate with the sales team in a growth-focused real-estate office.",
+  "Handle inbound and outbound calls for property leads at Assetowns Smart-Asset, Padur along OMR. Qualify prospects, schedule site visits, and coordinate with the sales team in a growth-focused real-estate office.",
   "",
   "Requirements:",
+  "• Female candidate (as per employer hiring notice).",
   "• Telecalling or inside-sales experience preferred; real-estate calls are a plus.",
   "• Clear Tamil and English communication.",
   "• Comfortable with targets, follow-ups, and CRM-style tracking.",
   "",
-  "Who may apply: Female candidates (employer hiring notice).",
-  "Type: Full-time · Office.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Professional training and mentoring.",
+  "• Performance-based incentives.",
+  "• Stable employer on OMR with multiple open roles.",
+  "",
+  "Type: Full-time · Office jobs.",
+  assetownsFooter(
+    "https://myomr.in/omr-local-job-listings/job/87/senior-telecaller-female-padur",
+  ),
 ].join("\n");
 
 const assetownsBdeDescription = [
@@ -767,13 +780,20 @@ const assetownsBdeDescription = [
   "Drive new business for property and smart-asset solutions. Build local relationships, follow leads from telecalling, and represent the brand across the OMR corridor from Padur.",
   "",
   "Requirements:",
+  "• Male candidate (employer poster).",
   "• Business development or sales experience; property sector preferred.",
   "• Two-wheeler and willingness for local travel on OMR.",
   "• Target-driven with good client rapport.",
   "",
-  "Who may apply: Male candidates (employer poster).",
-  "Type: Full-time · Field.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Incentives on performance.",
+  "• Training on product and local market.",
+  "• Padur OMR office base.",
+  "",
+  "Type: Full-time · Office jobs (local OMR travel).",
+  assetownsFooter(
+    "https://myomr.in/omr-local-job-listings/job/88/business-development-executive-male-padur",
+  ),
 ].join("\n");
 
 const assetownsHrManagerDescription = [
@@ -786,10 +806,14 @@ const assetownsHrManagerDescription = [
   "• HR generalist experience (recruitment + employee records).",
   "• Organised documentation; MS Office.",
   "• Works well with sales and operations teams.",
+  "• Open to any gender (employer poster).",
   "",
-  "Who may apply: Open to any gender (employer poster).",
-  "Type: Full-time · Office.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Growth-oriented company hiring multiple roles.",
+  "• Central HR role as the team expands on OMR.",
+  "",
+  "Type: Full-time · Office jobs.",
+  assetownsFooter("https://myomr.in/omr-local-job-listings/job/89/hr-manager-padur"),
 ].join("\n");
 
 const assetownsSalesExecutiveDescription = [
@@ -799,13 +823,20 @@ const assetownsSalesExecutiveDescription = [
   "Meet clients, present property solutions, and close sales for Assetowns at Padur on Old Mahabalipuram Road. Coordinate with telecallers and CRM for a smooth buyer journey.",
   "",
   "Requirements:",
+  "• Male candidate (employer notice).",
   "• Sales experience; real estate or property background helpful.",
   "• Client-facing confidence and honesty in deals.",
   "• Based in or willing to work from Padur OMR.",
   "",
-  "Who may apply: Male candidates (employer notice).",
-  "Type: Full-time · Office.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Performance incentives.",
+  "• Training and sales support.",
+  "• Multiple vacancies — room to grow.",
+  "",
+  "Type: Full-time · Office jobs.",
+  assetownsFooter(
+    "https://myomr.in/omr-local-job-listings/job/90/sales-executive-male-padur",
+  ),
 ].join("\n");
 
 const assetownsCreDescription = [
@@ -815,13 +846,20 @@ const assetownsCreDescription = [
   "Be the first point of contact for customer queries after lead conversion — updates, documentation, and polite follow-up for Assetowns clients in Padur, OMR.",
   "",
   "Requirements:",
+  "• Female candidate (employer poster).",
   "• Customer support or client coordination experience.",
   "• Clear phone and in-person communication in Tamil / English.",
   "• Organised with follow-up reminders.",
   "",
-  "Who may apply: Female candidates (employer poster).",
-  "Type: Full-time · Office.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Training on CRM and client handling.",
+  "• Incentives where applicable.",
+  "• Office role at Padur OMR.",
+  "",
+  "Type: Full-time · Office jobs.",
+  assetownsFooter(
+    "https://myomr.in/omr-local-job-listings/job/91/customer-relationship-executive-female-padur",
+  ),
 ].join("\n");
 
 const assetownsCrmDescription = [
@@ -832,12 +870,19 @@ const assetownsCrmDescription = [
   "",
   "Requirements:",
   "• CRM or account-management experience preferred.",
+  "• Open to any gender (employer poster).",
   "• Leads junior CRM staff as the team grows.",
   "• Reporting and escalation to management.",
   "",
-  "Who may apply: Open to any gender (employer poster).",
-  "Type: Full-time · Office.",
-  assetownsSharedFooter,
+  "Benefits:",
+  "• Leadership path in a hiring wave.",
+  "• Performance-based rewards.",
+  "• Padur OMR location.",
+  "",
+  "Type: Full-time · Office jobs.",
+  assetownsFooter(
+    "https://myomr.in/omr-local-job-listings/job/92/customer-relationship-manager-padur",
+  ),
 ].join("\n");
 
 const eurekaForbesFieldRecruiterDescription = [
@@ -1290,7 +1335,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
   {
@@ -1309,7 +1354,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
   {
@@ -1328,7 +1373,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
   {
@@ -1347,7 +1392,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
   {
@@ -1366,7 +1411,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
   {
@@ -1385,7 +1430,7 @@ export const curatedPublishedJobs: Job[] = [
     featured: true,
     listingTier: "urgent",
     createdAt: ASSETOWNS_LISTING_AT,
-    updatedAt: ASSETOWNS_LISTING_AT,
+    updatedAt: ASSETOWNS_UPDATED_AT,
     expiresAt: ASSETOWNS_EXPIRES_AT,
   },
 ];
