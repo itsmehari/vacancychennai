@@ -11,6 +11,7 @@ import {
   findJob,
   findLocationById,
   getApplyPrefillForActor,
+  getCandidateDashboardProfile,
   getEmployerCompanyNameMap,
   listLocations,
   listRelatedPublishedJobs,
@@ -27,6 +28,8 @@ import {
   isCuratedWhatsAppOnlyJob,
 } from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-profile-constants";
+import { employerContactsRedacted, redactEmployerContacts } from "@/lib/redact-employer-contact";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { jobSidebarAds } from "@/lib/job-sidebar-ads";
 import {
@@ -69,9 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
   const applyHint = isCuratedExternalApplyUrlJob(jobId)
     ? "Apply via the employer form or careers page linked on Vacancy Chennai."
     : isCuratedDirectEmployerContactJob(jobId)
-      ? "Contact the employer using email or phone on Vacancy Chennai."
+      ? "Employer email and phone are shown after a free job seeker profile."
       : isCuratedWhatsAppOnlyJob(job.id)
-        ? "Apply through WhatsApp using the details on Vacancy Chennai."
+        ? "WhatsApp contact is shown after a free job seeker profile."
         : "Quick apply on Vacancy Chennai — moderated Chennai listings.";
   const description = truncateMetaDescription(
     `${job.title}: ${job.category} · ${job.industry}. ${job.jobType.replace("-", " ")} in ${location?.area ?? "Chennai"}, Chennai. ${salaryBit}. ${employerName}. ${applyHint}`,
@@ -79,13 +82,21 @@ export async function generateMetadata({ params }: { params: Promise<{ jobId: st
   const titleBase = `${job.title} · ${location?.area ?? "Chennai"}`;
   const metaTitle =
     titleBase.length > 52 ? `${titleBase.slice(0, 49)}… | Vacancy Chennai` : `${titleBase} | Vacancy Chennai`;
+  const zone = location?.zone ?? "";
   const keywords = Array.from(
     new Set(
       [
         `${job.title} jobs Chennai`,
+        `${job.title} ${areaLabel}`,
+        `${job.title} jobs ${areaLabel}`,
+        `${areaLabel} jobs`,
         `${areaLabel} jobs Chennai`,
+        zone.includes("OMR") ? "OMR jobs" : "",
+        zone.includes("OMR") ? `jobs in OMR Chennai` : "",
         `${job.category} jobs Chennai`,
+        `${job.category} jobs ${areaLabel}`,
         `${job.industry} jobs Chennai`,
+        `${employerName} jobs`,
         "Chennai jobs",
         "Vacancy Chennai",
       ].filter(Boolean),
@@ -118,6 +129,9 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   ]);
   const locationsById = new Map(locations.map((l) => [l.id, l]));
   const session = await getSession();
+  const seekerProfile =
+    session?.role === "candidate" ? await getCandidateDashboardProfile(session.actorId) : null;
+  const contactUnlocked = candidateCanViewEmployerContact(seekerProfile);
   const prefill =
     session?.role === "candidate" ? await getApplyPrefillForActor(session.actorId) : null;
   const whatsappOnly = isCuratedWhatsAppOnlyJob(job.id);
@@ -127,6 +141,15 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   const directEmployerContact = isCuratedDirectEmployerContactJob(job.id);
   const directContact = directEmployerContact ? getCuratedDirectEmployerContact(job.id) : null;
   const waDigits = getCuratedWhatsAppApplyDigits(job.id);
+  const hasHiddenContact = Boolean(directContact || whatsappOnly || waDigits);
+  const contactLocked = hasHiddenContact && !contactUnlocked;
+  const returnPath = `/jobs/${job.id}`;
+  const visibleDescription = contactUnlocked ? job.description : redactEmployerContacts(job.description);
+  const visibleLandmark = contactUnlocked ? job.landmarkText : redactEmployerContacts(job.landmarkText);
+  const descriptionWasRedacted = employerContactsRedacted(job.description, visibleDescription);
+  const publicJob = contactUnlocked
+    ? job
+    : { ...job, description: visibleDescription, landmarkText: visibleLandmark };
 
   const applyMode: JobApplyMode = whatsappOnly
     ? "whatsapp-only"
@@ -137,12 +160,13 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
         : "quick-apply";
 
   const jobPostingLd = buildJobPostingJsonLd({
-    job,
+    job: publicJob,
     employerName,
     location: location ?? null,
     canonicalPath: `/jobs/${job.id}`,
     applyMode,
     externalApplyUrl,
+    applicationContactPhoneDigits: waDigits,
   });
 
   const areaLabel = location?.area ?? "Chennai";
@@ -152,8 +176,54 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     areaLabel,
   });
 
+  /** FAQPage for answer engines (AEO) — grounded in listing facts only. */
+  const jobFaqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `Where is the ${job.title} job located?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `${employerName} lists this role in ${areaLabel}${
+            location?.zone ? ` (${location.zone})` : ""
+          }, Chennai, Tamil Nadu${location?.pincode ? ` ${location.pincode}` : ""}. ${
+            publicJob.landmarkText?.trim() || "Confirm the exact office address with the employer before you travel."
+          }`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `What is the salary for ${job.title} in ${areaLabel}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            job.salaryMin != null && job.salaryMax != null
+              ? `The listing shows ₹${job.salaryMin.toLocaleString("en-IN")}–₹${job.salaryMax.toLocaleString("en-IN")} per month. Confirm the final offer with ${employerName}.`
+              : `Salary is competitive and to be discussed with ${employerName} HR. No rupee band is published on this listing.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `How do I apply for ${job.title} at ${employerName}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            applyMode === "whatsapp-only"
+              ? `Apply on WhatsApp from the Vacancy Chennai job page after a free job seeker profile unlocks the employer contact. Mention the role name ${job.title}.`
+              : applyMode === "external-url"
+                ? `Use the employer careers or application link on the Vacancy Chennai job page for ${job.title}.`
+                : applyMode === "direct-contact"
+                  ? `Contact the employer using the email or phone shown on Vacancy Chennai after a free job seeker profile. Mention ${job.title}.`
+                  : `Use quick apply on Vacancy Chennai for ${job.title} at ${employerName}.`,
+        },
+      },
+    ],
+  };
+
   const visibleSummary = buildFactualJobSummary({
-    job,
+    job: publicJob,
     location: location ?? null,
     employerName,
   });
@@ -171,6 +241,10 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jobFaqLd) }}
       />
       <InnerPageHero
         eyebrow="Chennai · Job listing"
@@ -227,7 +301,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               {employerName}
             </p>
             <p className="mt-2 text-base leading-relaxed text-slate-700">{visibleSummary}</p>
-            <p className="mt-3 text-sm text-slate-600">{job.landmarkText}</p>
+            <p className="mt-3 text-sm text-slate-600">{visibleLandmark}</p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <CopyJobLink url={absoluteUrl(`/jobs/${job.id}`)} />
             </div>
@@ -243,8 +317,13 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
             <h2 id="job-role-heading" className="text-lg font-semibold tracking-tight text-slate-900">
               Role details
             </h2>
+            {descriptionWasRedacted ? (
+              <p className="mt-2 text-sm text-slate-600">
+                Phone numbers and email addresses in this notice stay hidden until your profile is complete.
+              </p>
+            ) : null}
             <div className="mt-4 whitespace-pre-wrap text-[0.95rem] leading-[1.7] text-slate-800">
-              {job.description}
+              {visibleDescription}
             </div>
           </section>
         </div>
@@ -253,14 +332,18 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
           <JobApplyPanel
             jobId={job.id}
             jobTitle={job.title}
-            whatsappOnly={whatsappOnly}
-            waDigits={waDigits}
+            whatsappOnly={whatsappOnly && contactUnlocked}
+            waDigits={contactUnlocked ? waDigits : undefined}
             externalApplyUrl={externalApplyUrl}
-            directContact={directContact ?? null}
+            directContact={contactUnlocked ? (directContact ?? null) : null}
             query={query}
             prefill={prefill}
             jobUrl={absoluteUrl(`/jobs/${job.id}`)}
             sourceChannel={sourceChannel}
+            contactLocked={contactLocked}
+            registerHref={`/candidate/register?next=${encodeURIComponent(returnPath)}`}
+            loginHref={`/candidate/login?next=${encodeURIComponent(returnPath)}`}
+            signedIn={session?.role === "candidate"}
           />
           <JobSafetyAside />
           <JobRotatingAdPanel ads={jobSidebarAds()} />

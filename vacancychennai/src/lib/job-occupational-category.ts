@@ -47,6 +47,13 @@ const RULES: Rule[] = [
     test: (h) => /\bsales executive\b|\bsales representative\b|\bbusiness development\b|\bbdm\b|\bbde\b/i.test(h),
   },
   {
+    soc: "41-3091.00",
+    test: (h) =>
+      /\bcustomer relationship manager\b|\bcustomer relationship executive\b|\bcrm manager\b|\bcrm executive\b|\baccount manager\b/i.test(
+        h,
+      ),
+  },
+  {
     soc: "41-2031.00",
     test: (h) => /\bretail\b|\bcounter sales\b|\bstore associate\b|\bcashier\b/i.test(h),
   },
@@ -94,6 +101,10 @@ const RULES: Rule[] = [
   {
     soc: "23-2099.00",
     test: (h) => /\blegal\b|\badvocate\b|\bparalegal\b|\blaw firm\b/i.test(h),
+  },
+  {
+    soc: "11-9021.00",
+    test: (_h, job) => /\bproject manager\b/i.test(job.title),
   },
   {
     soc: "17-2051.00",

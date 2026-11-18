@@ -724,7 +724,7 @@ const hrSadhanaElectricalProjectManagerDescription = [
 ].join("\n");
 
 const ASSETOWNS_LISTING_AT = "2026-11-18T12:00:00.000Z";
-const ASSETOWNS_UPDATED_AT = "2026-11-18T18:00:00.000Z";
+const ASSETOWNS_UPDATED_AT = "2026-11-18T18:15:00.000Z";
 /** Premium featured window: live through end of IST on day 20 (18 Nov → 8 Dec 2026). */
 const ASSETOWNS_EXPIRES_AT = "2026-12-08T18:29:59.000Z";
 const ASSETOWNS_APPLY_WA = "917639001400";

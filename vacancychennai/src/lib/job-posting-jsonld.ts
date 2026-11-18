@@ -1,12 +1,13 @@
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { resolveOnetOccupationalCategoryUrl } from "@/lib/job-occupational-category";
 import { buildFactualJobIntro } from "@/lib/job-seo-intro";
+import { getCanonicalSiteBase } from "@/lib/site-base-url";
 import type { Job, Location } from "@/types/domain";
 
 export type JobApplyMode = "quick-apply" | "external-url" | "direct-contact" | "whatsapp-only";
 
 export function siteUrlRoot(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://vacancychennai.in").replace(/\/$/, "");
+  return getCanonicalSiteBase();
 }
 
 /** Google-supported values for schema.org JobPosting `employmentType`. */
@@ -72,6 +73,8 @@ export function buildJobPostingJsonLd(opts: {
   canonicalPath: string;
   applyMode: JobApplyMode;
   externalApplyUrl?: string;
+  /** Digits only for wa.me / tel, e.g. 917639001400 — WhatsApp / phone apply jobs. */
+  applicationContactPhoneDigits?: string;
 }): Record<string, unknown> {
   const root = siteUrlRoot();
   const pageUrl = `${root}${opts.canonicalPath}`;
@@ -120,6 +123,18 @@ export function buildJobPostingJsonLd(opts: {
     opts.job.salaryMin > 0 &&
     opts.job.salaryMax > 0;
 
+  const phoneDigits = opts.applicationContactPhoneDigits?.replace(/\D/g, "") ?? "";
+  const applicationContact =
+    phoneDigits.length >= 10
+      ? {
+          "@type": "ContactPoint",
+          contactType: "HR",
+          telephone: `+${phoneDigits}`,
+          areaServed: "IN",
+          availableLanguage: ["en", "ta"],
+        }
+      : undefined;
+
   const ld: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -132,6 +147,7 @@ export function buildJobPostingJsonLd(opts: {
     hiringOrganization,
     jobLocation: {
       "@type": "Place",
+      name: `${addressLocality}, Chennai`,
       address: postalAddress,
       ...(typeof loc?.lat === "number" && typeof loc?.lng === "number"
         ? {
@@ -162,6 +178,8 @@ export function buildJobPostingJsonLd(opts: {
         }
       : {}),
     url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    inLanguage: "en-IN",
     identifier: {
       "@type": "PropertyValue",
       name: "vacancychennai_job_id",
@@ -170,6 +188,7 @@ export function buildJobPostingJsonLd(opts: {
     industry: opts.job.industry?.trim() || undefined,
     directApply: opts.applyMode === "quick-apply",
     ...(occupationalCategory ? { occupationalCategory } : {}),
+    ...(applicationContact ? { applicationContact } : {}),
   };
 
   if (opts.applyMode === "external-url" && opts.externalApplyUrl?.trim()) {
