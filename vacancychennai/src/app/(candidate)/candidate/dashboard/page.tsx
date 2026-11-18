@@ -8,11 +8,11 @@ import {
 } from "@/features/core/repository";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { requireRole } from "@/lib/auth";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-can-view-employer-contact";
 import {
   EDUCATION_OPTIONS,
   EXPERIENCE_LEVEL_OPTIONS,
   JOB_PREFERENCE_OPTIONS,
-  candidateCanViewEmployerContact,
   phoneVerificationLabel,
 } from "@/lib/candidate-profile-constants";
 import { safeCandidateNextPath } from "@/lib/safe-next-path";

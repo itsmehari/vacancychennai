@@ -1,5 +1,3 @@
-import { normalizePhone } from "@/lib/phone";
-
 /** Product decision: profiles are tied to a signed-in candidate account (user id), not email-only guest submissions. */
 
 export const HEADLINE_MAX_LENGTH = 200;
@@ -101,24 +99,4 @@ export function phoneVerificationLabel(value: string): string {
   if (value === "verified") return "Verified";
   if (value === "rejected") return "Needs correction";
   return "Pending review";
-}
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** Profile fields required before employer phone, email, or WhatsApp is shown. */
-export function candidateCanViewEmployerContact(profile: {
-  name: string;
-  email: string;
-  phone: string;
-  locationId: string;
-  education: string;
-  jobPreferences: string[];
-} | null): boolean {
-  if (!profile) return false;
-  if (profile.name.trim().length < 2) return false;
-  if (!EMAIL_RE.test(profile.email.trim())) return false;
-  if (!normalizePhone(profile.phone)) return false;
-  if (!profile.locationId.trim()) return false;
-  if (!isAllowedEducation(profile.education)) return false;
-  return profile.jobPreferences.some((value) => isAllowedJobPreference(value));
 }

@@ -28,7 +28,7 @@ import {
   isCuratedWhatsAppOnlyJob,
 } from "@/features/core/static-curated-jobs";
 import { getSession } from "@/lib/auth";
-import { candidateCanViewEmployerContact } from "@/lib/candidate-profile-constants";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-can-view-employer-contact";
 import { employerContactsRedacted, redactEmployerContacts } from "@/lib/redact-employer-contact";
 import { jobsInAreaPath } from "@/lib/area-job-path";
 import { jobSidebarAds } from "@/lib/job-sidebar-ads";

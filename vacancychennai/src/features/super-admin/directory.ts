@@ -1,9 +1,7 @@
 import { applications, candidates, employers, jobs, locations } from "@/features/core/mock-db";
 import { dbQuery, hasDatabase } from "@/lib/db";
-import {
-  candidateCanViewEmployerContact,
-  type PhoneVerificationStatus,
-} from "@/lib/candidate-profile-constants";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-can-view-employer-contact";
+import { type PhoneVerificationStatus } from "@/lib/candidate-profile-constants";
 
 export type SeekerAdminRow = {
   userId: string;

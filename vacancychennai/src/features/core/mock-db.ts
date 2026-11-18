@@ -7,7 +7,7 @@ import {
   JobStatus,
   Location,
 } from "@/types/domain";
-import { candidateCanViewEmployerContact } from "@/lib/candidate-profile-constants";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-can-view-employer-contact";
 import { normalizePhone } from "@/lib/phone";
 import {
   curatedExternalEmployers,

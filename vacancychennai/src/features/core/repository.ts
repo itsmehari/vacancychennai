@@ -28,7 +28,8 @@ import {
   curatedLocations,
   curatedPublishedJobs,
 } from "@/features/core/static-curated-jobs";
-import { candidateCanViewEmployerContact, type PhoneVerificationStatus } from "@/lib/candidate-profile-constants";
+import { candidateCanViewEmployerContact } from "@/lib/candidate-can-view-employer-contact";
+import { type PhoneVerificationStatus } from "@/lib/candidate-profile-constants";
 import { normalizePhone } from "@/lib/phone";
 import type { CandidateProfile, Job, JobApplication, JobStatus, Location } from "@/types/domain";
 
