@@ -9,14 +9,38 @@ export const homeHeroBrand = "Vacancy Chennai";
 
 export const homeHeroEyebrow = "Hyperlocal hiring · Greater Chennai";
 
-/** Single short H1 — no mid-sentence highlight pill. */
-export const homeHeroTitle = "Jobs near the corridors you already commute";
+/** First hero slide. This is the H1 search engines see on first paint. */
+export const homeHeroTitle = "Local jobs in Chennai, free for candidates";
 
-/** Amber-underline locality line under the H1 (SEO corridors, not a wrapping blob). */
+/** Areas we name on the hero. */
 export const homeHeroCorridors = "OMR · Tambaram · Porur · Velachery";
 
 export const homeHeroSubcopy =
-  "Browse micro-areas employers actually name in postings. Filter by suburb, salary, and shift — moderated listings, quick apply with name and mobile.";
+  "Moderated listings from employers in your area. Search by neighbourhood, category, and shift. Apply with your name and mobile.";
+
+export const homeHeroSlides = {
+  local: {
+    title: homeHeroTitle,
+    body: homeHeroSubcopy,
+  },
+  search: {
+    title: "Search jobs by neighbourhood",
+    body: "Pick a Chennai area, a job type, and a category. We show the moderated listings that match.",
+  },
+  apply: {
+    title: "Apply free. Employers post local roles.",
+    body: "Candidates are not charged. Each listing names the Chennai area before you apply.",
+  },
+  offer: {
+    title: "What Vacancy Chennai offers",
+    points: [
+      "Jobs listed by Chennai neighbourhood",
+      "Filter by category, shift, and pay",
+      "Free apply with your name and mobile",
+      "Listings are checked before they go live",
+    ],
+  },
+} as const;
 
 export const homeHeroCtaBrowseJobs = "See all Chennai listings";
 export const homeHeroCtaLearnMore = "How applying works";

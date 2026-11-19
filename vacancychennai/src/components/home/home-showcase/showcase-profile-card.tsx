@@ -1,21 +1,21 @@
 export default function ShowcaseProfileCard() {
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200/90 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-card)]">
-      <div
-        className="relative h-24 bg-gradient-to-br from-violet-200 via-fuchsia-100 to-amber-100 md:h-28"
-        aria-hidden
+      <img
+        src="/images/home/colleagues.jpg"
+        alt=""
+        className="h-24 w-full object-cover object-center md:h-28"
       />
       <div className="relative px-5 pb-5 pt-0 md:px-6 md:pb-6">
         <div className="-mt-10 flex justify-center md:-mt-11">
-          <div
-            className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-teal-600 to-emerald-700 text-xl font-bold text-white shadow-md ring-1 ring-slate-200/80 md:size-[5.5rem]"
-            aria-hidden
-          >
-            KV
-          </div>
+          <img
+            src="/images/home/portrait.jpg"
+            alt=""
+            className="size-20 rounded-full border-4 border-white object-cover object-top shadow-md ring-1 ring-slate-200/80 md:size-[5.5rem]"
+          />
         </div>
         <div className="mt-3 text-center">
-          <h3 className="text-base font-semibold text-slate-900">Karthik Venkat</h3>
+          <h3 className="text-base font-semibold text-slate-900">Divya Menon</h3>
           <p className="text-sm text-slate-600">Senior product designer · OMR corridor</p>
         </div>
         <div className="mt-3 flex justify-center gap-3" aria-label="Social links (sample)">
@@ -40,12 +40,12 @@ export default function ShowcaseProfileCard() {
           Build a profile candidates trust—skills, headline, and work samples in one place.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="aspect-[9/16] rounded-xl bg-gradient-to-b from-slate-200 to-slate-100 ring-1 ring-slate-200/80"
-              aria-hidden
-            />
+          {[
+            ["/images/home/interview.jpg", "An Indian woman and man working at a laptop"],
+            ["/images/home/job-search-desk.jpg", "An Indian professional working on a laptop"],
+            ["/images/home/freshers.jpg", "Indian college students studying together"],
+          ].map(([src, alt]) => (
+            <img key={src} src={src} alt={alt} className="aspect-[9/16] rounded-xl object-cover ring-1 ring-slate-200/80" />
           ))}
         </div>
       </div>

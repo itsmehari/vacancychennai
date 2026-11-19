@@ -50,7 +50,13 @@ export default function HomeEmployersMarketing() {
               ))}
             </ul>
           </div>
-          <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-slate-200/80 bg-white/95 p-6 shadow-sm lg:sticky lg:top-28">
+          <div className="flex flex-col gap-3 lg:sticky lg:top-28">
+            <img
+              src="/images/home/hiring-team.jpg"
+              alt="Two Indian colleagues reviewing work on a laptop"
+              className="h-44 w-full rounded-[var(--radius-md)] object-cover"
+            />
+            <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
             <p className="text-sm font-medium text-slate-500">Next step</p>
             <Link href="/pricing" className={btnPrimary} data-cta="employers-pricing">
               See employer pricing
@@ -58,6 +64,7 @@ export default function HomeEmployersMarketing() {
             <Link href="/employer/login" className={btnSecondary} data-cta="employers-login">
               Employer login
             </Link>
+            </div>
           </div>
         </div>
       </section>

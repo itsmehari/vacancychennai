@@ -44,6 +44,11 @@ export default function HomeCandidatesJoin() {
           title="How to join as a job seeker"
           description="Getting started is free. We focus on speed and clarity for Chennai workers."
         />
+        <img
+          src="/images/home/colleagues.jpg"
+          alt="Indian colleagues working together at a table"
+          className="h-52 w-full rounded-[var(--radius-lg)] object-cover"
+        />
         <ol className="grid gap-4 md:grid-cols-3">
           {steps.map((step, i) => (
             <li

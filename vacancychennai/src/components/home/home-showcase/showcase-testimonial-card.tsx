@@ -4,7 +4,7 @@ import { SHOWCASE_HREF } from "./showcase-ctas";
 
 export default function ShowcaseTestimonialCard() {
   return (
-    <article className="relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-3xl border border-orange-200/60 bg-gradient-to-br from-orange-100 via-amber-50 to-orange-50/90 shadow-[var(--shadow-card)] md:min-h-[320px]">
+    <article className="relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-3xl border border-amber-200/70 bg-gradient-to-br from-amber-50 via-white to-slate-50 shadow-[var(--shadow-card)] md:min-h-[320px]">
       <div className="flex flex-1 flex-col p-5 pb-0 md:p-6 md:pb-0">
         <div className="flex items-start justify-between gap-3 pr-24 md:pr-28">
           <div>
@@ -42,17 +42,16 @@ export default function ShowcaseTestimonialCard() {
         </div>
       </div>
       <div className="pointer-events-none absolute -right-2 top-4 w-[42%] max-w-[200px] md:right-2 md:top-6">
-        <div
-          className="relative flex aspect-[3/4] flex-col justify-end rounded-2xl border-2 border-white bg-gradient-to-b from-orange-600/85 to-slate-800 p-4 shadow-lg ring-1 ring-orange-200/50"
-          aria-hidden
-        >
-          <p className="text-xs font-semibold uppercase tracking-wide text-orange-100/90">
-            Verified hire
-          </p>
-          <p className="mt-2 text-lg font-bold text-white tabular-nums">Velachery</p>
-          <p className="mt-1 text-[11px] leading-snug text-orange-50/95">
-            Local shortlist • Chennai moderated
-          </p>
+        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-1 ring-amber-200/70">
+          <img
+            src="/images/home/interview.jpg"
+            alt="An Indian woman and man working together at a laptop"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">Verified hire</p>
+            <p className="mt-1 text-lg font-bold text-white">Velachery</p>
+          </div>
         </div>
       </div>
     </article>

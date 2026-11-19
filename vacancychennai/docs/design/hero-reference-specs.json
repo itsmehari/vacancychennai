@@ -1,0 +1,932 @@
+{
+  "specVersion": "1.0.0",
+  "purpose": "Layer-by-layer reconstruction brief for three marketing hero references. Every photo, blob, chip, squiggle, and type block is a separate element so the layout can be rebuilt without flattening the composition into one image.",
+  "coordinateSystem": {
+    "origin": "top-left of the named stage",
+    "units": "percent of that stage width (x, w) and height (y, h) unless a field says px",
+    "z": "paint order, low behind, high in front",
+    "positionsAreApproximate": true,
+    "note": "Percentages are visual estimates from the reference screenshots, precise enough to rebuild spacing, overlap, and stacking. They are not measured from a design file."
+  },
+  "assetRules": {
+    "photos": "Export people as PNG with a transparent background. Subject only. No backdrop, no blobs, no chips baked in. Soft natural edge, no harsh halo. 2x the on-screen size.",
+    "avatars": "Circular-crop source PNGs, transparent outside the circle, or a square photo masked in CSS to a circle.",
+    "shapes": "Prefer inline SVG for blobs, dots, squiggles, icons, and dashed orbits so they stay sharp. PNG only when the shape is a textured brush mark.",
+    "doNotBake": "Never composite the headline, buttons, name pills, or stat cards into the person PNG. Those stay HTML so copy and links can change.",
+    "copyright": "These records describe the references. Rebuild with original photography or illustration. Do not trace or reuse the people in the screenshots."
+  },
+  "heroes": [
+    {
+      "id": "adelfox",
+      "name": "Adelfox",
+      "sourceRole": "reference-1",
+      "mood": "Playful product launch. A white app window floats on a loud gradient mesh. A cut-out person overlaps abstract blobs, with chat chips and hand-drawn squiggles.",
+      "canvas": {
+        "aspect": "16 / 10",
+        "outerBackground": {
+          "type": "mesh-gradient",
+          "description": "Full-bleed abstract color fields, soft and slightly blurred, visible as a frame around the white window.",
+          "stops": [
+            { "region": "top-left", "color": "#FF3B6A", "note": "hot pink / coral" },
+            { "region": "mid-left", "color": "#FF5A2A", "note": "saturated orange-red" },
+            { "region": "bottom-left", "color": "#7C3AED", "note": "violet" },
+            { "region": "bottom-center", "color": "#C026D3", "note": "magenta" },
+            { "region": "top-right", "color": "#38BDF8", "note": "sky cyan" },
+            { "region": "mid-right", "color": "#2563EB", "note": "blue" },
+            { "region": "bottom-right", "color": "#FB7185", "note": "pink" }
+          ]
+        },
+        "stage": {
+          "id": "white-window",
+          "type": "panel",
+          "x": 3.5,
+          "y": 6,
+          "w": 93,
+          "h": 88,
+          "radiusPx": 28,
+          "fill": "#FFFFFF",
+          "shadow": "0 30px 80px rgba(30, 10, 60, 0.28)",
+          "overflow": "hidden on the panel, but the person and a few chips visually sit inside the padding, not outside the card"
+        }
+      },
+      "typography": {
+        "display": { "family": "geometric grotesque, extra bold", "weight": 800, "color": "#111827", "tracking": "-0.03em", "lineHeight": 0.95 },
+        "body": { "family": "same grotesque, regular", "weight": 400, "color": "#6B7280", "size": "15px", "lineHeight": 1.55 },
+        "nav": { "weight": 500, "color": "#374151", "size": "14px" },
+        "wordmark": { "weight": 700, "color": "#111827", "size": "18px" }
+      },
+      "elements": [
+        {
+          "id": "traffic-lights",
+          "kind": "chrome",
+          "z": 30,
+          "box": { "x": 2.2, "y": 3.2, "w": 7, "h": 2.2 },
+          "dots": [
+            { "color": "#FF5F57", "diameterPx": 10 },
+            { "color": "#FEBC2E", "diameterPx": 10 },
+            { "color": "#28C840", "diameterPx": 10 }
+          ],
+          "gapPx": 6
+        },
+        {
+          "id": "logo",
+          "kind": "brand",
+          "z": 30,
+          "box": { "x": 2.4, "y": 8.5, "w": 16, "h": 5 },
+          "mark": {
+            "type": "svg",
+            "description": "Stylized fox head, two pointed ears, face split blue left and lighter blue right",
+            "colors": ["#2563EB", "#60A5FA"],
+            "sizePx": 28
+          },
+          "word": "Adelfox"
+        },
+        {
+          "id": "nav",
+          "kind": "nav",
+          "z": 30,
+          "box": { "x": 22, "y": 9, "w": 36, "h": 4 },
+          "items": [
+            { "label": "Product", "caret": true },
+            { "label": "Community", "caret": true },
+            { "label": "Plans", "caret": false }
+          ],
+          "gap": "28px",
+          "color": "#4B5563"
+        },
+        {
+          "id": "login",
+          "kind": "text-link",
+          "z": 30,
+          "box": { "x": 78, "y": 9.2, "w": 6, "h": 3.5 },
+          "label": "Login",
+          "color": "#111827",
+          "weight": 600
+        },
+        {
+          "id": "signup",
+          "kind": "button",
+          "z": 30,
+          "box": { "x": 85.5, "y": 8.2, "w": 11, "h": 5 },
+          "label": "Sign Up",
+          "fill": "#111827",
+          "color": "#FFFFFF",
+          "radius": "999px",
+          "padding": "10px 18px",
+          "weight": 600,
+          "size": "14px"
+        },
+        {
+          "id": "eyebrow-pill",
+          "kind": "badge",
+          "z": 30,
+          "box": { "x": 6.5, "y": 24, "w": 18, "h": 4.2 },
+          "label": "ADELFOX.DESIGN",
+          "icon": { "type": "svg", "description": "tiny orange fox or asterisk", "color": "#F97316" },
+          "fill": "#FFFFFF",
+          "border": "1px solid #BBF7D0",
+          "color": "#166534",
+          "radius": "999px",
+          "tracking": "0.08em",
+          "size": "11px",
+          "weight": 700
+        },
+        {
+          "id": "headline",
+          "kind": "heading",
+          "z": 30,
+          "box": { "x": 6.2, "y": 30, "w": 38, "h": 28 },
+          "lines": ["Bring all", "your work", "together"],
+          "size": "clamp(40px, 4.6vw, 64px)",
+          "weight": 800,
+          "color": "#111827",
+          "lineHeight": 0.98,
+          "inlineMark": {
+            "id": "lightning",
+            "type": "svg-or-emoji",
+            "glyph": "lightning bolt",
+            "color": "#FACC15",
+            "size": "0.7em",
+            "placement": "immediately after the word together, same baseline"
+          }
+        },
+        {
+          "id": "subcopy",
+          "kind": "paragraph",
+          "z": 30,
+          "box": { "x": 6.5, "y": 60, "w": 30, "h": 8 },
+          "text": "A better experience for your attendees and less stress for your team.",
+          "color": "#9CA3AF",
+          "size": "15px",
+          "maxWidth": "280px"
+        },
+        {
+          "id": "primary-cta",
+          "kind": "button",
+          "z": 30,
+          "box": { "x": 6.5, "y": 71, "w": 18, "h": 6.5 },
+          "label": "Download for Free",
+          "fill": "#2563EB",
+          "color": "#FFFFFF",
+          "radius": "999px",
+          "padding": "12px 22px",
+          "shadow": "0 8px 20px rgba(37, 99, 235, 0.28)",
+          "weight": 600
+        },
+        {
+          "id": "scroll-cue",
+          "kind": "icon-button",
+          "z": 30,
+          "box": { "x": 6.8, "y": 90, "w": 4.2, "h": 6 },
+          "shape": "circle",
+          "diameterPx": 36,
+          "fill": "#F3F4F6",
+          "icon": "arrow down",
+          "iconColor": "#6B7280"
+        },
+        {
+          "id": "blob-green",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 8,
+          "box": { "x": 52, "y": 16, "w": 7, "h": 9 },
+          "shape": "circle",
+          "fill": "linear-gradient(160deg, #86EFAC, #4ADE80)",
+          "blur": "none"
+        },
+        {
+          "id": "blob-pink-red",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 6,
+          "box": { "x": 58, "y": 22, "w": 34, "h": 42 },
+          "shape": "rounded rectangle, top-right corner cut softer, slightly rotated -6deg",
+          "fill": "linear-gradient(200deg, #FB7185 0%, #F43F5E 55%, #E11D48 100%)",
+          "radius": "28px"
+        },
+        {
+          "id": "blob-purple",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 7,
+          "box": { "x": 62, "y": 38, "w": 28, "h": 48 },
+          "shape": "organic rounded blob, behind the person torso",
+          "fill": "linear-gradient(180deg, #C4B5FD, #8B5CF6)",
+          "radius": "40px"
+        },
+        {
+          "id": "blob-pink-quarter",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 12,
+          "box": { "x": 86, "y": 28, "w": 10, "h": 14 },
+          "shape": "quarter circle / pie slice, flat side toward the person",
+          "fill": "#F9A8D4"
+        },
+        {
+          "id": "triangle-orange",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 5,
+          "box": { "x": -1, "y": 48, "w": 6, "h": 8 },
+          "shape": "triangle, clipped by the left edge of the white stage",
+          "fill": "#FB923C",
+          "rotation": "-18deg"
+        },
+        {
+          "id": "dot-purple",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 14,
+          "box": { "x": 49, "y": 68, "w": 5.5, "h": 7 },
+          "shape": "circle",
+          "fill": "#A78BFA"
+        },
+        {
+          "id": "squiggle-top-right",
+          "kind": "doodle",
+          "asset": "svg",
+          "z": 16,
+          "box": { "x": 84, "y": 24, "w": 6, "h": 10 },
+          "stroke": "#111827",
+          "strokeWidth": 2,
+          "description": "loose hand-drawn spiral, two loops, thin"
+        },
+        {
+          "id": "squiggle-lower",
+          "kind": "doodle",
+          "asset": "svg",
+          "z": 16,
+          "box": { "x": 44, "y": 72, "w": 7, "h": 8 },
+          "stroke": "#111827",
+          "strokeWidth": 2.5,
+          "description": "three-loop spring / curl, sitting left of the person's hip"
+        },
+        {
+          "id": "person",
+          "kind": "cutout",
+          "asset": {
+            "format": "png",
+            "background": "transparent",
+            "file": "adelfox-person.png",
+            "exportPx": { "w": 900, "h": 1200 },
+            "display": "subject from mid-thigh up, feet cropped by the bottom of the white stage"
+          },
+          "z": 18,
+          "box": { "x": 52, "y": 16, "w": 36, "h": 84 },
+          "anchor": "bottom-center",
+          "subject": {
+            "pose": "standing, hands in jacket pockets, shoulders square, head turned about 20 degrees to her right (viewer's left), wide smile, teeth visible",
+            "wardrobe": "grey beanie with a small dark circular patch, black rectangular glasses, grey hoodie with hood up, open blue denim jacket, white hoodie drawstrings",
+            "hair": "auburn, visible at the sides under the hood",
+            "crop": "cut out at the jacket and hoodie silhouette. No background color inside the PNG.",
+            "lighting": "soft frontal daylight, slight cool cast"
+          }
+        },
+        {
+          "id": "chip-left",
+          "kind": "floating-card",
+          "z": 24,
+          "box": { "x": 40, "y": 40, "w": 22, "h": 7 },
+          "fill": "#FFFFFF",
+          "radius": "999px",
+          "shadow": "0 10px 24px rgba(15, 23, 42, 0.08)",
+          "parts": [
+            {
+              "id": "chip-left-avatar",
+              "asset": { "format": "png", "file": "adelfox-avatar-woman.png", "mask": "circle", "px": 64 },
+              "description": "small photo of a smiling woman, dark hair"
+            },
+            { "id": "chip-left-bar", "type": "placeholder-bars", "description": "two short grey rounded lines, like a name and a status" },
+            { "id": "chip-left-status", "type": "dot", "fill": "#22C55E", "diameterPx": 18, "icon": "white check or phone" }
+          ]
+        },
+        {
+          "id": "pill-mireya",
+          "kind": "name-pill",
+          "z": 26,
+          "box": { "x": 50, "y": 49, "w": 10, "h": 4.5 },
+          "label": "Mireya",
+          "fill": "#F97316",
+          "color": "#FFFFFF",
+          "radius": "999px",
+          "size": "13px",
+          "weight": 600,
+          "shadow": "0 6px 14px rgba(249, 115, 22, 0.35)"
+        },
+        {
+          "id": "chip-right",
+          "kind": "floating-card",
+          "z": 24,
+          "box": { "x": 74, "y": 58, "w": 22, "h": 8 },
+          "fill": "#FFFFFF",
+          "radius": "999px",
+          "shadow": "0 12px 28px rgba(15, 23, 42, 0.1)",
+          "parts": [
+            {
+              "id": "chip-right-avatar",
+              "asset": { "format": "png", "file": "adelfox-avatar-man.png", "mask": "circle", "px": 64 },
+              "description": "man with a beard, teal shirt"
+            },
+            { "id": "chip-right-track", "type": "progress", "track": "#E5E7EB", "fill": "#3B82F6", "width": "70%", "heightPx": 6, "radius": "999px" }
+          ]
+        },
+        {
+          "id": "pill-davin",
+          "kind": "name-pill",
+          "z": 26,
+          "box": { "x": 82, "y": 74, "w": 9, "h": 4.5 },
+          "label": "Davin",
+          "fill": "#7C3AED",
+          "color": "#FFFFFF",
+          "radius": "999px",
+          "size": "13px",
+          "weight": 600
+        }
+      ]
+    },
+    {
+      "id": "jobspot",
+      "name": "Jobspot",
+      "sourceRole": "reference-2",
+      "mood": "Job board. Quiet lavender page, bold left headline, search row, then a dark category strip. Right side is a cut-out person on a white cube, ringed by a thin orbit and two floating cards.",
+      "canvas": {
+        "aspect": "16 / 11",
+        "pageBackground": "#D1D5DB",
+        "note": "The screenshot sits on a grey artboard. The designed page itself is white header plus lavender hero plus a dark footer band.",
+        "regions": [
+          { "id": "header", "y": 0, "h": 11, "fill": "#FFFFFF" },
+          { "id": "hero", "y": 11, "h": 67, "fill": "#F4F1FB" },
+          { "id": "category-band", "y": 78, "h": 22, "fill": "#0B1020" }
+        ]
+      },
+      "typography": {
+        "display": { "family": "geometric grotesque, extra bold", "weight": 800, "color": "#1E1B4B", "tracking": "-0.035em", "lineHeight": 1.02 },
+        "body": { "color": "#6B7280", "size": "15px", "lineHeight": 1.6 },
+        "nav": { "size": "14px", "weight": 600, "color": "#1F2937" }
+      },
+      "elements": [
+        {
+          "id": "logo",
+          "kind": "brand",
+          "stage": "header",
+          "z": 30,
+          "box": { "x": 6, "y": 3.2, "w": 14, "h": 5 },
+          "mark": {
+            "type": "svg",
+            "description": "orange circle containing a white mark of three vertical bars, like a simplified person or signal",
+            "fill": "#F97316",
+            "diameterPx": 28
+          },
+          "word": "Jobspot",
+          "wordColor": "#111827",
+          "weight": 700
+        },
+        {
+          "id": "nav",
+          "kind": "nav",
+          "stage": "header",
+          "z": 30,
+          "box": { "x": 32, "y": 3.5, "w": 42, "h": 4 },
+          "align": "center",
+          "items": [
+            { "label": "Find Jobs", "active": true, "underline": "2px solid #F97316", "color": "#111827" },
+            { "label": "Career Resources", "caret": true },
+            { "label": "Company Profiles" },
+            { "label": "About" }
+          ]
+        },
+        {
+          "id": "upload-resume",
+          "kind": "button",
+          "stage": "header",
+          "z": 30,
+          "box": { "x": 78, "y": 2.6, "w": 16, "h": 5.5 },
+          "label": "Upload Resume",
+          "icon": { "type": "svg", "name": "upload", "placement": "end" },
+          "fill": "#4F46E5",
+          "color": "#FFFFFF",
+          "radius": "10px",
+          "weight": 600
+        },
+        {
+          "id": "wash-left",
+          "kind": "shape",
+          "asset": "css",
+          "stage": "hero",
+          "z": 1,
+          "box": { "x": 0, "y": 12, "w": 28, "h": 30 },
+          "shape": "soft radial",
+          "fill": "radial-gradient(circle, rgba(255,255,255,0.9), transparent 70%)"
+        },
+        {
+          "id": "headline",
+          "kind": "heading",
+          "stage": "hero",
+          "z": 20,
+          "box": { "x": 6, "y": 18, "w": 36, "h": 22 },
+          "lines": ["Get your", "dream Job", "Today"],
+          "size": "clamp(44px, 4.8vw, 68px)",
+          "weight": 800,
+          "color": "#1E1B4B",
+          "note": "Job is capitalized mid-sentence in the reference"
+        },
+        {
+          "id": "subcopy",
+          "kind": "paragraph",
+          "stage": "hero",
+          "z": 20,
+          "box": { "x": 6, "y": 42, "w": 32, "h": 8 },
+          "text": "Explore all the most exciting job roles based on your interest and study major.",
+          "color": "#6B7280",
+          "maxWidth": "360px"
+        },
+        {
+          "id": "search",
+          "kind": "search-bar",
+          "stage": "hero",
+          "z": 22,
+          "box": { "x": 6, "y": 52, "w": 42, "h": 8 },
+          "fill": "#FFFFFF",
+          "radius": "12px",
+          "border": "1px solid #E5E7EB",
+          "shadow": "0 8px 24px rgba(15, 23, 42, 0.04)",
+          "fields": [
+            { "label": "Location", "placeholder": "Enter location", "dividerAfter": true },
+            { "label": "Type", "placeholder": "Enter type of job" }
+          ],
+          "button": {
+            "label": "Search",
+            "icon": "magnifying glass",
+            "fill": "#F97316",
+            "color": "#FFFFFF",
+            "radius": "10px"
+          }
+        },
+        {
+          "id": "popular-label",
+          "kind": "heading",
+          "stage": "hero",
+          "z": 20,
+          "box": { "x": 6, "y": 66, "w": 24, "h": 6 },
+          "text": "Popular Category",
+          "size": "28px",
+          "weight": 800,
+          "color": "#1E1B4B",
+          "decoration": {
+            "id": "sparkles",
+            "type": "svg",
+            "description": "three small blue spark marks to the right of the word",
+            "color": "#60A5FA"
+          }
+        },
+        {
+          "id": "blob-cyan",
+          "kind": "shape",
+          "asset": "svg",
+          "stage": "hero",
+          "z": 4,
+          "box": { "x": 46, "y": 22, "w": 16, "h": 22 },
+          "shape": "circle",
+          "fill": "#7DD3FC"
+        },
+        {
+          "id": "blob-purple",
+          "kind": "shape",
+          "asset": "svg",
+          "stage": "hero",
+          "z": 4,
+          "box": { "x": 78, "y": 16, "w": 14, "h": 20 },
+          "shape": "vertical oval",
+          "fill": "#A855F7"
+        },
+        {
+          "id": "blob-yellow",
+          "kind": "shape",
+          "asset": "svg",
+          "stage": "hero",
+          "z": 4,
+          "box": { "x": 84, "y": 36, "w": 16, "h": 28 },
+          "shape": "circle, partly behind the stat card",
+          "fill": "#FACC15"
+        },
+        {
+          "id": "orbit",
+          "kind": "shape",
+          "asset": "svg",
+          "stage": "hero",
+          "z": 12,
+          "box": { "x": 44, "y": 28, "w": 48, "h": 36 },
+          "shape": "ellipse stroke, not filled",
+          "stroke": "#FFFFFF",
+          "strokeWidth": 3,
+          "description": "a thin white ring that passes behind the laptop and in front of the color blobs, circling the seated person"
+        },
+        {
+          "id": "cube",
+          "kind": "prop",
+          "asset": { "format": "png", "background": "transparent", "file": "jobspot-cube.png", "exportPx": { "w": 640, "h": 520 } },
+          "stage": "hero",
+          "z": 10,
+          "box": { "x": 58, "y": 48, "w": 22, "h": 28 },
+          "description": "matte white cube, three faces visible, soft shadow on the floor plane. Person sits on the top face. Can also be CSS 3D, but a PNG matches the reference lighting."
+        },
+        {
+          "id": "person",
+          "kind": "cutout",
+          "asset": {
+            "format": "png",
+            "background": "transparent",
+            "file": "jobspot-person.png",
+            "exportPx": { "w": 900, "h": 1100 }
+          },
+          "stage": "hero",
+          "z": 16,
+          "box": { "x": 50, "y": 14, "w": 32, "h": 62 },
+          "anchor": "bottom-center",
+          "subject": {
+            "pose": "seated on the cube, torso leaning slightly forward, both hands on a laptop, eyes on the screen",
+            "wardrobe": "black-rimmed glasses, short dark hair, light beard, white t-shirt, blue denim jacket, blue jeans, red sneakers with white laces and soles",
+            "prop": "silver laptop, open, angled toward the viewer. Export the laptop inside the person PNG so the hands stay attached.",
+            "crop": "full body, shoes included, nothing below the shoes"
+          }
+        },
+        {
+          "id": "job-card",
+          "kind": "floating-card",
+          "stage": "hero",
+          "z": 22,
+          "box": { "x": 40, "y": 24, "w": 20, "h": 12 },
+          "fill": "#FFFFFF",
+          "radius": "14px",
+          "shadow": "0 16px 40px rgba(15, 23, 42, 0.08)",
+          "parts": [
+            {
+              "id": "job-card-mark",
+              "type": "icon-tile",
+              "fill": "#4F46E5",
+              "radius": "10px",
+              "icon": "white headset or user mark"
+            },
+            { "id": "job-title", "text": "UI/UX designer", "weight": 700, "color": "#111827", "size": "14px" },
+            { "id": "job-company", "text": "Orlzon", "color": "#9CA3AF", "size": "12px" },
+            {
+              "id": "job-apply",
+              "type": "pill",
+              "label": "Apply",
+              "fill": "#FB923C",
+              "color": "#FFFFFF",
+              "radius": "999px",
+              "placement": "top-right of the card"
+            }
+          ]
+        },
+        {
+          "id": "stat-card",
+          "kind": "floating-card",
+          "stage": "hero",
+          "z": 22,
+          "box": { "x": 78, "y": 46, "w": 16, "h": 16 },
+          "fill": "#FFFFFF",
+          "radius": "16px",
+          "shadow": "0 16px 40px rgba(15, 23, 42, 0.08)",
+          "parts": [
+            { "id": "stat-value", "text": "50K+", "weight": 800, "size": "22px", "color": "#111827" },
+            { "id": "stat-icon", "type": "svg", "name": "briefcase", "color": "#111827", "placement": "right of 50K+" },
+            {
+              "id": "stat-bars",
+              "type": "bar-chart",
+              "bars": [
+                { "h": 40, "color": "#FB923C" },
+                { "h": 70, "color": "#6366F1" },
+                { "h": 55, "color": "#F97316" },
+                { "h": 90, "color": "#4F46E5" },
+                { "h": 48, "color": "#FB923C" }
+              ]
+            },
+            { "id": "stat-caption", "text": "People got hired", "color": "#9CA3AF", "size": "12px" }
+          ]
+        },
+        {
+          "id": "category-band",
+          "kind": "band",
+          "stage": "category-band",
+          "z": 5,
+          "box": { "x": 0, "y": 0, "w": 78, "h": 100 },
+          "fill": "#0B1020",
+          "items": [
+            { "icon": "megaphone", "label": "Marketer", "meta": "123 Job Offers" },
+            { "icon": "pen-square", "label": "Copywriter", "meta": "46 Job Offers" },
+            { "icon": "pen-nib", "label": "Designer", "meta": "349 Job Offers" },
+            { "icon": "headset", "label": "Anchor", "meta": "14 Job Offers" },
+            { "icon": "camera", "label": "Photographer", "meta": "181 Job Offers" }
+          ],
+          "iconColor": "#FFFFFF",
+          "labelColor": "#FFFFFF",
+          "metaColor": "#9CA3AF",
+          "layout": "five equal columns, icon above label above count"
+        },
+        {
+          "id": "explore-all",
+          "kind": "band",
+          "stage": "category-band",
+          "z": 6,
+          "box": { "x": 78, "y": 0, "w": 22, "h": 100 },
+          "fill": "#F97316",
+          "parts": [
+            { "id": "explore-arrow", "type": "circle-button", "fill": "#FFFFFF", "icon": "arrow up-right", "iconColor": "#F97316" },
+            { "id": "explore-label", "text": "EXPLORE ALL", "color": "#FFFFFF", "tracking": "0.12em", "weight": 700 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jobbbly",
+      "name": "Jobbbly",
+      "sourceRole": "reference-3",
+      "mood": "Soft product card on a grey page. Headline with one orange phrase, a filter row, a rising dashed sparkline, and a cut-out person inside a dotted orbit with status chips.",
+      "canvas": {
+        "aspect": "16 / 10",
+        "pageBackground": "#E7E9F2",
+        "stage": {
+          "id": "white-card",
+          "x": 4,
+          "y": 4,
+          "w": 92,
+          "h": 92,
+          "radiusPx": 28,
+          "fill": "#FFFFFF",
+          "shadow": "0 20px 50px rgba(15, 23, 42, 0.06)"
+        }
+      },
+      "typography": {
+        "display": { "family": "geometric grotesque, extra bold", "weight": 800, "color": "#111827", "tracking": "-0.03em", "lineHeight": 1.05 },
+        "accentPhrase": { "color": "#F97316" },
+        "body": { "color": "#6B7280", "size": "15px" },
+        "nav": { "size": "14px", "weight": 600, "color": "#374151" }
+      },
+      "elements": [
+        {
+          "id": "logo",
+          "kind": "brand",
+          "z": 30,
+          "box": { "x": 4, "y": 4.5, "w": 12, "h": 4 },
+          "word": "Jobbbly",
+          "treatment": "J is black. The double-b cluster carries an orange accent, rest of the word is near-black.",
+          "weight": 800
+        },
+        {
+          "id": "nav",
+          "kind": "nav",
+          "z": 30,
+          "box": { "x": 32, "y": 4.8, "w": 28, "h": 4 },
+          "align": "center",
+          "items": [
+            { "label": "Home", "active": true, "color": "#F97316", "underline": "2px solid #F97316" },
+            { "label": "About" },
+            { "label": "Contact Us" },
+            { "label": "Blog" }
+          ]
+        },
+        {
+          "id": "sign-in",
+          "kind": "text-link",
+          "z": 30,
+          "box": { "x": 74, "y": 5, "w": 6, "h": 3.5 },
+          "label": "Sign In",
+          "color": "#111827",
+          "weight": 600
+        },
+        {
+          "id": "sign-up",
+          "kind": "button",
+          "z": 30,
+          "box": { "x": 82, "y": 3.8, "w": 10, "h": 5 },
+          "label": "Sign Up",
+          "fill": "#2DD4BF",
+          "color": "#FFFFFF",
+          "radius": "10px",
+          "weight": 700
+        },
+        {
+          "id": "hero-well",
+          "kind": "panel",
+          "z": 2,
+          "box": { "x": 3, "y": 12, "w": 94, "h": 68 },
+          "fill": "#F7F7F8",
+          "radiusPx": 24,
+          "description": "inset grey field that holds the headline, filters, person, and orbit. Stats sit below it on the white card."
+        },
+        {
+          "id": "headline",
+          "kind": "heading",
+          "z": 20,
+          "box": { "x": 6, "y": 22, "w": 36, "h": 16 },
+          "lines": [
+            { "text": "It's Easy to Find" },
+            { "text": "Your Dream Job", "accentWords": ["Dream Job"] }
+          ],
+          "size": "clamp(36px, 3.6vw, 52px)",
+          "weight": 800,
+          "color": "#111827",
+          "accentColor": "#F97316"
+        },
+        {
+          "id": "subcopy",
+          "kind": "paragraph",
+          "z": 20,
+          "box": { "x": 6, "y": 40, "w": 32, "h": 7 },
+          "text": "Explore thousands of jobs in one place and get the job of your dream.",
+          "color": "#6B7280",
+          "maxWidth": "340px"
+        },
+        {
+          "id": "filters",
+          "kind": "filter-bar",
+          "z": 22,
+          "box": { "x": 6, "y": 50, "w": 40, "h": 9 },
+          "fill": "#FFFFFF",
+          "radius": "12px",
+          "shadow": "0 8px 24px rgba(15, 23, 42, 0.05)",
+          "fields": [
+            { "label": "Select Job type", "value": "UX/UI Designer", "caret": true },
+            { "label": "Location", "value": "CA, Los Angeles", "caret": true }
+          ],
+          "button": { "label": "Explore", "fill": "#F97316", "color": "#FFFFFF", "radius": "10px" }
+        },
+        {
+          "id": "sparkline",
+          "kind": "doodle",
+          "asset": "svg",
+          "z": 8,
+          "box": { "x": 6, "y": 64, "w": 28, "h": 12 },
+          "stroke": "#CBD5E1",
+          "strokeWidth": 2,
+          "dash": "4 6",
+          "description": "a dashed line that dips, rises, dips, then climbs to an arrow head pointing up-right",
+          "endCap": "arrow"
+        },
+        {
+          "id": "yellow-disc",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 6,
+          "box": { "x": 62, "y": 28, "w": 22, "h": 32 },
+          "shape": "circle",
+          "fill": "#FACC15",
+          "description": "sits behind the person's torso and laptop"
+        },
+        {
+          "id": "orbit",
+          "kind": "shape",
+          "asset": "svg",
+          "z": 7,
+          "box": { "x": 52, "y": 18, "w": 42, "h": 58 },
+          "shape": "ellipse",
+          "stroke": "#D1D5DB",
+          "strokeWidth": 2,
+          "dash": "2 7",
+          "fill": "none",
+          "description": "dotted orbit. Avatar chips sit on the ring."
+        },
+        {
+          "id": "person",
+          "kind": "cutout",
+          "asset": {
+            "format": "png",
+            "background": "transparent",
+            "file": "jobbbly-person.png",
+            "exportPx": { "w": 1000, "h": 1200 }
+          },
+          "z": 14,
+          "box": { "x": 48, "y": 16, "w": 34, "h": 58 },
+          "anchor": "bottom-center",
+          "subject": {
+            "pose": "standing, facing camera, smiling, right hand lifting the frame of her glasses, left hand supporting an open laptop",
+            "wardrobe": "long dark wavy hair, thin metal glasses, black-and-white striped t-shirt, light beige blazer, light trousers",
+            "prop": "silver laptop, screen toward the viewer, held in front of the torso. Include the laptop in the person PNG.",
+            "crop": "from head to about mid-thigh. The well crops the lower body."
+          }
+        },
+        {
+          "id": "node-applied",
+          "kind": "orbit-node",
+          "z": 24,
+          "box": { "x": 56, "y": 18, "w": 16, "h": 8 },
+          "avatar": { "file": "jobbbly-avatar-blonde.png", "mask": "circle", "px": 72, "description": "smiling person, blonde hair" },
+          "badge": { "icon": "check", "fill": "#22C55E", "placement": "bottom-right of avatar" },
+          "pill": { "label": "Applied", "fill": "#FFFFFF", "shadow": "0 8px 18px rgba(15,23,42,0.08)", "radius": "999px" }
+        },
+        {
+          "id": "node-company",
+          "kind": "orbit-node",
+          "z": 24,
+          "box": { "x": 82, "y": 28, "w": 14, "h": 14 },
+          "avatar": { "file": "jobbbly-avatar-woman-glasses.png", "mask": "circle", "px": 80, "description": "woman with glasses, light hair" },
+          "badge": { "icon": "star", "fill": "#F97316", "placement": "bottom-right of avatar" },
+          "pill": { "label": "Found a dream company", "fill": "#FFFFFF", "radius": "999px", "placement": "left of the avatar, vertically centered" }
+        },
+        {
+          "id": "node-apple",
+          "kind": "floating-card",
+          "z": 24,
+          "box": { "x": 74, "y": 44, "w": 18, "h": 8 },
+          "fill": "#FFFFFF",
+          "radius": "12px",
+          "shadow": "0 10px 24px rgba(15, 23, 42, 0.08)",
+          "parts": [
+            { "id": "apple-mark", "type": "icon-tile", "fill": "#111827", "radius": "8px", "icon": "apple logo, white" },
+            { "id": "apple-copy", "text": "Apple responded to your resume!", "weight": 600, "size": "13px", "color": "#111827" }
+          ]
+        },
+        {
+          "id": "node-programmer",
+          "kind": "orbit-node",
+          "z": 24,
+          "box": { "x": 78, "y": 58, "w": 16, "h": 8 },
+          "avatar": { "file": "jobbbly-avatar-man.png", "mask": "circle", "px": 72, "description": "man in a red shirt" },
+          "badge": { "icon": "check", "fill": "#22C55E" },
+          "pill": { "label": "Became a programmer", "fill": "#FFFFFF", "radius": "999px" }
+        },
+        {
+          "id": "invite-card",
+          "kind": "floating-card",
+          "z": 26,
+          "box": { "x": 46, "y": 58, "w": 18, "h": 12 },
+          "fill": "#FFFFFF",
+          "radius": "14px",
+          "shadow": "0 16px 36px rgba(15, 23, 42, 0.1)",
+          "parts": [
+            { "id": "google-mark", "type": "svg", "name": "google G", "sizePx": 22 },
+            { "id": "role", "text": "UX/UI designer", "weight": 700, "size": "14px" },
+            { "id": "company", "text": "Google", "color": "#6B7280", "size": "12px" },
+            { "id": "status", "text": "You were invited", "color": "#F97316", "size": "12px", "weight": 600 }
+          ]
+        },
+        {
+          "id": "stats",
+          "kind": "stat-row",
+          "z": 20,
+          "box": { "x": 6, "y": 84, "w": 88, "h": 12 },
+          "layout": "three groups, spread across the row",
+          "items": [
+            {
+              "iconTile": { "fill": "#FACC15", "radius": "12px", "icon": "briefcase", "iconColor": "#111827" },
+              "value": "50K +",
+              "label": "Job vacancy"
+            },
+            {
+              "iconTile": { "fill": "#22D3EE", "radius": "12px", "icon": "user", "iconColor": "#FFFFFF" },
+              "value": "20K +",
+              "label": "People Got Hired"
+            },
+            {
+              "iconTile": { "fill": "#F97316", "radius": "12px", "icon": "buildings", "iconColor": "#FFFFFF" },
+              "value": "2K +",
+              "label": "Companies"
+            }
+          ],
+          "valueWeight": 800,
+          "valueSize": "28px",
+          "labelColor": "#6B7280"
+        }
+      ]
+    }
+  ],
+  "assetManifest": [
+    { "file": "adelfox-person.png", "kind": "cutout", "hero": "adelfox", "px": "900x1200", "notes": "woman, hoodie and denim, transparent" },
+    { "file": "adelfox-avatar-woman.png", "kind": "avatar", "hero": "adelfox", "px": "128x128" },
+    { "file": "adelfox-avatar-man.png", "kind": "avatar", "hero": "adelfox", "px": "128x128" },
+    { "file": "jobspot-person.png", "kind": "cutout", "hero": "jobspot", "px": "900x1100", "notes": "seated man plus laptop, transparent, shoes included" },
+    { "file": "jobspot-cube.png", "kind": "prop", "hero": "jobspot", "px": "640x520", "notes": "white cube, transparent around the faces" },
+    { "file": "jobbbly-person.png", "kind": "cutout", "hero": "jobbbly", "px": "1000x1200", "notes": "woman plus laptop, transparent" },
+    { "file": "jobbbly-avatar-blonde.png", "kind": "avatar", "hero": "jobbbly", "px": "160x160" },
+    { "file": "jobbbly-avatar-woman-glasses.png", "kind": "avatar", "hero": "jobbbly", "px": "160x160" },
+    { "file": "jobbbly-avatar-man.png", "kind": "avatar", "hero": "jobbbly", "px": "160x160" }
+  ],
+  "svgNotPng": [
+    "logo marks",
+    "traffic lights",
+    "carets",
+    "lightning",
+    "squiggles",
+    "color blobs, discs, triangle, quarter circle",
+    "orbits and the dashed sparkline",
+    "bar chart",
+    "category icons",
+    "status checks, star, apple, google G",
+    "search, upload, and arrow icons"
+  ],
+  "sharedPatterns": {
+    "layout": "Copy column on the left, about 40 percent. Illustration column on the right, about 55 percent. They overlap in the middle where chips sit.",
+    "person": "Always a transparent PNG in front of flat color shapes, never a photo with its own background.",
+    "chips": "White surfaces, 12 to 16px radius or full pill, soft shadow, one line of strong text plus a quiet meta line.",
+    "accent": "One hot color does the work: blue on Adelfox, orange on Jobspot and Jobbbly. Everything else is ink, grey, or a pastel shape.",
+    "motionCandidates": [
+      "chips drift 6 to 10px on a slow loop, different delays",
+      "orbit dashes rotate very slowly",
+      "person does not move",
+      "headline fades up first, chips second"
+    ]
+  }
+}

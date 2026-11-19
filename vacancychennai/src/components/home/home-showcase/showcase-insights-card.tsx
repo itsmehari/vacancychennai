@@ -26,9 +26,10 @@ export default function ShowcaseInsightsCard() {
         <div className="absolute left-[6%] top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-800 ring-2 ring-blue-200/80">
           IT
         </div>
-        <div
-          className="absolute right-[6%] top-1/2 size-12 -translate-y-1/2 overflow-hidden rounded-full border-2 border-white bg-gradient-to-br from-rose-200 to-amber-100 shadow-md ring-1 ring-slate-200"
-          aria-hidden
+        <img
+          src="/images/home/portrait.jpg"
+          alt=""
+          className="absolute right-[6%] top-1/2 size-12 -translate-y-1/2 rounded-full border-2 border-white object-cover object-top shadow-md ring-1 ring-slate-200"
         />
         <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full bg-slate-100 px-3 py-1.5 text-center text-xs font-semibold text-slate-800 ring-1 ring-slate-200">
           4 positions

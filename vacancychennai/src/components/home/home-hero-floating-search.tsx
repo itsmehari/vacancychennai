@@ -8,6 +8,10 @@ import { focusRing, transitionFast } from "@/lib/ui";
 type Props = {
   categories: string[];
   locations: Location[];
+  /** Grouped white bar used inside the rotating hero scenes. */
+  variant?: "card" | "inline";
+  idPrefix?: string;
+  submitLabel?: string;
 };
 
 function areaSlug(area: string) {
@@ -18,7 +22,13 @@ const selectClass = `min-h-[48px] w-full cursor-pointer appearance-none rounded-
 
 const chevronWrap = "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500";
 
-export default function HomeHeroFloatingSearch({ categories, locations }: Props) {
+export default function HomeHeroFloatingSearch({
+  categories,
+  locations,
+  variant = "card",
+  idPrefix = "hero-find",
+  submitLabel = "See matching jobs",
+}: Props) {
   const router = useRouter();
   const [jobType, setJobType] = useState("");
   const [category, setCategory] = useState("");
@@ -34,6 +44,91 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
     router.push(`/jobs-in-chennai${qs ? `?${qs}` : ""}`);
   }
 
+  const jobTypeId = `${idPrefix}-job-type`;
+  const categoryId = `${idPrefix}-category`;
+  const locationId = `${idPrefix}-location`;
+
+  if (variant === "inline") {
+    const fieldClass = `min-h-[52px] w-full cursor-pointer appearance-none bg-transparent px-3 py-2 text-sm font-semibold text-slate-900 outline-none ${focusRing}`;
+    return (
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_16px_40px_-24px_rgb(15_23_42/0.35)] sm:flex-row sm:items-center"
+        data-hero-floating-search
+      >
+        <div className="relative min-w-0 flex-1">
+          <label htmlFor={locationId} className="sr-only">
+            Location
+          </label>
+          <select
+            id={locationId}
+            value={locationKey}
+            onChange={(ev) => setLocationKey(ev.target.value)}
+            className={fieldClass}
+            data-cta="hero-float-location"
+          >
+            <option value="">Area — all Chennai</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={areaSlug(loc.area)}>
+                {loc.area}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden />
+        <div className="relative min-w-0 flex-1">
+          <label htmlFor={jobTypeId} className="sr-only">
+            Job type
+          </label>
+          <select
+            id={jobTypeId}
+            value={jobType}
+            onChange={(ev) => setJobType(ev.target.value)}
+            className={fieldClass}
+            data-cta="hero-float-job-type"
+          >
+            <option value="">Job type — any</option>
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+            <option value="internship">Internship</option>
+            <option value="contract">Contract</option>
+            <option value="temporary">Temporary</option>
+          </select>
+        </div>
+        <div className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden />
+        <div className="relative min-w-0 flex-1">
+          <label htmlFor={categoryId} className="sr-only">
+            Category
+          </label>
+          <select
+            id={categoryId}
+            value={category}
+            onChange={(ev) => setCategory(ev.target.value)}
+            className={fieldClass}
+            data-cta="hero-float-category"
+          >
+            <option value="">Category — all</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="submit"
+          className={`inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-cta-amber)] px-5 text-sm font-semibold text-slate-950 hover:bg-[var(--color-cta-amber-hover)] ${focusRing} ${transitionFast}`}
+          data-cta="hero-float-search-submit"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.4} stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" />
+          </svg>
+          {submitLabel}
+        </button>
+      </form>
+    );
+  }
+
   return (
     <div
       className="rounded-[var(--radius-lg)] border border-slate-200/80 bg-white p-4 shadow-[0_20px_50px_-18px_rgb(15_23_42/0.28)] sm:p-5 md:p-5"
@@ -47,11 +142,11 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
         className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-stretch lg:flex-nowrap lg:gap-3"
       >
         <div className="relative min-w-0 flex-1 md:min-w-[140px]">
-          <label htmlFor="hero-find-job-type" className="sr-only">
+          <label htmlFor={jobTypeId} className="sr-only">
             Job type
           </label>
           <select
-            id="hero-find-job-type"
+            id={jobTypeId}
             value={jobType}
             onChange={(ev) => setJobType(ev.target.value)}
             className={selectClass}
@@ -72,11 +167,11 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
         </div>
 
         <div className="relative min-w-0 flex-1 md:min-w-[160px]">
-          <label htmlFor="hero-industry" className="sr-only">
+          <label htmlFor={categoryId} className="sr-only">
             Industry or category
           </label>
           <select
-            id="hero-industry"
+            id={categoryId}
             value={category}
             onChange={(ev) => setCategory(ev.target.value)}
             className={selectClass}
@@ -97,11 +192,11 @@ export default function HomeHeroFloatingSearch({ categories, locations }: Props)
         </div>
 
         <div className="relative min-w-0 flex-1 md:min-w-[160px]">
-          <label htmlFor="hero-location" className="sr-only">
+          <label htmlFor={locationId} className="sr-only">
             Location
           </label>
           <select
-            id="hero-location"
+            id={locationId}
             value={locationKey}
             onChange={(ev) => setLocationKey(ev.target.value)}
             className={selectClass}

@@ -6,6 +6,21 @@ import { btnPrimary, cardInteractive, transitionFast } from "@/lib/ui";
 
 type SegmentIconName = (typeof homeSegmentCards)[number]["icon"];
 
+const segmentPhotos: Record<string, { src: string; alt: string }> = {
+  "/freshers-jobs-chennai": {
+    src: "/images/home/freshers.jpg",
+    alt: "Indian college students studying together",
+  },
+  "/part-time-jobs-chennai": {
+    src: "/images/home/shift-work.jpg",
+    alt: "A shopkeeper in a sari at a store counter",
+  },
+  "/jobs-in-chennai": {
+    src: "/images/home/candidates-group.jpg",
+    alt: "Indian colleagues looking at a tablet together",
+  },
+};
+
 const accentStyles = {
   blue: {
     bar: "border-l-blue-500",
@@ -75,7 +90,11 @@ export default function HomeSegmentCards() {
                 key={item.href}
                 className={`group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-card)] ${a.bar} ${cardInteractive} motion-reduce:hover:translate-y-0`}
               >
-                <div className={`h-1 w-full bg-gradient-to-r ${a.top}`} aria-hidden />
+                <img
+                  src={segmentPhotos[item.href]?.src}
+                  alt={segmentPhotos[item.href]?.alt ?? ""}
+                  className="h-36 w-full object-cover"
+                />
                 <div className="flex flex-1 flex-col p-6 pt-5">
                   {item.badge ? (
                     <span className="mb-3 inline-flex w-fit rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
